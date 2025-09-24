@@ -340,7 +340,7 @@ class VariablesMapperTest {
 
         // Then
         assertNotNull(result);
-        assertInstanceOf(List<?>.class, result);
+        assertInstanceOf(List.class, result);
         var list = (List<?>) result;
         assertEquals(3, list.size());
     }
@@ -356,7 +356,7 @@ class VariablesMapperTest {
 
         // Then
         assertNotNull(result);
-        assertInstanceOf(Map<?, ?>.class, result);
+        assertInstanceOf(Map.class, result);
         var map = (Map<?, ?>) result;
         assertEquals("value", map.get("key"));
     }
@@ -397,7 +397,7 @@ class VariablesMapperTest {
 
         // Then
         assertNotNull(result);
-        assertInstanceOf(Map<?, ?>.class, result);
+        assertInstanceOf(Map.class, result);
     }
 
     @Test
