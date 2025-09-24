@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0wyg1ed" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_06ynf6y">
+    <bpmn:participant id="Participant_OrderPaymentProcess" name="Order Payment Process" processRef="OrderPaymentProcess" />
+  </bpmn:collaboration>
+  <bpmn:process id="OrderPaymentProcess" name="Order Payment Process" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_17lpfnx" sourceRef="OrderPaymentProcessStartEvent" targetRef="EventBasedGateway" />
+    <bpmn:sequenceFlow id="Flow_0xi9fgh" sourceRef="EventBasedGateway" targetRef="PaymentReceivedEvent" />
+    <bpmn:sequenceFlow id="Flow_1c2tw21" sourceRef="PaymentReceivedEvent" targetRef="PaymentTransaction" />
+    <bpmn:sequenceFlow id="Flow_1o16y6v" sourceRef="PaymentSuccessNotification" targetRef="OrderPaymentProcessEndEvent" />
+    <bpmn:startEvent id="OrderPaymentProcessStartEvent">
+      <bpmn:outgoing>Flow_17lpfnx</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_13umc9z" sourceRef="EventBasedGateway" targetRef="PaymentRejectedEvent" />
+    <bpmn:sequenceFlow id="Flow_0dl57z8" sourceRef="PaymentRejectedEvent" targetRef="PaymentRejectedNotification" />
+    <bpmn:sequenceFlow id="Flow_1ngk15j" sourceRef="PaymentRejectedNotification" targetRef="Event_1eemimy" />
+    <bpmn:intermediateCatchEvent id="PaymentRejectedEvent" name="Payment rejected event">
+      <bpmn:incoming>Flow_13umc9z</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dl57z8</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_1m4f6hg">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${paymentRejected==true}</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:eventBasedGateway id="EventBasedGateway">
+      <bpmn:incoming>Flow_17lpfnx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xi9fgh</bpmn:outgoing>
+      <bpmn:outgoing>Flow_13umc9z</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1mywpdi</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="PaymentReceivedEvent" name="Payment received event">
+      <bpmn:incoming>Flow_0xi9fgh</bpmn:incoming>
+      <bpmn:outgoing>Flow_1c2tw21</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1cyuuxj" messageRef="Message_0v5u26f" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:subProcess id="PaymentTransaction" name="Payment Transaction">
+      <bpmn:incoming>Flow_1c2tw21</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qcm1t3</bpmn:outgoing>
+      <bpmn:startEvent id="PaymentTransactionStartEvent">
+        <bpmn:outgoing>Flow_16egv9g</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_16egv9g" sourceRef="PaymentTransactionStartEvent" targetRef="Debit" />
+      <bpmn:sequenceFlow id="Flow_0316kci" sourceRef="Debit" targetRef="Deposit" />
+      <bpmn:endEvent id="PaymentTransactionEndEvent">
+        <bpmn:incoming>Flow_17os4pz</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_17os4pz" sourceRef="Deposit" targetRef="PaymentTransactionEndEvent" />
+      <bpmn:serviceTask id="Debit" name="Debit" camunda:type="external" camunda:topic="debit">
+        <bpmn:incoming>Flow_16egv9g</bpmn:incoming>
+        <bpmn:outgoing>Flow_0316kci</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="Deposit" name="Deposit" camunda:type="external" camunda:topic="deposit">
+        <bpmn:incoming>Flow_0316kci</bpmn:incoming>
+        <bpmn:outgoing>Flow_17os4pz</bpmn:outgoing>
+      </bpmn:serviceTask>
+    </bpmn:subProcess>
+    <bpmn:sendTask id="PaymentRejectedNotification" name="Payment rejected notification" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your payment rejected!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0dl57z8</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ngk15j</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="PaymentSuccessNotification" name="Payment success notification" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your payment accepted!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1bjravd</bpmn:incoming>
+      <bpmn:outgoing>Flow_1o16y6v</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="OrderPaymentProcessEndEvent">
+      <bpmn:incoming>Flow_1o16y6v</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="ExclusiveGateway" default="Flow_1bjravd">
+      <bpmn:incoming>Flow_0qcm1t3</bpmn:incoming>
+      <bpmn:outgoing>Flow_1bjravd</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0zuh9l8</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0qcm1t3" sourceRef="PaymentTransaction" targetRef="ExclusiveGateway" />
+    <bpmn:sequenceFlow id="Flow_1bjravd" sourceRef="ExclusiveGateway" targetRef="PaymentSuccessNotification" />
+    <bpmn:sequenceFlow id="Flow_0zuh9l8" sourceRef="ExclusiveGateway" targetRef="ErrorEndEvent">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentFailed == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="ErrorEndEvent">
+      <bpmn:incoming>Flow_0zuh9l8</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0nyanqb" errorRef="Error_0mh3cpl" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="Event_1eemimy">
+      <bpmn:incoming>Flow_1ngk15j</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1cwjm9h" errorRef="Error_1w9utw9" />
+    </bpmn:endEvent>
+    <bpmn:subProcess id="PaymentFailed" name="Payment Failed" triggeredByEvent="true">
+      <bpmn:startEvent id="PaymentFailedErrorStartEvent">
+        <bpmn:outgoing>Flow_011nxnu</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_00u4g4m" errorRef="Error_0mh3cpl" />
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_011nxnu" sourceRef="PaymentFailedErrorStartEvent" targetRef="PaymentFailedNotification" />
+      <bpmn:sequenceFlow id="Flow_1gzzr9s" sourceRef="PaymentFailedNotification" targetRef="PaymentFailedTerminateEndEvent" />
+      <bpmn:endEvent id="PaymentFailedTerminateEndEvent">
+        <bpmn:incoming>Flow_1gzzr9s</bpmn:incoming>
+        <bpmn:terminateEventDefinition id="TerminateEventDefinition_1cyfg0j" />
+      </bpmn:endEvent>
+      <bpmn:sendTask id="PaymentFailedNotification" name="Payment failed notification" camunda:type="external" camunda:topic="notification">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your payment failed!</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_011nxnu</bpmn:incoming>
+        <bpmn:outgoing>Flow_1gzzr9s</bpmn:outgoing>
+      </bpmn:sendTask>
+    </bpmn:subProcess>
+    <bpmn:intermediateCatchEvent id="Event_1iboswq">
+      <bpmn:incoming>Flow_1mywpdi</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hbadw0</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1pr6kq1" messageRef="Message_0i72i4h" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1mywpdi" sourceRef="EventBasedGateway" targetRef="Event_1iboswq" />
+    <bpmn:sequenceFlow id="Flow_0hbadw0" sourceRef="Event_1iboswq" targetRef="Event_1izsrul" />
+    <bpmn:endEvent id="Event_1izsrul">
+      <bpmn:incoming>Flow_0hbadw0</bpmn:incoming>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0d7gl3b" errorRef="Error_1ywjqwj" />
+    </bpmn:endEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_0v5u26f" name="PaymentReceived" />
+  <bpmn:error id="Error_0mh3cpl" name="PaymentFailed" errorCode="PAYMENT_FAILED" camunda:errorMessage="Hi, ${client.firstName} ${client.lastName}! Your payment failed!" />
+  <bpmn:error id="Error_1w9utw9" name="PaymentRejected" errorCode="PAYMENT_REJECTED" />
+  <bpmn:message id="Message_0i72i4h" name="PaymentTimeout" />
+  <bpmn:error id="Error_1ywjqwj" name="PaymentTimeout" errorCode="PAYMENT_TIMEOUT" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_06ynf6y">
+      <bpmndi:BPMNShape id="Participant_0e2tf51_di" bpmnElement="Participant_OrderPaymentProcess" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1660" height="810" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="OrderPaymentProcessStartEvent">
+        <dc:Bounds x="212" y="402" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0lp09h2_di" bpmnElement="PaymentRejectedEvent">
+        <dc:Bounds x="412" y="552" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="389" y="595" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0bl7vvk_di" bpmnElement="EventBasedGateway">
+        <dc:Bounds x="305" y="395" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_01xsyzp_di" bpmnElement="PaymentReceivedEvent">
+        <dc:Bounds x="412" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="386" y="265" width="89" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1iboswq_di" bpmnElement="Event_1iboswq">
+        <dc:Bounds x="412" y="402" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_13zrb6f_di" bpmnElement="Event_1izsrul">
+        <dc:Bounds x="512" y="402" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ylu3xd_di" bpmnElement="PaymentTransaction" isExpanded="true">
+        <dc:Bounds x="590" y="140" width="570" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0bhl0fa_di" bpmnElement="PaymentTransactionStartEvent">
+        <dc:Bounds x="630" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_16kxj3o_di" bpmnElement="PaymentTransactionEndEvent">
+        <dc:Bounds x="1042" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00sxtjs_di" bpmnElement="Debit">
+        <dc:Bounds x="720" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1mn65nk_di" bpmnElement="Deposit">
+        <dc:Bounds x="880" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_16egv9g_di" bpmnElement="Flow_16egv9g">
+        <di:waypoint x="666" y="240" />
+        <di:waypoint x="720" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0316kci_di" bpmnElement="Flow_0316kci">
+        <di:waypoint x="820" y="240" />
+        <di:waypoint x="880" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17os4pz_di" bpmnElement="Flow_17os4pz">
+        <di:waypoint x="980" y="240" />
+        <di:waypoint x="1042" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0vjopm5_di" bpmnElement="PaymentRejectedNotification">
+        <dc:Bounds x="590" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_09z5uyp_di" bpmnElement="PaymentSuccessNotification">
+        <dc:Bounds x="1500" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_15wwnb1_di" bpmnElement="OrderPaymentProcessEndEvent">
+        <dc:Bounds x="1692" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ku23yf_di" bpmnElement="ExclusiveGateway" isMarkerVisible="true">
+        <dc:Bounds x="1305" y="215" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hgjcz2_di" bpmnElement="ErrorEndEvent">
+        <dc:Bounds x="1512" y="332" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_07adzkm_di" bpmnElement="Event_1eemimy">
+        <dc:Bounds x="832" y="552" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oobenw_di" bpmnElement="PaymentFailed" isExpanded="true">
+        <dc:Bounds x="810" y="640" width="350" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1owh40q_di" bpmnElement="PaymentFailedErrorStartEvent">
+        <dc:Bounds x="850" y="722" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f4qkop_di" bpmnElement="PaymentFailedTerminateEndEvent">
+        <dc:Bounds x="1102" y="722" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_132yfep_di" bpmnElement="PaymentFailedNotification">
+        <dc:Bounds x="940" y="700" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_011nxnu_di" bpmnElement="Flow_011nxnu">
+        <di:waypoint x="886" y="740" />
+        <di:waypoint x="940" y="740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gzzr9s_di" bpmnElement="Flow_1gzzr9s">
+        <di:waypoint x="1040" y="740" />
+        <di:waypoint x="1102" y="740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17lpfnx_di" bpmnElement="Flow_17lpfnx">
+        <di:waypoint x="248" y="420" />
+        <di:waypoint x="305" y="420" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xi9fgh_di" bpmnElement="Flow_0xi9fgh">
+        <di:waypoint x="330" y="395" />
+        <di:waypoint x="330" y="240" />
+        <di:waypoint x="412" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1c2tw21_di" bpmnElement="Flow_1c2tw21">
+        <di:waypoint x="448" y="240" />
+        <di:waypoint x="590" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1o16y6v_di" bpmnElement="Flow_1o16y6v">
+        <di:waypoint x="1600" y="240" />
+        <di:waypoint x="1692" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13umc9z_di" bpmnElement="Flow_13umc9z">
+        <di:waypoint x="330" y="445" />
+        <di:waypoint x="330" y="570" />
+        <di:waypoint x="412" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dl57z8_di" bpmnElement="Flow_0dl57z8">
+        <di:waypoint x="448" y="570" />
+        <di:waypoint x="590" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ngk15j_di" bpmnElement="Flow_1ngk15j">
+        <di:waypoint x="690" y="570" />
+        <di:waypoint x="832" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qcm1t3_di" bpmnElement="Flow_0qcm1t3">
+        <di:waypoint x="1160" y="240" />
+        <di:waypoint x="1305" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bjravd_di" bpmnElement="Flow_1bjravd">
+        <di:waypoint x="1355" y="240" />
+        <di:waypoint x="1500" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zuh9l8_di" bpmnElement="Flow_0zuh9l8">
+        <di:waypoint x="1330" y="265" />
+        <di:waypoint x="1330" y="350" />
+        <di:waypoint x="1512" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mywpdi_di" bpmnElement="Flow_1mywpdi">
+        <di:waypoint x="355" y="420" />
+        <di:waypoint x="412" y="420" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hbadw0_di" bpmnElement="Flow_0hbadw0">
+        <di:waypoint x="448" y="420" />
+        <di:waypoint x="512" y="420" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
