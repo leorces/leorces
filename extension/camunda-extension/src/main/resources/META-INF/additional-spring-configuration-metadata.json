@@ -4,7 +4,7 @@
       "name": "leorces.extension.camunda.bpmn-path",
       "type": "java.lang.String",
       "defaultValue": "bpmn",
-      "description": "Path to the directory containing BPMN files for the Camunda V7 extension."
+      "description": "Path to the directory containing BPMN files for the Camunda extension."
     },
     {
       "name": "leorces.extension.camunda.processes",
@@ -16,7 +16,7 @@
     {
       "name": "leorces.extension.camunda",
       "type": "com.leorces.extension.camunda.configuration.properties.CamundaProperties",
-      "description": "Configuration properties for Camunda V7 extension."
+      "description": "Configuration properties for Camunda extension."
     },
     {
       "name": "leorces.extension.camunda.processes",
