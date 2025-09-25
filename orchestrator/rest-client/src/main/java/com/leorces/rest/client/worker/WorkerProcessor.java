@@ -1,6 +1,5 @@
 package com.leorces.rest.client.worker;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.rest.client.client.TaskRestClient;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ExecutorService;
-
 
 @Slf4j
 @Component

@@ -1,6 +1,5 @@
 package com.leorces.rest.client.service;
 
-
 import com.leorces.rest.client.client.TaskRestClient;
 import com.leorces.rest.client.model.Task;
 import lombok.AllArgsConstructor;
@@ -10,14 +9,12 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Map;
 
-
 @Slf4j
 @Service
 @AllArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
     private final TaskRestClient taskRestClient;
-
 
     @Override
     public boolean complete(Task task) {
@@ -60,5 +57,4 @@ public class TaskServiceImpl implements TaskService {
             return false;
         }
     }
-
 }

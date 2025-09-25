@@ -1,6 +1,5 @@
 package com.leorces.rest.client.worker;
 
-
 import com.leorces.rest.client.model.worker.WorkerContext;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
 
 @Component
 public class WorkerScheduler {

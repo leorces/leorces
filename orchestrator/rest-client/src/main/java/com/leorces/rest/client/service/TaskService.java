@@ -1,10 +1,8 @@
 package com.leorces.rest.client.service;
 
-
 import com.leorces.rest.client.model.Task;
 
 import java.util.Map;
-
 
 public interface TaskService {
 

@@ -100,5 +100,4 @@ public record Task(
                     variable.varKey(), clazz.getSimpleName(), variable.varValue()), e);
         }
     }
-
 }
