@@ -1,0 +1,10 @@
+{
+  "properties": [],
+  "groups": [
+    {
+      "name": "leorces.orchestrator.rest",
+      "type": "com.leorces.rest.configuration.OrchestratorRestAutoConfiguration",
+      "description": "Configuration properties for Orchestrator REST module."
+    }
+  ]
+}
