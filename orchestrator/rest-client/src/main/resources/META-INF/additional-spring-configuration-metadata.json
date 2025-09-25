@@ -1,0 +1,196 @@
+{
+  "groups": [
+    {
+      "name": "leorces.rest",
+      "type": "com.leorces.rest.client.configuration.properties.rest.RestClientProperties",
+      "description": "Configuration for orchestrator REST client"
+    },
+    {
+      "name": "leorces.resilence",
+      "type": "com.leorces.rest.client.configuration.properties.resilence.ResilenceConfigurationProperties",
+      "description": "Resilience configuration for REST client"
+    },
+    {
+      "name": "leorces.resilence.task-poll",
+      "type": "com.leorces.rest.client.configuration.properties.resilence.ResilenceProperties",
+      "description": "Resilience configuration for task-poll"
+    },
+    {
+      "name": "leorces.resilence.task-poll.circuit-breaker",
+      "type": "com.leorces.rest.client.configuration.properties.resilence.CircuitBreakerProperties",
+      "description": "Circuit breaker configuration for task-poll"
+    },
+    {
+      "name": "leorces.resilence.task-update",
+      "type": "com.leorces.rest.client.configuration.properties.resilence.ResilenceProperties",
+      "description": "Resilience configuration for task-update"
+    },
+    {
+      "name": "leorces.resilence.task-update.circuit-breaker",
+      "type": "com.leorces.rest.client.configuration.properties.resilence.CircuitBreakerProperties",
+      "description": "Circuit breaker configuration for task-update"
+    },
+    {
+      "name": "leorces.resilence.task-update.retry",
+      "type": "com.leorces.rest.client.configuration.properties.resilence.RetryProperties",
+      "description": "Retry configuration for task-update"
+    },
+    {
+      "name": "leorces.process",
+      "type": "com.leorces.rest.client.configuration.properties.process.ProcessConfigurationProperties",
+      "description": "Worker process configuration"
+    },
+    {
+      "name": "leorces.process.[name]",
+      "type": "com.leorces.rest.client.configuration.properties.process.WorkerProperties",
+      "description": "Worker group configuration"
+    },
+    {
+      "name": "leorces.process.[name].workers.[worker-name]",
+      "type": "com.leorces.rest.client.configuration.properties.process.WorkerConfigProperties",
+      "description": "Worker configuration details"
+    }
+  ],
+  "properties": [
+    {
+      "name": "leorces.rest.host",
+      "type": "java.lang.String",
+      "description": "Base URL for orchestrator REST client",
+      "defaultValue": "http://localhost:8080"
+    },
+    {
+      "name": "leorces.rest.connect-timeout",
+      "type": "java.time.Duration",
+      "description": "Connection timeout for REST client",
+      "defaultValue": "PT30S"
+    },
+    {
+      "name": "leorces.rest.read-timeout",
+      "type": "java.time.Duration",
+      "description": "Read timeout for REST client",
+      "defaultValue": "PT60S"
+    },
+    {
+      "name": "leorces.rest.write-timeout",
+      "type": "java.time.Duration",
+      "description": "Write timeout for REST client",
+      "defaultValue": "PT30S"
+    },
+    {
+      "name": "leorces.rest.max-connections",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of connections in the pool",
+      "defaultValue": 100
+    },
+    {
+      "name": "leorces.rest.max-connections-per-route",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of connections per route",
+      "defaultValue": 20
+    },
+    {
+      "name": "leorces.rest.keep-alive-timeout",
+      "type": "java.time.Duration",
+      "description": "Keep-alive timeout for connections",
+      "defaultValue": "PT2M"
+    },
+    {
+      "name": "leorces.rest.enable-retry-on-connection-failure",
+      "type": "java.lang.Boolean",
+      "description": "Enable retry on connection failure",
+      "defaultValue": true
+    },
+    {
+      "name": "leorces.resilence.task-poll.circuit-breaker.failure-rate-threshold",
+      "type": "java.lang.Float",
+      "description": "Failure rate threshold (%) for task-poll circuit breaker",
+      "defaultValue": 50.0
+    },
+    {
+      "name": "leorces.resilence.task-poll.circuit-breaker.wait-duration-in-open-state",
+      "type": "java.time.Duration",
+      "description": "Wait duration in open state for task-poll circuit breaker",
+      "defaultValue": "30s"
+    },
+    {
+      "name": "leorces.resilence.task-poll.circuit-breaker.sliding-window-size",
+      "type": "java.lang.Integer",
+      "description": "Sliding window size for task-poll circuit breaker",
+      "defaultValue": 10
+    },
+    {
+      "name": "leorces.resilence.task-poll.circuit-breaker.minimum-number-of-calls",
+      "type": "java.lang.Integer",
+      "description": "Minimum number of calls for task-poll circuit breaker",
+      "defaultValue": 5
+    },
+    {
+      "name": "leorces.resilence.task-poll.circuit-breaker.permitted-number-of-calls-in-half-open-state",
+      "type": "java.lang.Integer",
+      "description": "Permitted number of calls in half-open state for task-poll circuit breaker",
+      "defaultValue": 3
+    },
+    {
+      "name": "leorces.resilence.task-update.circuit-breaker.failure-rate-threshold",
+      "type": "java.lang.Float",
+      "description": "Failure rate threshold (%) for task-update circuit breaker",
+      "defaultValue": 50.0
+    },
+    {
+      "name": "leorces.resilence.task-update.circuit-breaker.wait-duration-in-open-state",
+      "type": "java.time.Duration",
+      "description": "Wait duration in open state for task-update circuit breaker",
+      "defaultValue": "30s"
+    },
+    {
+      "name": "leorces.resilence.task-update.circuit-breaker.sliding-window-size",
+      "type": "java.lang.Integer",
+      "description": "Sliding window size for task-update circuit breaker",
+      "defaultValue": 10
+    },
+    {
+      "name": "leorces.resilence.task-update.circuit-breaker.minimum-number-of-calls",
+      "type": "java.lang.Integer",
+      "description": "Minimum number of calls for task-update circuit breaker",
+      "defaultValue": 5
+    },
+    {
+      "name": "leorces.resilence.task-update.circuit-breaker.permitted-number-of-calls-in-half-open-state",
+      "type": "java.lang.Integer",
+      "description": "Permitted number of calls in half-open state for task-update circuit breaker",
+      "defaultValue": 3
+    },
+    {
+      "name": "leorces.resilence.task-update.retry.max-attempts",
+      "type": "java.lang.Integer",
+      "description": "Max retry attempts for task-update",
+      "defaultValue": 3
+    },
+    {
+      "name": "leorces.resilence.task-update.retry.wait-duration",
+      "type": "java.time.Duration",
+      "description": "Wait duration between retries for task-update",
+      "defaultValue": "1s"
+    },
+    {
+      "name": "leorces.process.[name].workers.[worker-name].interval",
+      "type": "java.lang.Long",
+      "description": "Worker execution interval"
+    },
+    {
+      "name": "leorces.process.[name].workers.[worker-name].time-unit",
+      "type": "java.util.concurrent.TimeUnit",
+      "description": "Time unit for worker interval"
+    },
+    {
+      "name": "leorces.process.[name].workers.[worker-name].initial-delay",
+      "type": "java.lang.Long",
+      "description": "Initial delay before worker starts"
+    },
+    {
+      "name": "leorces.process.[name].workers.[worker-name].max-concurrent-tasks",
+      "type": "java.lang.Integer",
+      "description": "Maximum number of concurrent tasks handled by this worker"
+    }
+  ]
+}
