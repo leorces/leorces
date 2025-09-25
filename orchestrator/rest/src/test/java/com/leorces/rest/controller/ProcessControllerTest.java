@@ -13,7 +13,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -116,7 +115,7 @@ class ProcessControllerTest {
         when(processService.findById(TEST_PROCESS_ID)).thenReturn(Optional.of(expectedProcess));
 
         // When
-        ResponseEntity<ProcessExecution> result = subject.findById(TEST_PROCESS_ID);
+        var result = subject.findById(TEST_PROCESS_ID);
 
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -131,7 +130,7 @@ class ProcessControllerTest {
         when(processService.findById(TEST_PROCESS_ID)).thenReturn(Optional.empty());
 
         // When
-        ResponseEntity<ProcessExecution> result = subject.findById(TEST_PROCESS_ID);
+        var result = subject.findById(TEST_PROCESS_ID);
 
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);

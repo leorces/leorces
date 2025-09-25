@@ -1,11 +1,9 @@
 package com.leorces.rest.controller;
 
-import com.leorces.rest.model.response.ErrorResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -45,7 +43,7 @@ class RestControllerAdviceTest {
         when(mockBindingResult.getAllErrors()).thenReturn(List.of(fieldError));
 
         // When
-        ResponseEntity<ErrorResponse> response = subject.handleValidationExceptions(mockException);
+        var response = subject.handleValidationExceptions(mockException);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -73,7 +71,7 @@ class RestControllerAdviceTest {
         when(mockBindingResult.getAllErrors()).thenReturn(List.of(fieldError1, fieldError2));
 
         // When
-        ResponseEntity<ErrorResponse> response = subject.handleValidationExceptions(mockException);
+        var response = subject.handleValidationExceptions(mockException);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -92,7 +90,7 @@ class RestControllerAdviceTest {
         var exception = new IllegalArgumentException(ILLEGAL_ARGUMENT_MESSAGE);
 
         // When
-        ResponseEntity<ErrorResponse> response = subject.handleIllegalArgumentException(exception);
+        var response = subject.handleIllegalArgumentException(exception);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -113,7 +111,7 @@ class RestControllerAdviceTest {
         var exception = new RuntimeException(GENERIC_EXCEPTION_MESSAGE);
 
         // When
-        ResponseEntity<ErrorResponse> response = subject.handleGenericException(exception);
+        var response = subject.handleGenericException(exception);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -138,7 +136,7 @@ class RestControllerAdviceTest {
         when(mockBindingResult.getAllErrors()).thenReturn(List.of());
 
         // When
-        ResponseEntity<ErrorResponse> response = subject.handleValidationExceptions(mockException);
+        var response = subject.handleValidationExceptions(mockException);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -155,7 +153,7 @@ class RestControllerAdviceTest {
         var exception = new IllegalArgumentException((String) null);
 
         // When
-        ResponseEntity<ErrorResponse> response = subject.handleIllegalArgumentException(exception);
+        var response = subject.handleIllegalArgumentException(exception);
 
         // Then
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

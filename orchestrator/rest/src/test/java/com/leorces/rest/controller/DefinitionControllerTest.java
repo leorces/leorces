@@ -12,7 +12,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -170,7 +169,7 @@ class DefinitionControllerTest {
         when(definitionService.findById(TEST_DEFINITION_ID)).thenReturn(Optional.of(expectedDefinition));
 
         // When
-        ResponseEntity<ProcessDefinition> result = subject.findById(TEST_DEFINITION_ID);
+        var result = subject.findById(TEST_DEFINITION_ID);
 
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -185,7 +184,7 @@ class DefinitionControllerTest {
         when(definitionService.findById(TEST_DEFINITION_ID)).thenReturn(Optional.empty());
 
         // When
-        ResponseEntity<ProcessDefinition> result = subject.findById(TEST_DEFINITION_ID);
+        var result = subject.findById(TEST_DEFINITION_ID);
 
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -277,7 +276,7 @@ class DefinitionControllerTest {
         when(definitionService.findById(emptyId)).thenReturn(Optional.empty());
 
         // When
-        ResponseEntity<ProcessDefinition> result = subject.findById(emptyId);
+        var result = subject.findById(emptyId);
 
         // Then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
