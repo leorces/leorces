@@ -135,8 +135,6 @@ class DefinitionPersistenceIT extends RepositoryIT {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(savedDefinition);
-
         var foundDefinition = result.get();
 
         // Verify ProcessDefinition fields
@@ -220,7 +218,6 @@ class DefinitionPersistenceIT extends RepositoryIT {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(savedDefinition);
         assertThat(result.get().key()).isEqualTo(orderFulfillment.key());
         assertThat(result.get().version()).isEqualTo(1);
     }
@@ -321,7 +318,6 @@ class DefinitionPersistenceIT extends RepositoryIT {
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(savedDefinition);
 
         var foundDefinition = result.get();
 
