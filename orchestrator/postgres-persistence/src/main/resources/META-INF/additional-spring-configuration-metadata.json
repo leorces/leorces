@@ -1,0 +1,10 @@
+{
+  "properties": [],
+  "groups": [
+    {
+      "name": "leorces.persistence.postgres",
+      "type": "com.leorces.persistence.postgres.configuration.PostgresPersistenceAutoConfiguration",
+      "description": "Configuration properties for Postgres Persistence module."
+    }
+  ]
+}
