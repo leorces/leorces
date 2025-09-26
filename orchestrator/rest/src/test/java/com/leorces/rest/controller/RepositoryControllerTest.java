@@ -84,4 +84,5 @@ class RepositoryControllerTest {
             verify(repositoryService).doCompaction();
         }
     }
+
 }

@@ -111,4 +111,5 @@ class Camunda7ExtensionServiceTest {
         // Then - Should process successfully
         assertThat(true).isTrue();
     }
+
 }

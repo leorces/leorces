@@ -432,5 +432,7 @@ class ActivityDefinitionTest {
         public Map<String, Object> outputs() {
             return Map.of("output1", "result1");
         }
+
     }
+
 }

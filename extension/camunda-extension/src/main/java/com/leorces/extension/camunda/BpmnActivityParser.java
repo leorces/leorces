@@ -25,4 +25,5 @@ public class BpmnActivityParser {
                 .flatMap(strategy -> strategy.extract(processElement, parentId, processId).stream())
                 .collect(Collectors.toCollection(ArrayList::new));
     }
+
 }

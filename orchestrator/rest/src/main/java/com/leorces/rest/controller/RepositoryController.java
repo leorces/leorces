@@ -37,4 +37,5 @@ public class RepositoryController {
         repositoryService.doCompaction();
         return ResponseEntity.noContent().build();
     }
+
 }

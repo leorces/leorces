@@ -295,4 +295,5 @@ class ParallelGatewayTest {
         assertTrue(parallelGateway.incoming().isEmpty());
         assertTrue(parallelGateway.outgoing().isEmpty());
     }
+
 }

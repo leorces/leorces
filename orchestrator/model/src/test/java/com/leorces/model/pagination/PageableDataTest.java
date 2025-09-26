@@ -139,4 +139,5 @@ class PageableDataTest {
         assertEquals(TEST_DATA, pageableData.data());
         assertEquals(negativeTotal, pageableData.total());
     }
+
 }

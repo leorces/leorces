@@ -65,4 +65,5 @@ public class ExclusiveGatewayExtractor implements ActivityExtractionStrategy {
         }
         return result;
     }
+
 }

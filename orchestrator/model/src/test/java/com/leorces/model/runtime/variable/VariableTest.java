@@ -220,4 +220,5 @@ class VariableTest {
         assertEquals("stringValue", stringVar.varValue());
         assertEquals("42", intVar.varValue());
     }
+
 }

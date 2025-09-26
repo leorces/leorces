@@ -98,4 +98,5 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
     private String getStringOrNull(String value) {
         return value.isEmpty() ? null : value;
     }
+
 }

@@ -272,4 +272,5 @@ class TaskRestClientTest {
         assertNotNull(result.getBody());
         assertTrue(result.getBody().isEmpty());
     }
+
 }

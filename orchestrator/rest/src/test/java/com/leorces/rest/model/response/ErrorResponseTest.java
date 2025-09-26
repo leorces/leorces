@@ -262,4 +262,5 @@ class ErrorResponseTest {
         // Then
         assertThat(errorResponse.timestamp()).isEqualToIgnoringNanos(currentTime);
     }
+
 }

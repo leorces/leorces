@@ -138,4 +138,5 @@ class BpmnFileReaderTest {
 
         assertThat(filenames).anyMatch(name -> name != null && name.contains(".bpmn"));
     }
+
 }

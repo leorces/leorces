@@ -256,4 +256,5 @@ class ActivityClientTest {
                 .completedAt(null)
                 .build();
     }
+
 }

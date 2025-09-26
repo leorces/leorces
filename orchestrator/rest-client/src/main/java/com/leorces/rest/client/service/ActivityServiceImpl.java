@@ -56,4 +56,5 @@ public class ActivityServiceImpl implements ActivityService {
     public List<Activity> poll(String topic, String processDefinitionKey, int limit) {
         return activityClient.poll(processDefinitionKey, topic, limit);
     }
+
 }

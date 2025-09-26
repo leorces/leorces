@@ -310,4 +310,5 @@ class EndEventTest {
         assertEquals(ActivityType.END_EVENT, normalEndEvent.type());
         assertEquals(ActivityType.END_EVENT, multiPathEndEvent.type());
     }
+
 }

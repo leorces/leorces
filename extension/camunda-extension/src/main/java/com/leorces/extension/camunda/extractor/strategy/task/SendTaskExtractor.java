@@ -63,4 +63,5 @@ public class SendTaskExtractor implements ActivityExtractionStrategy {
         }
         return processProperties.taskRetries();
     }
+
 }

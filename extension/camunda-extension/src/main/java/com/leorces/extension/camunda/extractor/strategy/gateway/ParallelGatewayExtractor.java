@@ -32,4 +32,5 @@ public class ParallelGatewayExtractor implements ActivityExtractionStrategy {
                 .outgoing(helper.extractOutgoing(element))
                 .build();
     }
+
 }

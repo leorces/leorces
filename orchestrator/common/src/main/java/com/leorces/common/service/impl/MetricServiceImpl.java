@@ -124,5 +124,7 @@ public class MetricServiceImpl implements MetricService {
         public void stop(String name, Map<String, String> labels) {
             // No-op when metrics are disabled
         }
+
     }
+
 }

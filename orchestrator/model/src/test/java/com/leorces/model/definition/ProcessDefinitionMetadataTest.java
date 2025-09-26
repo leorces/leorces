@@ -175,4 +175,5 @@ class ProcessDefinitionMetadataTest {
         assertEquals(bpmnSchema2, metadata2.schema());
         assertNotEquals(metadata1, metadata2);
     }
+
 }

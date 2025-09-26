@@ -158,4 +158,5 @@ class HistoryClientTest {
     private Pageable createTestPageable() {
         return new Pageable(0L, 10, "test-filter", "test-state");
     }
+
 }

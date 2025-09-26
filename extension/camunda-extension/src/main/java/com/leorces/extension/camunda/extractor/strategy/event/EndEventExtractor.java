@@ -74,4 +74,5 @@ public class EndEventExtractor implements ActivityExtractionStrategy {
                 .outgoing(helper.extractOutgoing(element))
                 .build();
     }
+
 }

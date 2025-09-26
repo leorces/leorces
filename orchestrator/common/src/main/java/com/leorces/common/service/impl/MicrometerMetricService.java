@@ -176,5 +176,7 @@ public class MicrometerMetricService implements MetricService {
             labels.forEach(builder::tag);
             sample.stop(builder.register(meterRegistry));
         }
+
     }
+
 }

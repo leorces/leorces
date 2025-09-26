@@ -41,4 +41,5 @@ public class WorkerState {
         var requiredInterval = currentBackoffInterval.get() > 0 ? currentBackoffInterval.get() : baseInterval;
         return timeSinceLastPoll >= requiredInterval;
     }
+
 }

@@ -58,4 +58,5 @@ class JuelConfigurationTest {
         // Then
         assertEquals("Hello World", result);
     }
+
 }

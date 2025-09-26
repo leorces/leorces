@@ -36,4 +36,5 @@ public class WorkerConfigResolver {
                 workerConfig != null ? workerConfig.timeUnit() : annotation.timeUnit()
         );
     }
+
 }

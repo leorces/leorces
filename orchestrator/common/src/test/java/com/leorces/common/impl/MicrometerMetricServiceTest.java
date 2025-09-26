@@ -254,4 +254,5 @@ class MicrometerMetricServiceTest {
         MicrometerMetricServiceTest.TEST_LABELS.forEach(meterBuilder::tag);
         return meterBuilder.timer();
     }
+
 }

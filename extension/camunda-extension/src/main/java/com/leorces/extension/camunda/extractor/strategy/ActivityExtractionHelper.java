@@ -73,4 +73,5 @@ public class ActivityExtractionHelper {
     public String getName(Element element) {
         return element.getAttribute("name");
     }
+
 }

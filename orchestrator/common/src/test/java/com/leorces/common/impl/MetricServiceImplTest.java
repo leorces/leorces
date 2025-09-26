@@ -315,4 +315,5 @@ class MetricServiceImplTest {
         timerSample.stop(METRIC_NAME);
         timerSample.stop(METRIC_NAME, TEST_LABELS);
     }
+
 }

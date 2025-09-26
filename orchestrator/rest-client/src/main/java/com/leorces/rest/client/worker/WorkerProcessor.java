@@ -126,4 +126,5 @@ public class WorkerProcessor {
             log.debug("Task '{}' finished. Worker '{}' remaining activeTasks={}/{}", task.id(), topic, remaining, state.maxCapacity);
         }
     }
+
 }

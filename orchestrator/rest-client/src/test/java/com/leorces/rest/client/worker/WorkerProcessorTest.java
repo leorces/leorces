@@ -204,4 +204,5 @@ class WorkerProcessorTest {
         when(task.id()).thenReturn(id);
         return task;
     }
+
 }

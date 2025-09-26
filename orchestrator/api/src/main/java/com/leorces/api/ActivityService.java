@@ -17,7 +17,7 @@ public interface ActivityService {
      * Runs an activity with the specified activity definition ID within a process.
      *
      * @param definitionId the unique identifier of the activity definition to run
-     * @param processId           the unique identifier of the process instance
+     * @param processId    the unique identifier of the process instance
      */
     void run(String definitionId, String processId);
 

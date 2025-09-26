@@ -60,4 +60,5 @@ public class BpmnDocumentParser {
         factory.setNamespaceAware(true);
         return factory;
     }
+
 }

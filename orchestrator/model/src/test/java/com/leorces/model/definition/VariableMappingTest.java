@@ -180,4 +180,5 @@ class VariableMappingTest {
         assertTrue(toStringResult.contains(TEST_TARGET));
         assertTrue(toStringResult.contains(String.valueOf(TEST_LOCAL)));
     }
+
 }

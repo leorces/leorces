@@ -1136,4 +1136,5 @@ class BpmnParserTest {
         // Verify total number of activities matches expected count
         assertThat(processDefinition.activities()).hasSize(14);
     }
+
 }

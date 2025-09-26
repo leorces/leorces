@@ -32,4 +32,5 @@ public class EventBasedGatewayExtractor implements ActivityExtractionStrategy {
                 .outgoing(helper.extractOutgoing(element))
                 .build();
     }
+
 }

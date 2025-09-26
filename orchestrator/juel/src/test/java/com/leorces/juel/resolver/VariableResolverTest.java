@@ -296,4 +296,5 @@ class VariableResolverTest {
         //Then
         assertThat(result).isEqualTo("Value: John, ID: ID123");
     }
+
 }

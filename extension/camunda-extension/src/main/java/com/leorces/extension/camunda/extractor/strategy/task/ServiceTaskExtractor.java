@@ -64,4 +64,5 @@ public class ServiceTaskExtractor implements ActivityExtractionStrategy {
         }
         return processProperties.taskRetries();
     }
+
 }

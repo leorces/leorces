@@ -18,4 +18,5 @@ public class HistoryServiceImpl implements HistoryService {
     public PageableData<ProcessExecution> findAll(Pageable pageable) {
         return historyClient.findAll(pageable);
     }
+
 }

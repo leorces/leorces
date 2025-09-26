@@ -165,4 +165,5 @@ class RestControllerAdviceTest {
         assertThat(errorResponse.status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(errorResponse.validationErrors()).isNull();
     }
+
 }

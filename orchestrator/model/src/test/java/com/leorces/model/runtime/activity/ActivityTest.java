@@ -288,4 +288,5 @@ class ActivityTest {
         assertEquals(now, activity.startedAt());
         assertEquals(now, activity.completedAt());
     }
+
 }

@@ -151,4 +151,5 @@ class ErrorItemTest {
         assertEquals(emptyErrorCode, errorItem.errorCode());
         assertEquals(emptyMessage, errorItem.message());
     }
+
 }

@@ -68,5 +68,7 @@ class RestClientAutoConfigurationTest {
         public MeterRegistry meterRegistry() {
             return new SimpleMeterRegistry();
         }
+
     }
+
 }

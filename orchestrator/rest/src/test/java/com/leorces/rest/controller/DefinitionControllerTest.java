@@ -295,4 +295,5 @@ class DefinitionControllerTest {
         var testDefinition = createTestProcessDefinition();
         return new PageableData<>(List.of(testDefinition), 1L);
     }
+
 }

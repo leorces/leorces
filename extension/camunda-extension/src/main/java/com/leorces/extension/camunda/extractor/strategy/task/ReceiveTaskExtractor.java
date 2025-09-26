@@ -38,4 +38,5 @@ public class ReceiveTaskExtractor implements ActivityExtractionStrategy {
                 .outputs(helper.extractOutputParameters(element))
                 .build();
     }
+
 }

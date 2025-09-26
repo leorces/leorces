@@ -266,4 +266,5 @@ class TerminateEndEventTest {
         assertTrue(activityDefinition.inputs().isEmpty());
         assertTrue(activityDefinition.outputs().isEmpty());
     }
+
 }

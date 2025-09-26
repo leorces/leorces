@@ -126,4 +126,5 @@ class RepositoryClientTest {
         assertThrows(ResourceAccessException.class,
                 () -> repositoryClient.doCompaction());
     }
+
 }

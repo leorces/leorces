@@ -55,4 +55,5 @@ public class IntermediateCatchEventExtractor implements ActivityExtractionStrate
                 .outputs(helper.extractOutputParameters(element))
                 .build();
     }
+
 }

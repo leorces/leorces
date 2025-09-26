@@ -182,4 +182,5 @@ class ExternalTaskTest {
         assertNull(externalTask.inputs());
         assertNull(externalTask.outputs());
     }
+
 }

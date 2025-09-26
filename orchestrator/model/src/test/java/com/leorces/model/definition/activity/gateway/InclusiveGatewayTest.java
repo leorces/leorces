@@ -154,4 +154,5 @@ class InclusiveGatewayTest {
         assertEquals(TEST_ID, inclusiveGateway.id());
         assertNull(inclusiveGateway.condition());
     }
+
 }

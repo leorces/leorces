@@ -214,4 +214,5 @@ class ActivityControllerTest {
     private List<Activity> createTestActivities() {
         return List.of();
     }
+
 }

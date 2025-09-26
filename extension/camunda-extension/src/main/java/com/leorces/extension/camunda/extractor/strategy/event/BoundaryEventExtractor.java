@@ -186,4 +186,5 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
         }
         return null;
     }
+
 }

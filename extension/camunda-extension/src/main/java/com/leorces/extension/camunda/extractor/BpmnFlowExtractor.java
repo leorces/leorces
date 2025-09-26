@@ -83,4 +83,5 @@ public class BpmnFlowExtractor {
                 ? sequenceFlow.getAttribute("sourceRef")
                 : sequenceFlow.getAttribute("targetRef");
     }
+
 }

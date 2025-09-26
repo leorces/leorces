@@ -132,21 +132,44 @@ class ActivityUtilsTest {
     private ActivityDefinition createMockActivityDefinition(String id, String parentId, ActivityType type) {
         return new ActivityDefinition() {
             @Override
-            public String id() { return id; }
+            public String id() {
+                return id;
+            }
+
             @Override
-            public String parentId() { return parentId; }
+            public String parentId() {
+                return parentId;
+            }
+
             @Override
-            public String name() { return "Test Activity"; }
+            public String name() {
+                return "Test Activity";
+            }
+
             @Override
-            public ActivityType type() { return type; }
+            public ActivityType type() {
+                return type;
+            }
+
             @Override
-            public List<String> incoming() { return List.of(); }
+            public List<String> incoming() {
+                return List.of();
+            }
+
             @Override
-            public List<String> outgoing() { return List.of(); }
+            public List<String> outgoing() {
+                return List.of();
+            }
+
             @Override
-            public Map<String, Object> inputs() { return Map.of(); }
+            public Map<String, Object> inputs() {
+                return Map.of();
+            }
+
             @Override
-            public Map<String, Object> outputs() { return Map.of(); }
+            public Map<String, Object> outputs() {
+                return Map.of();
+            }
         };
     }
 
@@ -175,4 +198,5 @@ class ActivityUtilsTest {
                 .createdAt(LocalDateTime.now())
                 .build();
     }
+
 }

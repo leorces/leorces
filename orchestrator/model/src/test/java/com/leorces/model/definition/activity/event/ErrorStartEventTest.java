@@ -313,4 +313,5 @@ class ErrorStartEventTest {
         assertEquals(TEST_OUTGOING, errorStartEvent.outgoing());
         assertFalse(errorStartEvent.outgoing().isEmpty());
     }
+
 }

@@ -160,4 +160,5 @@ class ActivityStateTest {
         }
         return false;
     }
+
 }

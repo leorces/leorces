@@ -82,4 +82,5 @@ class HistoryServiceImplTest {
                 .id(id)
                 .build();
     }
+
 }

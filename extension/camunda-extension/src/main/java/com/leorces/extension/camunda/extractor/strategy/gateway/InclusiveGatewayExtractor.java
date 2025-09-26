@@ -65,4 +65,5 @@ public class InclusiveGatewayExtractor implements ActivityExtractionStrategy {
         }
         return result;
     }
+
 }

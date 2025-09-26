@@ -269,4 +269,5 @@ class WorkerConfigResolverTest {
         assertThat(result.maxConcurrentTasks()).isEqualTo(maxConcurrentTasks);
         assertThat(result.timeUnit()).isEqualTo(timeUnit);
     }
+
 }

@@ -286,4 +286,5 @@ class StartEventTest {
         assertEquals(ActivityType.START_EVENT, subprocessStartEvent.type());
         assertEquals(List.of("subprocess-task"), subprocessStartEvent.outgoing());
     }
+
 }

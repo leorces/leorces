@@ -33,4 +33,5 @@ public class CamundaExtensionAutoConfiguration implements ApplicationListener<Ap
             throw e;
         }
     }
+
 }

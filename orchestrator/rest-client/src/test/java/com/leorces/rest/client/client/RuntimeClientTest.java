@@ -260,4 +260,5 @@ class RuntimeClientTest {
         assertThrows(ResourceAccessException.class,
                 () -> runtimeClient.startProcessByKey(TEST_DEFINITION_KEY, TEST_BUSINESS_KEY, TEST_VARIABLES));
     }
+
 }

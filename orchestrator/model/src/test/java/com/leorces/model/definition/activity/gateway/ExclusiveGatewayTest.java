@@ -176,4 +176,5 @@ class ExclusiveGatewayTest {
         assertTrue(activityDefinition.inputs().isEmpty());
         assertTrue(activityDefinition.outputs().isEmpty());
     }
+
 }

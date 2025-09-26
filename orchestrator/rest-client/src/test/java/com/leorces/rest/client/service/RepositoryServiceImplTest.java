@@ -29,4 +29,5 @@ class RepositoryServiceImplTest {
         //Then
         verify(repositoryClient).doCompaction();
     }
+
 }

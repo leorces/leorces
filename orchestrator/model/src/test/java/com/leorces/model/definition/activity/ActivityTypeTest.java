@@ -153,4 +153,5 @@ class ActivityTypeTest {
         }
         return false;
     }
+
 }

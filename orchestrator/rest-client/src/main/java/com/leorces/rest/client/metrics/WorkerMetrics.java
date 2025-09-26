@@ -60,4 +60,5 @@ public class WorkerMetrics {
         );
         metricsConsumer.accept(labels);
     }
+
 }

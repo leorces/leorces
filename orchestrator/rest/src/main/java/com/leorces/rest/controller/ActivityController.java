@@ -160,4 +160,5 @@ public class ActivityController {
         var result = activityService.poll(topic, processDefinitionKey, size);
         return ResponseEntity.ok(result);
     }
+
 }

@@ -239,4 +239,5 @@ class ErrorEndEventTest {
         assertNotNull(errorEndEvent);
         assertEquals(emptyErrorCode, errorEndEvent.errorCode());
     }
+
 }

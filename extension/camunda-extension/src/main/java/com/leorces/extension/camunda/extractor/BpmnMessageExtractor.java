@@ -34,4 +34,5 @@ public class BpmnMessageExtractor {
 
         return messageRef;
     }
+
 }

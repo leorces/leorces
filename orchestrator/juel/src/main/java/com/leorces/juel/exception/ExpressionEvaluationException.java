@@ -10,4 +10,5 @@ public class ExpressionEvaluationException extends RuntimeException {
     public ExpressionEvaluationException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

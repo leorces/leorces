@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("ActivityExecution Tests")
 class ActivityExecutionTest {
@@ -607,4 +605,5 @@ class ActivityExecutionTest {
                 .definition(processDefinition)
                 .build();
     }
+
 }

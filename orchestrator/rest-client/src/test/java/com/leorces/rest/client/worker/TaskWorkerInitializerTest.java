@@ -251,6 +251,7 @@ class TaskWorkerInitializerTest {
         public void handle(Task task, TaskService taskService) {
             // Test implementation - do nothing
         }
+
     }
 
     // Test implementation of TaskHandler without TaskWorker annotation
@@ -259,5 +260,7 @@ class TaskWorkerInitializerTest {
         public void handle(Task task, TaskService taskService) {
             // Test implementation - do nothing
         }
+
     }
+
 }

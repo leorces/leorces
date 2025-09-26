@@ -33,4 +33,5 @@ public record ExpressionDataProcessor(JuelExpressionEvaluator evaluator) {
         var context = new ProcessingContext(origin, data, evaluator);
         return context.processDataWithExternalContext();
     }
+
 }

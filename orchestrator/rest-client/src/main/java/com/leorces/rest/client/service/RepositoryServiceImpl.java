@@ -15,4 +15,5 @@ public class RepositoryServiceImpl implements RepositoryService {
     public void doCompaction() {
         repositoryClient.doCompaction();
     }
+
 }

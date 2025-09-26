@@ -464,4 +464,5 @@ class IntermediateCatchEventTest {
         assertTrue(timerCatchEvent.outgoing().contains("continue-process"));
         assertTrue(messageCatchEvent.outgoing().contains("handle-message"));
     }
+
 }

@@ -310,4 +310,5 @@ class SpelExpressionConverterTest {
         //Then
         assertThat(result).isEqualTo("(#user['age'] + 5) > (#limit * 2)");
     }
+
 }

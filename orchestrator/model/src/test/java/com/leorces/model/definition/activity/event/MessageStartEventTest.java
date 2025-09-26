@@ -404,4 +404,5 @@ class MessageStartEventTest {
         assertTrue(orderStartEvent.outgoing().contains("validate-order"));
         assertTrue(paymentStartEvent.outgoing().contains("process-payment"));
     }
+
 }

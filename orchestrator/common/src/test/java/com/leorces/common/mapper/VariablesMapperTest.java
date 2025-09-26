@@ -481,4 +481,5 @@ class VariablesMapperTest {
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("Variable with key " + key + " not found"));
     }
+
 }

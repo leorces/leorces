@@ -67,4 +67,5 @@ public interface ExpressionEvaluator {
      * @return true if the string contains expression syntax, false otherwise
      */
     boolean isExpression(String value);
+
 }

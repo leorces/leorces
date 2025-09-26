@@ -251,4 +251,5 @@ class HistoryControllerTest {
         var testExecution = createTestProcessExecution();
         return new PageableData<>(List.of(testExecution), 1L);
     }
+
 }

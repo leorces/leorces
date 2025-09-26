@@ -73,4 +73,5 @@ public class HistoryClient {
             return new PageableData<>(Collections.emptyList(), 0L);
         }
     }
+
 }

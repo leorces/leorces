@@ -80,4 +80,5 @@ public class BpmnParameterExtractor {
         var value = parameterElement.getTextContent();
         parameters.put(name, value);
     }
+
 }

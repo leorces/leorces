@@ -135,6 +135,7 @@ public interface MetricService {
          * @param labels the labels to associate with the metric
          */
         void stop(String name, Map<String, String> labels);
+
     }
 
 }

@@ -326,4 +326,5 @@ class EventBasedGatewayTest {
         assertEquals(List.of("subprocess-task"), subprocessGateway.incoming());
         assertEquals(List.of("subprocess-event1", "subprocess-event2"), subprocessGateway.outgoing());
     }
+
 }

@@ -205,4 +205,5 @@ class ExpressionDataProcessorTest {
         assertThat(originalData.get("key")).isEqualTo("${expression}"); // Original unchanged
         assertThat(result.get("key")).isEqualTo("resolved"); // Result processed
     }
+
 }

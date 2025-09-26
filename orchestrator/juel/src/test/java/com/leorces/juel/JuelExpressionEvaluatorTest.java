@@ -389,4 +389,5 @@ class JuelExpressionEvaluatorTest {
         assertThat(result).isEqualTo("result");
         verify(mockSpelExpression).getValue(any(StandardEvaluationContext.class), eq(Object.class));
     }
+
 }

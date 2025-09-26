@@ -188,4 +188,5 @@ class LiteralValueConverterTest {
         assertThat(result).isEqualTo(TEST_STRING_VALUE);
         assertThat(result).isInstanceOf(CharSequence.class);
     }
+
 }

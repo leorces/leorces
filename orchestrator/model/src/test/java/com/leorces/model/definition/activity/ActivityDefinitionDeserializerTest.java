@@ -2,16 +2,15 @@ package com.leorces.model.definition.activity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.leorces.model.definition.activity.event.*;
-import com.leorces.model.definition.activity.gateway.EventBasedGateway;
+import com.leorces.model.definition.activity.event.EndEvent;
+import com.leorces.model.definition.activity.event.ErrorEndEvent;
+import com.leorces.model.definition.activity.event.StartEvent;
 import com.leorces.model.definition.activity.gateway.ExclusiveGateway;
 import com.leorces.model.definition.activity.gateway.InclusiveGateway;
 import com.leorces.model.definition.activity.gateway.ParallelGateway;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
-import com.leorces.model.definition.activity.subprocess.EventSubprocess;
 import com.leorces.model.definition.activity.subprocess.Subprocess;
 import com.leorces.model.definition.activity.task.ExternalTask;
-import com.leorces.model.definition.activity.task.ReceiveTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -247,8 +246,8 @@ class ActivityDefinitionDeserializerTest {
                 """.formatted(TEST_ID, TEST_NAME);
 
         // When & Then
-        var exception = assertThrows(IllegalArgumentException.class, () -> 
-            objectMapper.readValue(json, ActivityDefinition.class));
+        var exception = assertThrows(IllegalArgumentException.class, () ->
+                objectMapper.readValue(json, ActivityDefinition.class));
         assertEquals("Missing 'type' field in activity definition", exception.getMessage());
     }
 
@@ -265,7 +264,8 @@ class ActivityDefinitionDeserializerTest {
                 """.formatted(TEST_ID, TEST_NAME);
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> 
-            objectMapper.readValue(json, ActivityDefinition.class));
+        assertThrows(IllegalArgumentException.class, () ->
+                objectMapper.readValue(json, ActivityDefinition.class));
     }
+
 }

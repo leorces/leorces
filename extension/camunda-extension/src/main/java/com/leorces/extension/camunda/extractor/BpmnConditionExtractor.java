@@ -34,4 +34,5 @@ public class BpmnConditionExtractor {
         var expr = (Element) expression.item(0);
         return expr.getTextContent().trim();
     }
+
 }

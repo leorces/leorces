@@ -70,4 +70,5 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
                 .outgoing(helper.extractOutgoing(element))
                 .build();
     }
+
 }

@@ -80,4 +80,5 @@ public class SubprocessExtractor implements ActivityExtractionStrategy {
                 .outputs(helper.extractOutputParameters(element))
                 .build();
     }
+
 }

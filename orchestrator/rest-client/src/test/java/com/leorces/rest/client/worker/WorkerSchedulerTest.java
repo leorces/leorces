@@ -283,5 +283,7 @@ class WorkerSchedulerTest {
         public void handle(Task task, TaskService taskService) {
             // Test implementation - do nothing
         }
+
     }
+
 }
