@@ -1,6 +1,6 @@
 package com.leorces.rest.controller;
 
-import com.leorces.api.RepositoryService;
+import com.leorces.api.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,7 +22,7 @@ import static com.leorces.rest.constants.SwaggerConstants.*;
 @Tag(name = "Repository", description = "Repository management operations")
 public class RepositoryController {
 
-    private final RepositoryService repositoryService;
+    private final AdminService adminService;
 
     @Operation(
             summary = "Perform repository compaction",
@@ -34,7 +34,7 @@ public class RepositoryController {
     })
     @PutMapping("/compaction")
     public ResponseEntity<Void> compaction() {
-        repositoryService.doCompaction();
+        adminService.doCompaction();
         return ResponseEntity.noContent().build();
     }
 

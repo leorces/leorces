@@ -1,13 +1,13 @@
 package com.leorces.rest.client.service;
 
-import com.leorces.api.RepositoryService;
+import com.leorces.api.AdminService;
 import com.leorces.rest.client.client.RepositoryClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RepositoryServiceImpl implements RepositoryService {
+public class AdminServiceImpl implements AdminService {
 
     private final RepositoryClient repositoryClient;
 

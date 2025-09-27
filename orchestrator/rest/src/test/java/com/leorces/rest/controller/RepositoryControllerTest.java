@@ -1,6 +1,6 @@
 package com.leorces.rest.controller;
 
-import com.leorces.api.RepositoryService;
+import com.leorces.api.AdminService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,13 +15,13 @@ import static org.mockito.Mockito.*;
 class RepositoryControllerTest {
 
     @Mock
-    private RepositoryService repositoryService;
+    private AdminService adminService;
 
     private RepositoryController subject;
 
     @BeforeEach
     void setUp() {
-        subject = new RepositoryController(repositoryService);
+        subject = new RepositoryController(adminService);
     }
 
     @Test
@@ -31,7 +31,7 @@ class RepositoryControllerTest {
         subject.compaction();
 
         // Then
-        verify(repositoryService).doCompaction();
+        verify(adminService).doCompaction();
     }
 
     @Test
@@ -41,8 +41,8 @@ class RepositoryControllerTest {
         subject.compaction();
 
         // Then
-        verify(repositoryService, times(1)).doCompaction();
-        verifyNoMoreInteractions(repositoryService);
+        verify(adminService, times(1)).doCompaction();
+        verifyNoMoreInteractions(adminService);
     }
 
     @Test
@@ -54,19 +54,19 @@ class RepositoryControllerTest {
         subject.compaction();
 
         // Then
-        verify(repositoryService, times(3)).doCompaction();
+        verify(adminService, times(3)).doCompaction();
     }
 
     @Test
     @DisplayName("Should not throw exception during compaction")
     void shouldNotThrowExceptionDuringCompaction() {
         // Given
-        doNothing().when(repositoryService).doCompaction();
+        doNothing().when(adminService).doCompaction();
 
         // When & Then
         subject.compaction();
 
-        verify(repositoryService).doCompaction();
+        verify(adminService).doCompaction();
     }
 
     @Test
@@ -74,14 +74,14 @@ class RepositoryControllerTest {
     void shouldPropagateExceptionFromRepositoryService() {
         // Given
         var expectedException = new RuntimeException("Compaction failed");
-        doThrow(expectedException).when(repositoryService).doCompaction();
+        doThrow(expectedException).when(adminService).doCompaction();
 
         // When & Then
         try {
             subject.compaction();
         } catch (RuntimeException e) {
             // Exception should be propagated as-is
-            verify(repositoryService).doCompaction();
+            verify(adminService).doCompaction();
         }
     }
 

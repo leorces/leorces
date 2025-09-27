@@ -12,13 +12,13 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Repository Service Implementation Tests")
-class RepositoryServiceImplTest {
+class AdminServiceImplTest {
 
     @Mock
     private RepositoryClient repositoryClient;
 
     @InjectMocks
-    private RepositoryServiceImpl repositoryService;
+    private AdminServiceImpl repositoryService;
 
     @Test
     @DisplayName("Should perform compaction by delegating to repository client")
