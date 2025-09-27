@@ -1,0 +1,95 @@
+server:
+  port: 8081
+
+leorces:
+  metrics:
+    enabled: true
+  rest:
+    host: http://localhost:8080
+
+  resilence:
+    task-poll:
+      circuit-breaker:
+        failure-rate-threshold: 60.0
+        wait-duration-in-open-state: 15s
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        permitted-number-of-calls-in-half-open-state: 5
+    task-update:
+      circuit-breaker:
+        failure-rate-threshold: 70.0
+        wait-duration-in-open-state: 10s
+        sliding-window-size: 15
+        minimum-number-of-calls: 8
+        permitted-number-of-calls-in-half-open-state: 3
+      retry:
+        max-attempts: 2
+        wait-duration: 500ms
+
+  process:
+    configuration:
+      OrderSubmittedProcess:
+        workers:
+          notification:
+            interval: 250
+            time-unit: milliseconds
+            initial-delay: 100
+            max-concurrent-tasks: 100
+      OrderPaymentProcess:
+        workers:
+          debit:
+            interval: 500
+            time-unit: milliseconds
+            initial-delay: 250
+            max-concurrent-tasks: 100
+          deposit:
+            interval: 500
+            time-unit: milliseconds
+            initial-delay: 500
+            max-concurrent-tasks: 100
+          payment-success-notification:
+            interval: 600
+            time-unit: milliseconds
+            initial-delay: 750
+            max-concurrent-tasks: 100
+      OrderFulfillmentProcess:
+        workers:
+          notification:
+            interval: 800
+            time-unit: milliseconds
+            initial-delay: 1000
+            max-concurrent-tasks: 150
+      OrderDeliveryProcess:
+        workers:
+          courier-delivery:
+            interval: 500
+            time-unit: milliseconds
+            initial-delay: 1000
+            max-concurrent-tasks: 75
+          express-delivery:
+            interval: 500
+            time-unit: milliseconds
+            initial-delay: 1000
+            max-concurrent-tasks: 80
+          postal-delivery:
+            interval: 500
+            time-unit: milliseconds
+            initial-delay: 1000
+            max-concurrent-tasks: 60
+          notification:
+            interval: 1000
+            time-unit: milliseconds
+            initial-delay: 2000
+            max-concurrent-tasks: 120
+logging:
+  level:
+    com.leorces.example: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+

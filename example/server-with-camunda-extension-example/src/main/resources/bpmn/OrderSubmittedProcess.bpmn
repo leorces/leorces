@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_03r613k" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_06vz3rk">
+    <bpmn:participant id="Participant_OrderSubmittedProcess" name="Order Submitted Process" processRef="OrderSubmittedProcess" />
+  </bpmn:collaboration>
+  <bpmn:process id="OrderSubmittedProcess" name="Order Submitted Process" isExecutable="true">
+    <bpmn:startEvent id="OrderSubmittedProcessStartEvent">
+      <bpmn:outgoing>Flow_1472r42</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1472r42" sourceRef="OrderSubmittedProcessStartEvent" targetRef="Gateway_0t354xy" />
+    <bpmn:parallelGateway id="Gateway_0t354xy">
+      <bpmn:incoming>Flow_1472r42</bpmn:incoming>
+      <bpmn:outgoing>Flow_0rkr77e</bpmn:outgoing>
+      <bpmn:outgoing>Flow_15w1cl1</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_0rkr77e" sourceRef="Gateway_0t354xy" targetRef="NotificationToClient" />
+    <bpmn:sequenceFlow id="Flow_15w1cl1" sourceRef="Gateway_0t354xy" targetRef="NotificationToSeller" />
+    <bpmn:sequenceFlow id="Flow_0qvu3w4" sourceRef="NotificationToSeller" targetRef="Gateway_0yprn2c" />
+    <bpmn:sequenceFlow id="Flow_076slcz" sourceRef="NotificationToClient" targetRef="Gateway_0yprn2c" />
+    <bpmn:endEvent id="OrderSubmittedProcessEndEvent">
+      <bpmn:incoming>Flow_0d6v3d0</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0d6v3d0" sourceRef="Gateway_0yprn2c" targetRef="OrderSubmittedProcessEndEvent" />
+    <bpmn:parallelGateway id="Gateway_0yprn2c">
+      <bpmn:incoming>Flow_0qvu3w4</bpmn:incoming>
+      <bpmn:incoming>Flow_076slcz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0d6v3d0</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sendTask id="NotificationToClient" name="Notification to client" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi ${client.firstName} ${client.lastName}! Your order ${order.number} accepted!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0rkr77e</bpmn:incoming>
+      <bpmn:outgoing>Flow_076slcz</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="NotificationToSeller" name="Notification to seller" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">New order ${order.number} created.</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_15w1cl1</bpmn:incoming>
+      <bpmn:outgoing>Flow_0qvu3w4</bpmn:outgoing>
+    </bpmn:sendTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_06vz3rk">
+      <bpmndi:BPMNShape id="Participant_0oh7hkx_di" bpmnElement="Participant_OrderSubmittedProcess" isHorizontal="true">
+        <dc:Bounds x="142" y="100" width="600" height="380" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="OrderSubmittedProcessStartEvent">
+        <dc:Bounds x="192" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_13b0z1v_di" bpmnElement="Gateway_0t354xy">
+        <dc:Bounds x="285" y="265" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1771jqc_di" bpmnElement="OrderSubmittedProcessEndEvent">
+        <dc:Bounds x="682" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1e1pyzy_di" bpmnElement="Gateway_0yprn2c">
+        <dc:Bounds x="565" y="265" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jck45s_di" bpmnElement="NotificationToClient">
+        <dc:Bounds x="400" y="150" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0597677_di" bpmnElement="NotificationToSeller">
+        <dc:Bounds x="400" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1472r42_di" bpmnElement="Flow_1472r42">
+        <di:waypoint x="228" y="290" />
+        <di:waypoint x="285" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rkr77e_di" bpmnElement="Flow_0rkr77e">
+        <di:waypoint x="310" y="265" />
+        <di:waypoint x="310" y="190" />
+        <di:waypoint x="400" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15w1cl1_di" bpmnElement="Flow_15w1cl1">
+        <di:waypoint x="310" y="315" />
+        <di:waypoint x="310" y="390" />
+        <di:waypoint x="400" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qvu3w4_di" bpmnElement="Flow_0qvu3w4">
+        <di:waypoint x="500" y="390" />
+        <di:waypoint x="590" y="390" />
+        <di:waypoint x="590" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_076slcz_di" bpmnElement="Flow_076slcz">
+        <di:waypoint x="500" y="190" />
+        <di:waypoint x="590" y="190" />
+        <di:waypoint x="590" y="265" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0d6v3d0_di" bpmnElement="Flow_0d6v3d0">
+        <di:waypoint x="615" y="290" />
+        <di:waypoint x="682" y="290" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

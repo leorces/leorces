@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0v8xv2e" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_1mw1ts1">
+    <bpmn:participant id="Participant_OrderFulfillmentProcess" name="Order Fulfillment Process" processRef="OrderFulfillmentProcess" />
+  </bpmn:collaboration>
+  <bpmn:process id="OrderFulfillmentProcess" name="Order Fulfillment Process" isExecutable="true">
+    <bpmn:startEvent id="OrderFulfillmentProcessStartEvent">
+      <bpmn:outgoing>Flow_05233vq</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="OrderFulfillmentProcessEndEvent">
+      <bpmn:incoming>Flow_1pi8gwx</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateCatchEvent id="WaitOrderFulfillment">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_07u7ond</bpmn:incoming>
+      <bpmn:outgoing>Flow_01zxs5x</bpmn:outgoing>
+      <bpmn:conditionalEventDefinition id="ConditionalEventDefinition_09vx1zc">
+        <bpmn:condition xsi:type="bpmn:tFormalExpression">${orderFulfilled==true}</bpmn:condition>
+      </bpmn:conditionalEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_05233vq" sourceRef="OrderFulfillmentProcessStartEvent" targetRef="OrderFulfillmentNotification" />
+    <bpmn:sequenceFlow id="Flow_1pi8gwx" sourceRef="OrderFulfillmentNotificationFinishedNotification" targetRef="OrderFulfillmentProcessEndEvent" />
+    <bpmn:sequenceFlow id="Flow_07u7ond" sourceRef="OrderFulfillmentNotification" targetRef="WaitOrderFulfillment" />
+    <bpmn:sequenceFlow id="Flow_01zxs5x" sourceRef="WaitOrderFulfillment" targetRef="OrderFulfillmentNotificationFinishedNotification" />
+    <bpmn:subProcess id="OrderFulfillment" name="Order fulfillment" triggeredByEvent="true">
+      <bpmn:startEvent id="OrderFulfillmentStartEvent" isInterrupting="false">
+        <bpmn:outgoing>Flow_0ze6xgs</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_1ldw6x9" messageRef="Message_2h754qt" />
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_0ze6xgs" sourceRef="OrderFulfillmentStartEvent" targetRef="ProcessOrderFulfillment" />
+      <bpmn:endEvent id="OrderFulfillmentEndEvent">
+        <bpmn:incoming>Flow_0t1ibzn</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0t1ibzn" sourceRef="ProcessOrderFulfillment" targetRef="OrderFulfillmentEndEvent" />
+      <bpmn:serviceTask id="ProcessOrderFulfillment" name="Process order fulfillment" camunda:type="external" camunda:topic="process-order-fulfillment">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:outputParameter name="orderFulfilled">true</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0ze6xgs</bpmn:incoming>
+        <bpmn:outgoing>Flow_0t1ibzn</bpmn:outgoing>
+      </bpmn:serviceTask>
+    </bpmn:subProcess>
+    <bpmn:sendTask id="OrderFulfillmentNotificationFinishedNotification" name="Order fulfillment finished notification" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi ${client.firstName} ${client.lastName}! Your order ${order.number} fullfiled! Will send it soon!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_01zxs5x</bpmn:incoming>
+      <bpmn:outgoing>Flow_1pi8gwx</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sendTask id="OrderFulfillmentNotification" name="Order fulfillment notification" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your order ${order.number} will be fulfilled soon!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_05233vq</bpmn:incoming>
+      <bpmn:outgoing>Flow_07u7ond</bpmn:outgoing>
+    </bpmn:sendTask>
+  </bpmn:process>
+  <bpmn:message id="Message_2h754qt" name="OrderFulfillmentFinishedMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1mw1ts1">
+      <bpmndi:BPMNShape id="Participant_0t2se25_di" bpmnElement="Participant_OrderFulfillmentProcess" isHorizontal="true">
+        <dc:Bounds x="132" y="85" width="600" height="445" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="OrderFulfillmentProcessStartEvent">
+        <dc:Bounds x="182" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0syj2ig_di" bpmnElement="OrderFulfillmentProcessEndEvent">
+        <dc:Bounds x="662" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0qgro57_di" bpmnElement="WaitOrderFulfillment">
+        <dc:Bounds x="422" y="192" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0pvdeii_di" bpmnElement="OrderFulfillment" isExpanded="true">
+        <dc:Bounds x="265" y="290" width="350" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1mr9pkx_di" bpmnElement="OrderFulfillmentStartEvent">
+        <dc:Bounds x="305" y="372" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1fc2jk3_di" bpmnElement="OrderFulfillmentEndEvent">
+        <dc:Bounds x="562" y="372" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1n1qifd_di" bpmnElement="ProcessOrderFulfillment">
+        <dc:Bounds x="400" y="350" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0ze6xgs_di" bpmnElement="Flow_0ze6xgs">
+        <di:waypoint x="341" y="390" />
+        <di:waypoint x="400" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0t1ibzn_di" bpmnElement="Flow_0t1ibzn">
+        <di:waypoint x="500" y="390" />
+        <di:waypoint x="562" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0fg6z0d_di" bpmnElement="OrderFulfillmentNotificationFinishedNotification">
+        <dc:Bounds x="510" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_07lkh53_di" bpmnElement="OrderFulfillmentNotification">
+        <dc:Bounds x="270" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_05233vq_di" bpmnElement="Flow_05233vq">
+        <di:waypoint x="218" y="210" />
+        <di:waypoint x="270" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pi8gwx_di" bpmnElement="Flow_1pi8gwx">
+        <di:waypoint x="610" y="210" />
+        <di:waypoint x="662" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07u7ond_di" bpmnElement="Flow_07u7ond">
+        <di:waypoint x="370" y="210" />
+        <di:waypoint x="422" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01zxs5x_di" bpmnElement="Flow_01zxs5x">
+        <di:waypoint x="458" y="210" />
+        <di:waypoint x="510" y="210" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

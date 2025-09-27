@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: leorces
+  datasource:
+    url: jdbc:postgresql://localhost:5432/leorces
+    username: leorces
+    password: admin123
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+leorces:
+  engine:
+    compaction:
+      enable: true
+      batch-size: 2000
+      cron: 0 0 0 * * *
+  extension:
+    camunda:
+      bpmn-path: bpmn
+      processes:
+        OrderSubmittedProcess:
+          tasks:
+            notification:
+              retries: 3
+        OrderFulfillmentProcess:
+          task-retries: 3
+
+logging:
+  level:
+    com.leorces.engine: DEBUG
