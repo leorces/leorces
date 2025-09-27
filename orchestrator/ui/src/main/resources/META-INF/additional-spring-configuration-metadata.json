@@ -1,0 +1,10 @@
+{
+  "properties": [],
+  "groups": [
+    {
+      "name": "leorces.orchestrator.ui",
+      "type": "com.leorces.ui.configuration.OrchestratorUIAutoConfiguration",
+      "description": "Configuration properties for Orchestrator UI module."
+    }
+  ]
+}
