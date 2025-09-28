@@ -26,7 +26,7 @@ public class PostgresPersistenceAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ObjectMapper objectMapper() {
+    public ObjectMapper persistenceObjectMapper() {
         var objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
