@@ -19,6 +19,7 @@ public class ProcessStartService {
     private final ProcessFactory processFactory;
     private final ProcessPersistence processPersistence;
     private final EngineEventBus eventBus;
+    private final ProcessMetrics processMetrics;
 
     @EventListener
     void handleStart(StartProcessByCallActivityEvent event) {
@@ -35,6 +36,7 @@ public class ProcessStartService {
 
     public Process start(Process process) {
         var newProcess = processPersistence.run(process);
+        processMetrics.recordProcessStartedMetric(newProcess);
         startInitialActivity(newProcess);
         return newProcess;
     }

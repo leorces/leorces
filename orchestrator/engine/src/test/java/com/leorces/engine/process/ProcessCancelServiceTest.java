@@ -29,11 +29,18 @@ class ProcessCancelServiceTest {
     @Mock
     private EngineEventBus eventBus;
 
+    @Mock
+    private ProcessMetrics processMetrics;
+
     private ProcessCancelService processCancelService;
 
     @BeforeEach
     void setUp() {
-        processCancelService = new ProcessCancelService(processPersistence, eventBus);
+        processCancelService = new ProcessCancelService(
+                processPersistence,
+                eventBus,
+                processMetrics
+        );
     }
 
     @Test

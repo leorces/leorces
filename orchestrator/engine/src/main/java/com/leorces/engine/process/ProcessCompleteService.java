@@ -18,6 +18,7 @@ class ProcessCompleteService {
     private final ProcessPersistence processPersistence;
     private final ActivityPersistence activityPersistence;
     private final EngineEventBus eventBus;
+    private final ProcessMetrics processMetrics;
 
     @Async
     @EventListener
@@ -31,6 +32,7 @@ class ProcessCompleteService {
         }
 
         var result = processPersistence.complete(process);
+        processMetrics.recordProcessCompletedMetric(result);
         if (result.isCallActivity()) {
             eventBus.publish(ActivityEvent.completeByIdAsync(process.id()));
         }

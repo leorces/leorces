@@ -33,11 +33,19 @@ class ProcessCompleteServiceTest {
     @Mock
     private EngineEventBus eventBus;
 
+    @Mock
+    private ProcessMetrics processMetrics;
+
     private ProcessCompleteService processCompleteService;
 
     @BeforeEach
     void setUp() {
-        processCompleteService = new ProcessCompleteService(processPersistence, activityPersistence, eventBus);
+        processCompleteService = new ProcessCompleteService(
+                processPersistence,
+                activityPersistence,
+                eventBus,
+                processMetrics
+        );
     }
 
     @Test
