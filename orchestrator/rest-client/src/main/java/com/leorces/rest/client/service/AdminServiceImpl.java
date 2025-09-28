@@ -1,7 +1,7 @@
 package com.leorces.rest.client.service;
 
 import com.leorces.api.AdminService;
-import com.leorces.rest.client.client.RepositoryClient;
+import com.leorces.rest.client.client.AdminClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
-    private final RepositoryClient repositoryClient;
+    private final AdminClient adminClient;
 
     @Override
     public void doCompaction() {
-        repositoryClient.doCompaction();
+        adminClient.doCompaction();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.leorces.rest.client.service;
 
-import com.leorces.rest.client.client.RepositoryClient;
+import com.leorces.rest.client.client.AdminClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 class AdminServiceImplTest {
 
     @Mock
-    private RepositoryClient repositoryClient;
+    private AdminClient adminClient;
 
     @InjectMocks
     private AdminServiceImpl repositoryService;
@@ -27,7 +27,7 @@ class AdminServiceImplTest {
         repositoryService.doCompaction();
 
         //Then
-        verify(repositoryClient).doCompaction();
+        verify(adminClient).doCompaction();
     }
 
 }

@@ -20,8 +20,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RepositoryClient Tests")
-class RepositoryClientTest {
+@DisplayName("AdminClient Tests")
+class AdminClientTest {
 
     @Mock
     private RestClient restClient;
@@ -35,11 +35,11 @@ class RepositoryClientTest {
     @Mock
     private RestClient.ResponseSpec responseSpec;
 
-    private RepositoryClient repositoryClient;
+    private AdminClient adminClient;
 
     @BeforeEach
     void setUp() {
-        repositoryClient = new RepositoryClient(restClient);
+        adminClient = new AdminClient(restClient);
     }
 
     @Test
@@ -53,7 +53,7 @@ class RepositoryClientTest {
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
 
         // When
-        assertDoesNotThrow(() -> repositoryClient.doCompaction());
+        assertDoesNotThrow(() -> adminClient.doCompaction());
 
         // Then
         verify(restClient).post();
@@ -73,7 +73,7 @@ class RepositoryClientTest {
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When & Then
-        assertDoesNotThrow(() -> repositoryClient.doCompaction());
+        assertDoesNotThrow(() -> adminClient.doCompaction());
     }
 
     @Test
@@ -90,7 +90,7 @@ class RepositoryClientTest {
 
         // When & Then
         assertThrows(HttpServerErrorException.class,
-                () -> repositoryClient.doCompaction());
+                () -> adminClient.doCompaction());
     }
 
     @Test
@@ -107,7 +107,7 @@ class RepositoryClientTest {
 
         // When & Then
         assertThrows(HttpServerErrorException.class,
-                () -> repositoryClient.doCompaction());
+                () -> adminClient.doCompaction());
     }
 
     @Test
@@ -124,7 +124,7 @@ class RepositoryClientTest {
 
         // When & Then
         assertThrows(ResourceAccessException.class,
-                () -> repositoryClient.doCompaction());
+                () -> adminClient.doCompaction());
     }
 
 }
