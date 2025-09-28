@@ -1,4 +1,4 @@
-package com.leorces.rest.client.metrics;
+package com.leorces.rest.client.worker;
 
 import com.leorces.common.service.MetricService;
 import com.leorces.rest.client.model.worker.WorkerContext;

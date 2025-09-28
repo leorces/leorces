@@ -4,6 +4,7 @@ import com.leorces.common.service.MetricService;
 import com.leorces.rest.client.handler.TaskHandler;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
+import com.leorces.rest.client.worker.WorkerMetrics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

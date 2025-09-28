@@ -3,7 +3,6 @@ package com.leorces.rest.client.worker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.rest.client.client.TaskRestClient;
-import com.leorces.rest.client.metrics.WorkerMetrics;
 import com.leorces.rest.client.model.Task;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.service.TaskService;
