@@ -1,0 +1,305 @@
+{
+  "id": null,
+  "uid": "leorces-orchestrator",
+  "title": "Leorces Orchestrator Dashboard",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "5s",
+  "style": "dark",
+  "editable": true,
+  "tags": [
+    "orchestrator",
+    "leorces"
+  ],
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "📊 Application",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Application Startup Time",
+      "targets": [
+        {
+          "expr": "application_ready_time_seconds",
+          "legendFormat": "ready"
+        },
+        {
+          "expr": "application_started_time_seconds",
+          "legendFormat": "started"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Process Uptime",
+      "targets": [
+        {
+          "expr": "process_uptime_seconds",
+          "legendFormat": "uptime"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      }
+    },
+    {
+      "type": "row",
+      "title": "💾 Database",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Connections (active/idle)",
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active",
+          "legendFormat": "active"
+        },
+        {
+          "expr": "hikaricp_connections_idle",
+          "legendFormat": "idle"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Acquire / Usage Time",
+      "targets": [
+        {
+          "expr": "rate(hikaricp_connections_acquire_seconds_sum[1m])",
+          "legendFormat": "acquire"
+        },
+        {
+          "expr": "rate(hikaricp_connections_usage_seconds_sum[1m])",
+          "legendFormat": "usage"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      }
+    },
+    {
+      "type": "row",
+      "title": "⚙️ Executors & Threads",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Executor Queue",
+      "targets": [
+        {
+          "expr": "executor_active_threads",
+          "legendFormat": "active"
+        },
+        {
+          "expr": "executor_queue_remaining_tasks",
+          "legendFormat": "queue remaining"
+        },
+        {
+          "expr": "executor_queued_tasks",
+          "legendFormat": "queued"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 19
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Threads",
+      "targets": [
+        {
+          "expr": "jvm_threads_live_threads",
+          "legendFormat": "live"
+        },
+        {
+          "expr": "jvm_threads_daemon_threads",
+          "legendFormat": "daemon"
+        },
+        {
+          "expr": "jvm_threads_peak_threads",
+          "legendFormat": "peak"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      }
+    },
+    {
+      "type": "row",
+      "title": "🌐 HTTP Requests",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Request Latency",
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_sum[1m]) / rate(http_server_requests_seconds_count[1m])",
+          "legendFormat": "{{method}} {{uri}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Requests per Second",
+      "targets": [
+        {
+          "expr": "rate(http_server_requests_seconds_count[1m])",
+          "legendFormat": "{{method}} {{uri}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      }
+    },
+    {
+      "type": "row",
+      "title": "🔄 Leorces Engine",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 52
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Processes Started vs Completed",
+      "targets": [
+        {
+          "expr": "increase(leorces_engine_process_started_total[1m])",
+          "legendFormat": "started {{processDefinitionKey}}"
+        },
+        {
+          "expr": "increase(leorces_engine_process_completed_total[1m])",
+          "legendFormat": "completed {{processDefinitionKey}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 53
+      }
+    },
+    {
+      "type": "row",
+      "title": "📂 System / JVM / Logs",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 61
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU Usage",
+      "targets": [
+        {
+          "expr": "process_cpu_usage",
+          "legendFormat": "process"
+        },
+        {
+          "expr": "system_cpu_usage",
+          "legendFormat": "system"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 62
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Logs per Level",
+      "targets": [
+        {
+          "expr": "increase(logback_events_total{level=\"debug\"}[1m])",
+          "legendFormat": "debug"
+        },
+        {
+          "expr": "increase(logback_events_total{level=\"info\"}[1m])",
+          "legendFormat": "info"
+        },
+        {
+          "expr": "increase(logback_events_total{level=\"warn\"}[1m])",
+          "legendFormat": "warn"
+        },
+        {
+          "expr": "increase(logback_events_total{level=\"error\"}[1m])",
+          "legendFormat": "error"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 62
+      }
+    }
+  ]
+}

@@ -53,18 +53,12 @@ public class ProcessMetrics {
     }
 
     private void withLabels(Process process, Consumer<Map<String, String>> metricsConsumer) {
-        var labels = createLabels(
-                process.definition().key(),
-                process.businessKey()
-        );
+        var labels = createLabels(process.definition().key());
         metricsConsumer.accept(labels);
     }
 
-    private Map<String, String> createLabels(String processDefinitionKey, String businessKey) {
-        return Map.of(
-                PROCESS_DEFINITION_KEY, processDefinitionKey,
-                BUSINESS_KEY, businessKey != null ? businessKey : NONE
-        );
+    private Map<String, String> createLabels(String processDefinitionKey) {
+        return Map.of(PROCESS_DEFINITION_KEY, processDefinitionKey);
     }
 
 }
