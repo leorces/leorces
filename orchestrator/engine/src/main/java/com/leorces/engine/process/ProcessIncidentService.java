@@ -25,6 +25,7 @@ class ProcessIncidentService {
     private final ProcessPersistence processPersistence;
     private final ActivityPersistence activityPersistence;
     private final EngineEventBus eventBus;
+    private final ProcessMetrics processMetrics;
 
     @Async
     @EventListener
@@ -49,6 +50,7 @@ class ProcessIncidentService {
 
     private void incident(Process process) {
         var incidentProcess = processPersistence.incident(process);
+        processMetrics.recordProcessIncidentMetric(incidentProcess);
         if (incidentProcess.isCallActivity()) {
             eventBus.publish(ActivityEvent.failByIdAsync(incidentProcess.id(), Map.of()));
         }
@@ -57,6 +59,7 @@ class ProcessIncidentService {
     private void tryRecoverFromIncident(Process process) {
         if (!activityPersistence.isAnyFailed(process.id())) {
             processPersistence.changeState(process.id(), ProcessState.ACTIVE);
+            processMetrics.recordProcessRecoveredMetrics(process);
         }
     }
 

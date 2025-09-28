@@ -1,8 +1,9 @@
 package com.leorces.rest.client.constants;
 
 public final class ApiConstants {
-
+    // =====================
     // Base
+    // =====================
     public static final String API_BASE_PATH = "/api/v1";
     public static final String SIZE_PARAM = "limit";
     // =====================

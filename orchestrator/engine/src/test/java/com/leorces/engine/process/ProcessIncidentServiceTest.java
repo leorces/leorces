@@ -38,11 +38,19 @@ class ProcessIncidentServiceTest {
     @Mock
     private EngineEventBus eventBus;
 
+    @Mock
+    private ProcessMetrics processMetrics;
+
     private ProcessIncidentService processIncidentService;
 
     @BeforeEach
     void setUp() {
-        processIncidentService = new ProcessIncidentService(processPersistence, activityPersistence, eventBus);
+        processIncidentService = new ProcessIncidentService(
+                processPersistence,
+                activityPersistence,
+                eventBus,
+                processMetrics
+        );
     }
 
     @Test

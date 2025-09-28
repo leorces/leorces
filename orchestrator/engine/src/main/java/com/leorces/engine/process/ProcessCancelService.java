@@ -16,6 +16,7 @@ class ProcessCancelService {
 
     private final ProcessPersistence processPersistence;
     private final EngineEventBus eventBus;
+    private final ProcessMetrics processMetrics;
 
     @EventListener
     void handleCancel(CancelProcessByIdEvent event) {
@@ -32,11 +33,13 @@ class ProcessCancelService {
     private void cancel(Process process) {
         eventBus.publish(ActivityEvent.cancelAllByProcessId(process.id()));
         processPersistence.cancel(process);
+        processMetrics.recordProcessCancelledMetric(process);
     }
 
     private void terminate(Process process) {
         eventBus.publish(ActivityEvent.terminateAllByProcessId(process.id()));
         processPersistence.terminate(process);
+        processMetrics.recordProcessTerminatedMetric(process);
     }
 
 }

@@ -46,11 +46,19 @@ class ProcessStartServiceTest {
     @Mock
     private EngineEventBus eventBus;
 
+    @Mock
+    private ProcessMetrics processMetrics;
+
     private ProcessStartService processStartService;
 
     @BeforeEach
     void setUp() {
-        processStartService = new ProcessStartService(processFactory, processPersistence, eventBus);
+        processStartService = new ProcessStartService(
+                processFactory,
+                processPersistence,
+                eventBus,
+                processMetrics
+        );
     }
 
     @Test
