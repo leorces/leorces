@@ -9,7 +9,7 @@ public class ApiConstants {
     public static final String DEFINITIONS = API_BASE_PATH + "/definitions";
     public static final String PROCESSES_ENDPOINT = API_BASE_PATH + "/processes";
     public static final String ACTIVITIES_ENDPOINT = API_BASE_PATH + "/activities";
-    public static final String REPOSITORY_ENDPOINT = API_BASE_PATH + "/repository";
+    public static final String ADMIN_ENDPOINT = API_BASE_PATH + "/admin";
     public static final String HISTORY_ENDPOINT = API_BASE_PATH + "/history";
 
     private ApiConstants() {

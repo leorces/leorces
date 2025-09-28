@@ -41,7 +41,7 @@ public final class ApiConstants {
     // =====================
     // Repository endpoints
     // =====================
-    public static final String REPOSITORY_ENDPOINT = API_BASE_PATH + "/repository";
+    public static final String ADMIN_ENDPOINT = API_BASE_PATH + "/admin";
 
     private ApiConstants() {
     }

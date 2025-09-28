@@ -11,7 +11,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
-import static com.leorces.rest.client.constants.ApiConstants.REPOSITORY_ENDPOINT;
+import static com.leorces.rest.client.constants.ApiConstants.ADMIN_ENDPOINT;
 
 @Slf4j
 @Component
@@ -25,7 +25,7 @@ public class RepositoryClient {
     public void doCompaction() {
         try {
             restClient.post()
-                    .uri(REPOSITORY_ENDPOINT + "/compaction")
+                    .uri(ADMIN_ENDPOINT + "/repository/compaction")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()

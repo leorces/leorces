@@ -11,17 +11,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("RepositoryController Tests")
-class RepositoryControllerTest {
+@DisplayName("AdminController Tests")
+class AdminControllerTest {
 
     @Mock
     private AdminService adminService;
 
-    private RepositoryController subject;
+    private AdminController subject;
 
     @BeforeEach
     void setUp() {
-        subject = new RepositoryController(adminService);
+        subject = new AdminController(adminService);
     }
 
     @Test
