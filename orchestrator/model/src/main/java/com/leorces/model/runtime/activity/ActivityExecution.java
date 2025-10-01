@@ -89,6 +89,13 @@ public record ActivityExecution(
     }
 
     @JsonIgnore
+    public List<ActivityDefinition> childActivities() {
+        return processDefinition().activities().stream()
+                .filter(activity -> activity.parentId() != null && activity.parentId().equals(definitionId))
+                .toList();
+    }
+
+    @JsonIgnore
     public List<String> scope() {
         return ActivityUtils.buildScope(this);
     }
@@ -123,4 +130,8 @@ public record ActivityExecution(
         return ActivityState.ACTIVE.equals(state());
     }
 
+    @JsonIgnore
+    public boolean isInTerminalState() {
+        return state.isTerminal();
+    }
 }

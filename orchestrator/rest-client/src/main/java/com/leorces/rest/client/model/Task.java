@@ -65,7 +65,7 @@ public record Task(
     }
 
 
-    public <T> T getVariable(Class<T> clazz, String name) {
+    public <T> T getVariable(String name, Class<T> clazz) {
         return findVariableByName(name)
                 .map(variable -> convertVariableToCustomObject(variable, clazz))
                 .orElse(null);

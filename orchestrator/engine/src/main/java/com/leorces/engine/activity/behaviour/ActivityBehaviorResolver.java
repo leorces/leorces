@@ -13,37 +13,21 @@ import java.util.stream.Collectors;
 public class ActivityBehaviorResolver {
 
     private final Map<ActivityType, ActivityBehavior> behaviors;
-    private final Map<ActivityType, FailableActivityBehavior> failableBehaviors;
     private final Map<ActivityType, TriggerableActivityBehaviour> triggerableBehaviors;
-    private final Map<ActivityType, CancellableActivityBehaviour> cancellableBehaviors;
 
     public ActivityBehaviorResolver(List<ActivityBehavior> behaviors,
-                                    List<FailableActivityBehavior> failableBehaviors,
-                                    List<TriggerableActivityBehaviour> triggerableBehaviors,
-                                    List<CancellableActivityBehaviour> cancellableBehaviors) {
+                                    List<TriggerableActivityBehaviour> triggerableBehaviors) {
         this.behaviors = behaviors.stream()
                 .collect(Collectors.toMap(ActivityBehavior::type, Function.identity()));
-        this.failableBehaviors = failableBehaviors.stream()
-                .collect(Collectors.toMap(FailableActivityBehavior::type, Function.identity()));
         this.triggerableBehaviors = triggerableBehaviors.stream()
                 .collect(Collectors.toMap(TriggerableActivityBehaviour::type, Function.identity()));
-        this.cancellableBehaviors = cancellableBehaviors.stream()
-                .collect(Collectors.toMap(CancellableActivityBehaviour::type, Function.identity()));
     }
 
-    public Optional<TriggerableActivityBehaviour> resolveTriggerableStrategy(ActivityType activityType) {
+    public Optional<TriggerableActivityBehaviour> resolveTriggerableBehavior(ActivityType activityType) {
         return Optional.ofNullable(triggerableBehaviors.get(activityType));
     }
 
-    public Optional<FailableActivityBehavior> resolveFailableStrategy(ActivityType activityType) {
-        return Optional.ofNullable(failableBehaviors.get(activityType));
-    }
-
-    public Optional<CancellableActivityBehaviour> resolveCancellableStrategy(ActivityType activityType) {
-        return Optional.ofNullable(cancellableBehaviors.get(activityType));
-    }
-
-    public ActivityBehavior resolveStrategy(ActivityType activityType) {
+    public ActivityBehavior resolveBehavior(ActivityType activityType) {
         return behaviors.get(activityType);
     }
 

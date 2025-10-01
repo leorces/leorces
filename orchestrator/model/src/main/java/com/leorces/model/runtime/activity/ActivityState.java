@@ -7,5 +7,9 @@ public enum ActivityState {
     COMPLETED,
     CANCELED,
     TERMINATED,
-    FAILED
+    FAILED;
+
+    public boolean isTerminal() {
+        return this == TERMINATED || this == CANCELED || this == COMPLETED;
+    }
 }

@@ -1,12 +1,10 @@
 package com.leorces.engine.activity.behaviour.gateway;
 
-import com.leorces.engine.activity.behaviour.FailableActivityBehavior;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 
 import java.util.Collection;
@@ -14,29 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class AbstractGatewayBehavior implements FailableActivityBehavior {
+public abstract class AbstractGatewayBehavior extends AbstractActivityBehavior {
 
-    protected final ActivityPersistence activityPersistence;
     protected final ExpressionEvaluator expressionEvaluator;
-    protected final EngineEventBus eventBus;
 
-    protected AbstractGatewayBehavior(ActivityPersistence activityPersistence,
-                                      ExpressionEvaluator expressionEvaluator,
-                                      EngineEventBus eventBus) {
-        this.activityPersistence = activityPersistence;
+    protected AbstractGatewayBehavior(ActivityPersistence activityPersistence, ExpressionEvaluator expressionEvaluator, CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
         this.expressionEvaluator = expressionEvaluator;
-        this.eventBus = eventBus;
-    }
-
-    @Override
-    public void fail(ActivityExecution activity) {
-        activityPersistence.fail(activity);
-        eventBus.publish(ActivityEvent.incidentFailEvent(activity));
-    }
-
-    @Override
-    public void retry(ActivityExecution activity) {
-        eventBus.publish(ActivityEvent.runAsync(activity));
     }
 
     protected List<ActivityDefinition> getNextActivities(ProcessDefinition processDefinition, List<String> activityIds) {

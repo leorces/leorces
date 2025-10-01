@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-class ActivityFactory {
+public class ActivityFactory {
 
     private final ActivityPersistence activityPersistence;
     private final ProcessPersistence processPersistence;

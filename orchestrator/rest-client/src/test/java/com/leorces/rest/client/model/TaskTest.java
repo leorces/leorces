@@ -306,7 +306,7 @@ class TaskTest {
         var task = createTaskWithVariables(List.of(userVariable));
 
         // When
-        var result = task.getVariable(User.class, "user");
+        var result = task.getVariable("user", User.class);
 
         // Then
         assertEquals("John Doe", result.name());
@@ -322,7 +322,7 @@ class TaskTest {
         var task = createTaskWithVariables(List.of(existingVariable));
 
         // When
-        var result = task.getVariable(User.class, "nonExistentUser");
+        var result = task.getVariable("nonExistentUser", User.class);
 
         // Then
         assertNull(result);
@@ -336,7 +336,7 @@ class TaskTest {
         var task = createTaskWithVariables(List.of(nullValueVariable));
 
         // When
-        User result = task.getVariable(User.class, "user");
+        var result = task.getVariable("user", User.class);
 
         // Then
         assertNull(result);

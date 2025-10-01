@@ -1,22 +1,21 @@
 package com.leorces.engine.activity.behaviour.task;
 
-import com.leorces.engine.activity.behaviour.CancellableActivityBehaviour;
-import com.leorces.engine.activity.behaviour.FailableActivityBehavior;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.command.RetryActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.definition.activity.task.ExternalTask;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class ExternalTaskBehavior implements FailableActivityBehavior, CancellableActivityBehaviour {
+public class ExternalTaskBehavior extends AbstractActivityBehavior {
 
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
+    protected ExternalTaskBehavior(ActivityPersistence activityPersistence,
+                                   CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
+    }
 
     @Override
     public void run(ActivityExecution activity) {
@@ -24,38 +23,21 @@ public class ExternalTaskBehavior implements FailableActivityBehavior, Cancellab
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        eventBus.publish(ActivityEvent.runAllAsync(result.nextActivities(), result.process()));
-        return result;
-    }
-
-    @Override
-    public void fail(ActivityExecution activity) {
+    public boolean fail(ActivityExecution activity) {
         var externalTaskDefinition = (ExternalTask) activity.definition();
 
         if (activity.retries() < externalTaskDefinition.retries()) {
-            eventBus.publish(ActivityEvent.retryAsync(activity));
-            return;
+            dispatcher.dispatchAsync(RetryActivityCommand.of(activity));
+            return false;
         }
 
         activityPersistence.fail(activity);
-        eventBus.publish(ActivityEvent.incidentFailEvent(activity));
+        return true;
     }
 
     @Override
     public void retry(ActivityExecution activity) {
         activityPersistence.schedule(incrementRetries(activity));
-    }
-
-    @Override
-    public void cancel(ActivityExecution activity) {
-        activityPersistence.cancel(activity);
-    }
-
-    @Override
-    public void terminate(ActivityExecution activity) {
-        activityPersistence.terminate(activity);
     }
 
     @Override

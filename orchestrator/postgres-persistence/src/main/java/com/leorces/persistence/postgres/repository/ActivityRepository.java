@@ -54,4 +54,8 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     int updateStatusBatch(@Param("activityIds") List<String> activityIds,
                           @Param("newState") String newState);
 
+    @Modifying
+    @Query(CHANGE_STATE)
+    void changeState(@Param("processId") String activityId, @Param("state") String state);
+
 }

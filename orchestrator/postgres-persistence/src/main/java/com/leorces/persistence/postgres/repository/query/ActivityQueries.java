@@ -2,6 +2,13 @@ package com.leorces.persistence.postgres.repository.query;
 
 public final class ActivityQueries {
 
+    public static final String CHANGE_STATE = """
+            UPDATE activity
+            SET activity_state = :state,
+                activity_updated_at = NOW()
+            WHERE activity_id = :activityId;
+            """;
+
     public static final String IS_ANY_FAILED = """
             SELECT EXISTS (
                 SELECT 1
@@ -26,9 +33,9 @@ public final class ActivityQueries {
                 SELECT 1
                 FROM activity
                 WHERE process_id = :processId
-                  AND activity_completed_at IS NULL
+                  AND activity_state NOT IN ('COMPLETED', 'CANCELED', 'TERMINATED')
                   AND activity_async = false
-            )
+            );
             """;
 
     public static final String IS_ALL_COMPLETED = """

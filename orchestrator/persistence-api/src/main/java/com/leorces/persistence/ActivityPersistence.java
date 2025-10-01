@@ -3,6 +3,7 @@ package com.leorces.persistence;
 
 import com.leorces.model.runtime.activity.Activity;
 import com.leorces.model.runtime.activity.ActivityExecution;
+import com.leorces.model.runtime.activity.ActivityState;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,14 @@ public interface ActivityPersistence {
      * @return the failed activity
      */
     ActivityExecution fail(ActivityExecution activity);
+
+    /**
+     * Changes the state of a activity by its identifier.
+     *
+     * @param activityId the activity identifier
+     * @param state      the new activity state
+     */
+    void changeState(String activityId, ActivityState state);
 
     /**
      * Finds an activity by its unique identifier.

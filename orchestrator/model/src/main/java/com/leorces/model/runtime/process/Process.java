@@ -45,4 +45,13 @@ public record Process(
         return parentId != null;
     }
 
+    @JsonIgnore
+    public boolean isActive() {
+        return state == ProcessState.ACTIVE;
+    }
+
+    @JsonIgnore
+    public boolean isInTerminalState() {
+        return state.isTerminal();
+    }
 }

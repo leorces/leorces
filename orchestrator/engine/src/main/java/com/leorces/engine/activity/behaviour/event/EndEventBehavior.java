@@ -1,36 +1,26 @@
 package com.leorces.engine.activity.behaviour.event;
 
-import com.leorces.engine.activity.behaviour.ActivityBehavior;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
-import com.leorces.engine.event.process.ProcessEvent;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-@RequiredArgsConstructor
-public class EndEventBehavior implements ActivityBehavior {
+public class EndEventBehavior extends AbstractActivityBehavior {
 
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
-
-    @Override
-    public void run(ActivityExecution activity) {
-        eventBus.publish(ActivityEvent.completeAsync(activity));
+    protected EndEventBehavior(ActivityPersistence activityPersistence,
+                               CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        if (result.parentDefinitionId() == null) {
-            eventBus.publish(ProcessEvent.completeAsync(result.process()));
-        } else {
-            eventBus.publish(ActivityEvent.completeByDefinitionIdAsync(result.parentDefinitionId(), result.processId()));
-        }
-        return result;
+    public List<ActivityDefinition> getNextActivities(ActivityExecution activity) {
+        return List.of();
     }
 
     @Override

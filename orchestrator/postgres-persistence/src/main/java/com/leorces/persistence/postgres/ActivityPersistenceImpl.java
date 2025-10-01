@@ -73,6 +73,12 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
+    @Transactional
+    public void changeState(String activityId, ActivityState state) {
+        activityRepository.changeState(activityId, state.name());
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<ActivityExecution> findById(String id) {
         return activityRepository.findById(id)

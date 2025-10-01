@@ -1,57 +1,45 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
-import com.leorces.engine.activity.behaviour.CancellableActivityBehaviour;
-import com.leorces.engine.activity.behaviour.FailableActivityBehavior;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
-import com.leorces.engine.event.process.ProcessEvent;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.process.command.CancelProcessCommand;
+import com.leorces.engine.process.command.RunProcessCommand;
+import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class CallActivityBehavior implements CancellableActivityBehaviour, FailableActivityBehavior {
+public class CallActivityBehavior extends AbstractActivityBehavior {
 
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
+    protected CallActivityBehavior(ActivityPersistence activityPersistence,
+                                   CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
+    }
 
     @Override
     public void run(ActivityExecution activity) {
         var result = activityPersistence.run(activity);
-        eventBus.publish(ProcessEvent.startByCallActivity(result));
-    }
-
-    @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        eventBus.publish(ActivityEvent.runAllAsync(result.nextActivities(), result.process()));
-        return result;
-    }
-
-    @Override
-    public void fail(ActivityExecution activity) {
-        var result = activityPersistence.fail(activity);
-        eventBus.publish(ActivityEvent.incidentFailEvent(result));
+        dispatcher.dispatch(RunProcessCommand.of(result));
     }
 
     @Override
     public void retry(ActivityExecution activity) {
         var failedActivities = activityPersistence.findFailed(activity.id());
-        eventBus.publish(ActivityEvent.retryAllAsync(failedActivities));
+        dispatcher.dispatchAsync(RetryAllActivitiesCommand.of(failedActivities));
     }
 
     @Override
     public void cancel(ActivityExecution activity) {
-        eventBus.publish(ProcessEvent.cancelByIdEvent(activity.id()));
+        dispatcher.dispatch(CancelProcessCommand.of(activity.id()));
         activityPersistence.cancel(activity);
     }
 
     @Override
     public void terminate(ActivityExecution activity) {
-        eventBus.publish(ProcessEvent.terminateByIdEvent(activity.id()));
+        dispatcher.dispatch(TerminateProcessCommand.of(activity.id()));
         activityPersistence.terminate(activity);
     }
 

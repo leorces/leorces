@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0otok8n" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.36.1" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.23.0">
+  <bpmn:collaboration id="Collaboration_13cu7m6">
+    <bpmn:participant id="Participant_OrderProcess" name="Order Process" processRef="OrderProcess" />
+  </bpmn:collaboration>
+  <bpmn:process id="OrderProcess" name="Order Process" isExecutable="true">
+    <bpmn:startEvent id="OrderProcessStartEvent">
+      <bpmn:outgoing>Flow_1c3yuxv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:callActivity id="OrderSubmittedProcess" name="Order Submitted Process" calledElement="OrderSubmittedProcess" camunda:calledElementTenantId="">
+      <bpmn:extensionElements>
+        <camunda:in source="order" target="order" />
+        <camunda:in source="client" target="client" />
+        <camunda:inputOutput>
+          <camunda:outputParameter name="test">test</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1c3yuxv</bpmn:incoming>
+      <bpmn:outgoing>Flow_0q3woxf</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="OrderProcessEndEvent">
+      <bpmn:incoming>Flow_1b09jye</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:callActivity id="OrderPaymentProcess" name="Order Payment Process" calledElement="OrderPaymentProcess" camunda:calledElementTenantId="">
+      <bpmn:extensionElements>
+        <camunda:in source="order" target="order" />
+        <camunda:in source="client" target="client" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0q3woxf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1b09jye</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:endEvent id="Event_1hvxg1f">
+      <bpmn:incoming>Flow_1wtnxfo</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="PaymentCanceledNotification" name="Payment canceled notification" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your payment canceled!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_185909i</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wtnxfo</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="Event_1jr9dj4">
+      <bpmn:incoming>Flow_0dl5ccq</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="PaymentTimeoutNotification" name="Payment timeout notification" camunda:type="external" camunda:topic="notification">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your payment canceled due to timeout!</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0eue19x</bpmn:incoming>
+      <bpmn:outgoing>Flow_0dl5ccq</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:subProcess id="PaymentFailed" name="Payment Rejected" triggeredByEvent="true">
+      <bpmn:startEvent id="PaymentFailedErrorStartEvent">
+        <bpmn:outgoing>Flow_011nxnu</bpmn:outgoing>
+        <bpmn:errorEventDefinition id="ErrorEventDefinition_00u4g4m" errorRef="Error_0mh3cpl" />
+      </bpmn:startEvent>
+      <bpmn:endEvent id="PaymentFailedTerminateEndEvent">
+        <bpmn:incoming>Flow_1gzzr9s</bpmn:incoming>
+        <bpmn:terminateEventDefinition id="TerminateEventDefinition_1cyfg0j" />
+      </bpmn:endEvent>
+      <bpmn:sendTask id="PaymentRejectedNotification" name="Payment rejected notification" camunda:type="external" camunda:topic="notification">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="message">Hi, ${client.firstName} ${client.lastName}! Your payment failed!</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_011nxnu</bpmn:incoming>
+        <bpmn:outgoing>Flow_1gzzr9s</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:sequenceFlow id="Flow_011nxnu" sourceRef="PaymentFailedErrorStartEvent" targetRef="PaymentRejectedNotification" />
+      <bpmn:sequenceFlow id="Flow_1gzzr9s" sourceRef="PaymentRejectedNotification" targetRef="PaymentFailedTerminateEndEvent" />
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent id="Event_0d1wliw" attachedToRef="OrderPaymentProcess">
+      <bpmn:outgoing>Flow_0eue19x</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_0osbzys" errorRef="Error_1tkfxwx" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_1c3yuxv" sourceRef="OrderProcessStartEvent" targetRef="OrderSubmittedProcess" />
+    <bpmn:sequenceFlow id="Flow_0q3woxf" sourceRef="OrderSubmittedProcess" targetRef="OrderPaymentProcess" />
+    <bpmn:sequenceFlow id="Flow_1b09jye" sourceRef="OrderPaymentProcess" targetRef="OrderProcessEndEvent" />
+    <bpmn:sequenceFlow id="Flow_1wtnxfo" sourceRef="PaymentCanceledNotification" targetRef="Event_1hvxg1f" />
+    <bpmn:sequenceFlow id="Flow_185909i" sourceRef="Event_1gm5bl0" targetRef="PaymentCanceledNotification" />
+    <bpmn:sequenceFlow id="Flow_0dl5ccq" sourceRef="PaymentTimeoutNotification" targetRef="Event_1jr9dj4" />
+    <bpmn:sequenceFlow id="Flow_0eue19x" sourceRef="Event_0d1wliw" targetRef="PaymentTimeoutNotification" />
+    <bpmn:boundaryEvent id="Event_1gm5bl0" name="Payment cancel event" attachedToRef="OrderPaymentProcess">
+      <bpmn:outgoing>Flow_185909i</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0nzwbyz" messageRef="Message_205phe2" />
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmn:error id="Error_0mh3cpl" name="PaymentRejected" errorCode="PAYMENT_REJECTED" camunda:errorMessage="Hi, ${client.firstName} ${client.lastName}! Your payment rejected!" />
+  <bpmn:message id="Message_205phe2" name="PaymentCancel" />
+  <bpmn:error id="Error_1tkfxwx" name="PaymentTimeout" errorCode="PAYMENT_TIMEOUT" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_13cu7m6">
+      <bpmndi:BPMNShape id="Participant_0kio75s_di" bpmnElement="Participant_OrderProcess" isHorizontal="true">
+        <dc:Bounds x="130" y="80" width="770" height="710" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="OrderProcessStartEvent">
+        <dc:Bounds x="182" y="322" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jagv2a_di" bpmnElement="OrderSubmittedProcess">
+        <dc:Bounds x="270" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0fuw0yg_di" bpmnElement="OrderProcessEndEvent">
+        <dc:Bounds x="572" y="322" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0u260r7" bpmnElement="OrderPaymentProcess">
+        <dc:Bounds x="420" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hvxg1f_di" bpmnElement="Event_1hvxg1f">
+        <dc:Bounds x="742" y="442" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17azt4l_di" bpmnElement="PaymentCanceledNotification">
+        <dc:Bounds x="590" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jr9dj4_di" bpmnElement="Event_1jr9dj4">
+        <dc:Bounds x="742" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_18sngsx_di" bpmnElement="PaymentTimeoutNotification">
+        <dc:Bounds x="590" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0oobenw_di" bpmnElement="PaymentFailed" isExpanded="true">
+        <dc:Bounds x="270" y="550" width="350" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1owh40q_di" bpmnElement="PaymentFailedErrorStartEvent">
+        <dc:Bounds x="310" y="632" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f4qkop_di" bpmnElement="PaymentFailedTerminateEndEvent">
+        <dc:Bounds x="562" y="632" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_132yfep_di" bpmnElement="PaymentRejectedNotification">
+        <dc:Bounds x="400" y="610" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_011nxnu_di" bpmnElement="Flow_011nxnu">
+        <di:waypoint x="346" y="650" />
+        <di:waypoint x="400" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gzzr9s_di" bpmnElement="Flow_1gzzr9s">
+        <di:waypoint x="500" y="650" />
+        <di:waypoint x="562" y="650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_0os7aee_di" bpmnElement="Event_1gm5bl0">
+        <dc:Bounds x="502" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="430" y="416" width="79" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0d1wliw_di" bpmnElement="Event_0d1wliw">
+        <dc:Bounds x="502" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1c3yuxv_di" bpmnElement="Flow_1c3yuxv">
+        <di:waypoint x="218" y="340" />
+        <di:waypoint x="270" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0q3woxf_di" bpmnElement="Flow_0q3woxf">
+        <di:waypoint x="370" y="340" />
+        <di:waypoint x="420" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b09jye_di" bpmnElement="Flow_1b09jye">
+        <di:waypoint x="520" y="340" />
+        <di:waypoint x="572" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wtnxfo_di" bpmnElement="Flow_1wtnxfo">
+        <di:waypoint x="690" y="460" />
+        <di:waypoint x="742" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_185909i_di" bpmnElement="Flow_185909i">
+        <di:waypoint x="520" y="398" />
+        <di:waypoint x="520" y="460" />
+        <di:waypoint x="590" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0dl5ccq_di" bpmnElement="Flow_0dl5ccq">
+        <di:waypoint x="690" y="220" />
+        <di:waypoint x="742" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0eue19x_di" bpmnElement="Flow_0eue19x">
+        <di:waypoint x="520" y="282" />
+        <di:waypoint x="520" y="220" />
+        <di:waypoint x="590" y="220" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

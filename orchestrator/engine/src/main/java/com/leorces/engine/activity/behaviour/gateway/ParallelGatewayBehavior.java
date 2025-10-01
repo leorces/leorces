@@ -1,26 +1,26 @@
 package com.leorces.engine.activity.behaviour.gateway;
 
-import com.leorces.engine.activity.behaviour.ActivityBehavior;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class ParallelGatewayBehavior implements ActivityBehavior {
+public class ParallelGatewayBehavior extends AbstractActivityBehavior {
 
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
+    protected ParallelGatewayBehavior(ActivityPersistence activityPersistence,
+                                      CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
+    }
 
     @Override
     public void run(ActivityExecution activity) {
         if (activity.definition().incoming().size() == 1) {
-            eventBus.publish(ActivityEvent.completeAsync(activity));
+            dispatcher.dispatchAsync(CompleteActivityCommand.of(activity));
             return;
         }
 
@@ -29,15 +29,8 @@ public class ParallelGatewayBehavior implements ActivityBehavior {
                 .toList();
 
         if (activityPersistence.isAllCompleted(activity.processId(), incomingActivityIds)) {
-            eventBus.publish(ActivityEvent.completeAsync(activity));
+            dispatcher.dispatchAsync(CompleteActivityCommand.of(activity));
         }
-    }
-
-    @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        eventBus.publish(ActivityEvent.runAllAsync(result.nextActivities(), result.process()));
-        return result;
     }
 
     @Override

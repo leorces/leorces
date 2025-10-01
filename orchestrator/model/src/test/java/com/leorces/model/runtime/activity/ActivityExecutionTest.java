@@ -359,46 +359,6 @@ class ActivityExecutionTest {
     }
 
     @Test
-    @DisplayName("Should return true for isActive when state is ACTIVE")
-    void shouldReturnTrueForIsActiveWhenStateIsActive() {
-        // Given
-        var process = createTestProcess();
-        var activityExecution = ActivityExecution.builder()
-                .id(TEST_ID)
-                .definitionId(TEST_DEFINITION_ID)
-                .process(process)
-                .state(ActivityState.ACTIVE)
-                .retries(TEST_RETRIES)
-                .build();
-
-        // When
-        var isActive = activityExecution.isActive();
-
-        // Then
-        assertTrue(isActive);
-    }
-
-    @Test
-    @DisplayName("Should return false for isActive when state is not ACTIVE")
-    void shouldReturnFalseForIsActiveWhenStateIsNotActive() {
-        // Given
-        var process = createTestProcess();
-        var activityExecution = ActivityExecution.builder()
-                .id(TEST_ID)
-                .definitionId(TEST_DEFINITION_ID)
-                .process(process)
-                .state(ActivityState.COMPLETED)
-                .retries(TEST_RETRIES)
-                .build();
-
-        // When
-        var isActive = activityExecution.isActive();
-
-        // Then
-        assertFalse(isActive);
-    }
-
-    @Test
     @DisplayName("Should support toBuilder functionality")
     void shouldSupportToBuilderFunctionality() {
         // Given

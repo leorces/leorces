@@ -1,10 +1,10 @@
 package com.leorces.engine.activity.behaviour.event;
 
-import com.leorces.engine.activity.behaviour.CancellableActivityBehaviour;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.behaviour.TriggerableActivityBehaviour;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
-import com.leorces.engine.variables.VariableRuntimeService;
+import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.variables.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -12,22 +12,27 @@ import com.leorces.model.definition.activity.event.IntermediateCatchEvent;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class IntermediateCatchEventBehavior implements TriggerableActivityBehaviour, CancellableActivityBehaviour {
+public class IntermediateCatchEventBehavior extends AbstractActivityBehavior implements TriggerableActivityBehaviour {
 
-    private final VariableRuntimeService variableRuntimeService;
-    private final ActivityPersistence activityPersistence;
+    private final VariablesService variablesService;
     private final ExpressionEvaluator expressionEvaluator;
-    private final EngineEventBus eventBus;
+
+    protected IntermediateCatchEventBehavior(ActivityPersistence activityPersistence,
+                                             CommandDispatcher dispatcher,
+                                             VariablesService variablesService,
+                                             ExpressionEvaluator expressionEvaluator) {
+        super(activityPersistence, dispatcher);
+        this.variablesService = variablesService;
+        this.expressionEvaluator = expressionEvaluator;
+    }
 
     @Override
     public void trigger(Process process, ActivityDefinition definition) {
         activityPersistence.findByDefinitionId(process.id(), definition.id())
-                .ifPresent(activity -> eventBus.publish(ActivityEvent.completeAsync(activity)));
+                .ifPresent(activity -> dispatcher.dispatchAsync(CompleteActivityCommand.of(activity)));
     }
 
     @Override
@@ -35,25 +40,15 @@ public class IntermediateCatchEventBehavior implements TriggerableActivityBehavi
         var result = activityPersistence.run(activity);
 
         if (isConditionMatched(result)) {
-            eventBus.publish(ActivityEvent.completeAsync(result));
+            dispatcher.dispatchAsync(CompleteActivityCommand.of(result));
         }
     }
 
     @Override
     public ActivityExecution complete(ActivityExecution activity) {
         var result = activityPersistence.complete(activity);
-        eventBus.publish(ActivityEvent.runAllAsync(result.nextActivities(), result.process()));
+        completeEventBasedGatewayActivities(activity);
         return result;
-    }
-
-    @Override
-    public void cancel(ActivityExecution activity) {
-        activityPersistence.cancel(activity);
-    }
-
-    @Override
-    public void terminate(ActivityExecution activity) {
-        activityPersistence.terminate(activity);
     }
 
     @Override
@@ -62,7 +57,7 @@ public class IntermediateCatchEventBehavior implements TriggerableActivityBehavi
     }
 
     private boolean isConditionMatched(ActivityExecution activity) {
-        var variables = variableRuntimeService.getScopedVariables(activity);
+        var variables = variablesService.getScopedVariables(activity);
         var definition = (IntermediateCatchEvent) activity.definition();
         return expressionEvaluator.evaluateBoolean(definition.condition(), variables);
     }

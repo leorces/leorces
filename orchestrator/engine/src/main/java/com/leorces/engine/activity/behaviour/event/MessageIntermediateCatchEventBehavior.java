@@ -1,20 +1,29 @@
 package com.leorces.engine.activity.behaviour.event;
 
-import com.leorces.engine.activity.behaviour.CancellableActivityBehaviour;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.behaviour.TriggerableActivityBehaviour;
+import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
+import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class MessageIntermediateCatchEventBehavior implements CancellableActivityBehaviour {
+public class MessageIntermediateCatchEventBehavior extends AbstractActivityBehavior implements TriggerableActivityBehaviour {
 
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
+    protected MessageIntermediateCatchEventBehavior(ActivityPersistence activityPersistence,
+                                                    CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
+    }
+
+    @Override
+    public void trigger(Process process, ActivityDefinition definition) {
+        activityPersistence.findByDefinitionId(process.id(), definition.id())
+                .ifPresent(activity -> dispatcher.dispatchAsync(CompleteActivityCommand.of(activity)));
+    }
 
     @Override
     public void run(ActivityExecution activity) {
@@ -24,18 +33,8 @@ public class MessageIntermediateCatchEventBehavior implements CancellableActivit
     @Override
     public ActivityExecution complete(ActivityExecution activity) {
         var result = activityPersistence.complete(activity);
-        eventBus.publish(ActivityEvent.runAllAsync(result.nextActivities(), result.process()));
+        completeEventBasedGatewayActivities(result);
         return result;
-    }
-
-    @Override
-    public void cancel(ActivityExecution activity) {
-        activityPersistence.cancel(activity);
-    }
-
-    @Override
-    public void terminate(ActivityExecution activity) {
-        activityPersistence.terminate(activity);
     }
 
     @Override

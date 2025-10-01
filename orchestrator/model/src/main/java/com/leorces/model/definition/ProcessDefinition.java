@@ -38,9 +38,9 @@ public record ProcessDefinition(
     }
 
     @JsonIgnore
-    public Optional<ActivityDefinition> getActivityById(String activityDefinitionId) {
+    public Optional<ActivityDefinition> getActivityById(String definitionId) {
         return activities.stream()
-                .filter(activity -> activity.id().equals(activityDefinitionId))
+                .filter(activity -> activity.id().equals(definitionId))
                 .findFirst();
     }
 

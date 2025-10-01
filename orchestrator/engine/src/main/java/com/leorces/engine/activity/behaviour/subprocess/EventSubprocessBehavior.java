@@ -1,49 +1,29 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
-import com.leorces.engine.activity.behaviour.CancellableActivityBehaviour;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
-@RequiredArgsConstructor
-public class EventSubprocessBehavior implements CancellableActivityBehaviour {
+public class EventSubprocessBehavior extends AbstractSubprocessBehavior {
 
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
-
-    @Override
-    public void run(ActivityExecution activity) {
-        var result = activityPersistence.run(activity);
-        eventBus.publish(ActivityEvent.runByDefinitionAsync(getStartEvent(result), result.process()));
+    protected EventSubprocessBehavior(ActivityPersistence activityPersistence,
+                                      CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        return activityPersistence.complete(activity);
+    public List<ActivityDefinition> getNextActivities(ActivityExecution activity) {
+        return List.of();
     }
 
     @Override
-    public void cancel(ActivityExecution activity) {
-        activityPersistence.cancel(activity);
-    }
-
-    @Override
-    public void terminate(ActivityExecution activity) {
-        activityPersistence.terminate(activity);
-    }
-
-    @Override
-    public ActivityType type() {
-        return ActivityType.EVENT_SUBPROCESS;
-    }
-
     protected ActivityDefinition getStartEvent(ActivityExecution activity) {
         var definitionId = activity.definition().id();
         return activity.processDefinition().activities().stream()
@@ -51,6 +31,11 @@ public class EventSubprocessBehavior implements CancellableActivityBehaviour {
                 .filter(this::isStartEvent)
                 .findFirst()
                 .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(activity.definition().id()));
+    }
+
+    @Override
+    public ActivityType type() {
+        return ActivityType.EVENT_SUBPROCESS;
     }
 
     private boolean isStartEvent(ActivityDefinition activityDefinition) {

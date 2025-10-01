@@ -1,8 +1,11 @@
 package com.leorces.engine.activity.behaviour.event.boundary;
 
+import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.behaviour.TriggerableActivityBehaviour;
-import com.leorces.engine.event.EngineEventBus;
-import com.leorces.engine.event.activity.ActivityEvent;
+import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.activity.command.RunActivityCommand;
+import com.leorces.engine.activity.command.TerminateActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.BoundaryEventDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -12,15 +15,16 @@ import com.leorces.persistence.ActivityPersistence;
 
 import java.util.Optional;
 
-public abstract class AbstractBoundaryEventBehavior implements TriggerableActivityBehaviour {
-
-    private final ActivityPersistence activityPersistence;
-    private final EngineEventBus eventBus;
+public abstract class AbstractBoundaryEventBehavior extends AbstractActivityBehavior implements TriggerableActivityBehaviour {
 
     protected AbstractBoundaryEventBehavior(ActivityPersistence activityPersistence,
-                                            EngineEventBus eventBus) {
-        this.activityPersistence = activityPersistence;
-        this.eventBus = eventBus;
+                                            CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
+    }
+
+    @Override
+    public void trigger(Process process, ActivityDefinition definition) {
+        dispatcher.dispatchAsync(RunActivityCommand.of(process, definition));
     }
 
     @Override
@@ -32,25 +36,11 @@ public abstract class AbstractBoundaryEventBehavior implements TriggerableActivi
             return;
         }
 
-        var result = activityPersistence.run(activity);
-
         if (boundaryEvent.cancelActivity()) {
-            eventBus.publish(ActivityEvent.terminate(attachedActivity.get()));
+            dispatcher.dispatch(TerminateActivityCommand.of(attachedActivity.get(), true));
         }
 
-        eventBus.publish(ActivityEvent.completeAsync(result));
-    }
-
-    @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        eventBus.publish(ActivityEvent.runAllAsync(result.nextActivities(), result.process()));
-        return result;
-    }
-
-    @Override
-    public void trigger(Process process, ActivityDefinition definition) {
-        eventBus.publish(ActivityEvent.runByDefinitionAsync(definition, process));
+        dispatcher.dispatch(CompleteActivityCommand.of(activity));
     }
 
     protected boolean shouldRun(Optional<ActivityExecution> attachedActivity) {

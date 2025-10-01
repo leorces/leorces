@@ -1,7 +1,7 @@
 package com.leorces.engine.process;
 
 import com.leorces.engine.exception.process.ProcessDefinitionNotFoundException;
-import com.leorces.engine.variables.VariableRuntimeService;
+import com.leorces.engine.variables.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.VariableMapping;
@@ -17,10 +17,10 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-class ProcessFactory {
+public class ProcessFactory {
 
     private final DefinitionPersistence definitionPersistence;
-    private final VariableRuntimeService variableRuntimeService;
+    private final VariablesService variablesService;
     private final ExpressionEvaluator expressionEvaluator;
 
     public Process createByDefinitionId(String definitionId,
@@ -31,7 +31,7 @@ class ProcessFactory {
 
         return Process.builder()
                 .businessKey(businessKey)
-                .variables(variableRuntimeService.toList(variables))
+                .variables(variablesService.toList(variables))
                 .definition(definition)
                 .build();
     }
@@ -42,7 +42,7 @@ class ProcessFactory {
         var definition = getDefinitionByKey(definitionKey);
         return Process.builder()
                 .businessKey(businessKey)
-                .variables(variableRuntimeService.toList(variables))
+                .variables(variablesService.toList(variables))
                 .definition(definition)
                 .build();
     }
@@ -62,14 +62,14 @@ class ProcessFactory {
                 .rootProcessId(rootProcessId)
                 .businessKey(activity.process().businessKey())
                 .definition(definition)
-                .variables(variableRuntimeService.toList(variables))
+                .variables(variablesService.toList(variables))
                 .build();
     }
 
     private Map<String, Object> prepareVariables(ActivityExecution activity) {
         var callActivity = (CallActivity) activity.definition();
         var variables = new HashMap<String, Object>();
-        var scopedVariables = variableRuntimeService.getScopedVariables(activity);
+        var scopedVariables = variablesService.getScopedVariables(activity);
 
         if (callActivity.inheritVariables()) {
             variables.putAll(scopedVariables);
