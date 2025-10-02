@@ -13,12 +13,6 @@ public class HomeController {
 
     @GetMapping("/")
     public String root() {
-        return "redirect:/processes";
-    }
-
-
-    @GetMapping("/processes")
-    public String processes() {
         return "index";
     }
 
