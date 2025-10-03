@@ -193,14 +193,12 @@ public final class ProcessQueries {
 
     public static final String FIND_ALL_FULLY_COMPLETED = BASE_SELECT_WITH_ACTIVITIES + """
             WHERE process.process_state != 'ACTIVE'
-              AND process.process_state != 'SCHEDULED'
               AND process.process_state != 'INCIDENT'
               AND (process.root_process_id IS NULL OR NOT EXISTS (
                   SELECT 1
                   FROM process root_process
                   WHERE root_process.process_id = process.root_process_id
                     AND (root_process.process_state = 'ACTIVE'
-                         OR root_process.process_state = 'SCHEDULED'
                          OR root_process.process_state = 'INCIDENT')
               ))
               AND NOT EXISTS (
