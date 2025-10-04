@@ -1,7 +1,6 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
-import com.leorces.engine.activity.command.CancelAllActivitiesCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
@@ -25,24 +24,12 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
     }
 
     @Override
-    public void cancel(ActivityExecution activity) {
-        cancelChildActivities(activity);
-        activityPersistence.cancel(activity);
-    }
-
-    @Override
-    public void terminate(ActivityExecution activity) {
+    public ActivityExecution terminate(ActivityExecution activity) {
         terminateChildActivities(activity);
-        activityPersistence.terminate(activity);
+        return activityPersistence.terminate(activity);
     }
 
     protected abstract ActivityDefinition getStartEvent(ActivityExecution activity);
-
-    private void cancelChildActivities(ActivityExecution activity) {
-        var childActivityIds = getChildActivityIds(activity);
-        var childActivities = activityPersistence.findActive(activity.processId(), childActivityIds);
-        dispatcher.dispatch(CancelAllActivitiesCommand.of(childActivities));
-    }
 
     private void terminateChildActivities(ActivityExecution activity) {
         var childActivityIds = getChildActivityIds(activity);

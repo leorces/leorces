@@ -1,13 +1,11 @@
 package com.leorces.persistence;
 
-
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
 
 import java.util.List;
 import java.util.Optional;
-
 
 /**
  * Persistence layer for managing process definitions.

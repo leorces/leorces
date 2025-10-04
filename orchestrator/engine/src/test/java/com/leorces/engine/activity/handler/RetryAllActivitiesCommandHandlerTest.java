@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +25,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("RetryAllActivitiesCommandHandler Tests")
 class RetryAllActivitiesCommandHandlerTest {
 
@@ -49,13 +52,13 @@ class RetryAllActivitiesCommandHandlerTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(activityExecution1.id()).thenReturn(ACTIVITY_ID_1);
-        lenient().when(activityExecution1.type()).thenReturn(ActivityType.EXTERNAL_TASK);
-        lenient().when(activityExecution2.id()).thenReturn(ACTIVITY_ID_2);
-        lenient().when(activityExecution2.type()).thenReturn(ActivityType.RECEIVE_TASK);
+        when(activityExecution1.id()).thenReturn(ACTIVITY_ID_1);
+        when(activityExecution1.type()).thenReturn(ActivityType.EXTERNAL_TASK);
+        when(activityExecution2.id()).thenReturn(ACTIVITY_ID_2);
+        when(activityExecution2.type()).thenReturn(ActivityType.RECEIVE_TASK);
 
-        lenient().when(behaviorResolver.resolveBehavior(any())).thenReturn(activityBehavior);
-        lenient().when(taskExecutor.submit(any(Runnable.class)))
+        when(behaviorResolver.resolveBehavior(any())).thenReturn(activityBehavior);
+        when(taskExecutor.submit(any(Runnable.class)))
                 .thenAnswer(invocation -> {
                     Runnable r = invocation.getArgument(0);
                     r.run();

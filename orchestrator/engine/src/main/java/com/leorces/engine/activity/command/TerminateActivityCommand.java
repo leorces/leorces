@@ -18,16 +18,16 @@ public record TerminateActivityCommand(
                 .build();
     }
 
-    public static TerminateActivityCommand of(ActivityExecution activity) {
-        return TerminateActivityCommand.builder()
-                .activity(activity)
-                .withInterruption(false)
-                .build();
-    }
-
     public static TerminateActivityCommand of(ActivityExecution activity, boolean withInterruption) {
         return TerminateActivityCommand.builder()
                 .activity(activity)
+                .withInterruption(withInterruption)
+                .build();
+    }
+
+    public static TerminateActivityCommand of(String activityId, boolean withInterruption) {
+        return TerminateActivityCommand.builder()
+                .activityId(activityId)
                 .withInterruption(withInterruption)
                 .build();
     }

@@ -12,9 +12,7 @@ public interface ActivityBehavior {
 
     ActivityExecution complete(ActivityExecution activity);
 
-    void cancel(ActivityExecution activity);
-
-    void terminate(ActivityExecution activity);
+    ActivityExecution terminate(ActivityExecution activity);
 
     boolean fail(ActivityExecution activity);
 

@@ -5,11 +5,10 @@ public enum ActivityState {
     SCHEDULED,
     ACTIVE,
     COMPLETED,
-    CANCELED,
     TERMINATED,
     FAILED;
 
     public boolean isTerminal() {
-        return this == TERMINATED || this == CANCELED || this == COMPLETED;
+        return this == TERMINATED || this == COMPLETED;
     }
 }

@@ -62,27 +62,6 @@ class ProcessPersistenceIT extends RepositoryIT {
     }
 
     @Test
-    @DisplayName("Should cancel an active process successfully")
-    void cancel() {
-        // Given
-        var process = processPersistence.run(createOrderSubmittedProcess());
-
-        // When
-        var result = processPersistence.cancel(process);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(process.id());
-        assertThat(result.state()).isEqualTo(ProcessState.CANCELED);
-        assertThat(result.completedAt()).isNotNull();
-        assertThat(result.updatedAt()).isNotNull();
-        assertThat(result.definition()).isEqualTo(process.definition());
-        assertThat(result.variables()).isEqualTo(process.variables());
-        assertThat(result.startedAt()).isEqualTo(process.startedAt());
-        assertThat(result.createdAt()).isEqualTo(process.createdAt());
-    }
-
-    @Test
     @DisplayName("Should terminate an active process successfully")
     void terminate() {
         // Given

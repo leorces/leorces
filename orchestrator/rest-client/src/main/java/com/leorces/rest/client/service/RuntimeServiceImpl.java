@@ -57,6 +57,16 @@ public class RuntimeServiceImpl implements RuntimeService {
     }
 
     @Override
+    public void terminateProcess(String processId) {
+        runtimeClient.terminateProcess(processId);
+    }
+
+    @Override
+    public void moveExecution(String processId, String activityId, String targetDefinitionId) {
+        runtimeClient.moveExecution(processId, activityId, targetDefinitionId);
+    }
+
+    @Override
     public void setVariable(String executionId, String key, Object value) {
         setVariables(executionId, Map.of(key, value));
     }

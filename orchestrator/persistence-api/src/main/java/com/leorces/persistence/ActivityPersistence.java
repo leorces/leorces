@@ -1,13 +1,11 @@
 package com.leorces.persistence;
 
-
 import com.leorces.model.runtime.activity.Activity;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 
 import java.util.List;
 import java.util.Optional;
-
 
 /**
  * Persistence layer for managing activities throughout their lifecycle.
@@ -40,14 +38,6 @@ public interface ActivityPersistence {
     ActivityExecution complete(ActivityExecution activity);
 
     /**
-     * Cancels an activity.
-     *
-     * @param activity the activity to cancel
-     * @return the cancelled activity
-     */
-    ActivityExecution cancel(ActivityExecution activity);
-
-    /**
      * Terminates an activity forcefully.
      *
      * @param activity the activity to terminate
@@ -70,6 +60,14 @@ public interface ActivityPersistence {
      * @param state      the new activity state
      */
     void changeState(String activityId, ActivityState state);
+
+    /**
+     * Deletes all active activities by its identifier.
+     *
+     * @param processId     the process identifier
+     * @param definitionIds the list of activity definition identifiers
+     */
+    void deleteAllActive(String processId, List<String> definitionIds);
 
     /**
      * Finds an activity by its unique identifier.

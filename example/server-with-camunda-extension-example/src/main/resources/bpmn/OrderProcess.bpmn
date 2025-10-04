@@ -9,11 +9,7 @@
     </bpmn:startEvent>
     <bpmn:callActivity id="OrderSubmittedProcess" name="Order Submitted Process" calledElement="OrderSubmittedProcess" camunda:calledElementTenantId="">
       <bpmn:extensionElements>
-        <camunda:in source="order" target="order" />
-        <camunda:in source="client" target="client" />
-        <camunda:inputOutput>
-          <camunda:outputParameter name="test">test</camunda:outputParameter>
-        </camunda:inputOutput>
+        <camunda:in variables="all" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1c3yuxv</bpmn:incoming>
       <bpmn:outgoing>Flow_0q3woxf</bpmn:outgoing>

@@ -134,4 +134,5 @@ public record ActivityExecution(
     public boolean isInTerminalState() {
         return state.isTerminal();
     }
+
 }

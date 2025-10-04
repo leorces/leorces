@@ -47,12 +47,6 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
 
     @Override
     @Transactional
-    public Process cancel(Process process) {
-        return save(ProcessStateTransition.to(ProcessState.CANCELED).apply(process), false);
-    }
-
-    @Override
-    @Transactional
     public Process terminate(Process process) {
         return save(ProcessStateTransition.to(ProcessState.TERMINATED).apply(process), false);
     }

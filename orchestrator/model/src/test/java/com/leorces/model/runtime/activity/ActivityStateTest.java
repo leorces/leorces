@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Activity State Tests")
 class ActivityStateTest {
 
-    private static final int EXPECTED_ENUM_COUNT = 6;
+    private static final int EXPECTED_ENUM_COUNT = 5;
 
     @Test
     @DisplayName("Should contain all expected activity states")
@@ -23,7 +23,6 @@ class ActivityStateTest {
         assertTrue(contains(activityStates, ActivityState.SCHEDULED));
         assertTrue(contains(activityStates, ActivityState.ACTIVE));
         assertTrue(contains(activityStates, ActivityState.COMPLETED));
-        assertTrue(contains(activityStates, ActivityState.CANCELED));
         assertTrue(contains(activityStates, ActivityState.TERMINATED));
         assertTrue(contains(activityStates, ActivityState.FAILED));
     }
@@ -129,9 +128,8 @@ class ActivityStateTest {
         assertEquals(ActivityState.SCHEDULED, states[0]);
         assertEquals(ActivityState.ACTIVE, states[1]);
         assertEquals(ActivityState.COMPLETED, states[2]);
-        assertEquals(ActivityState.CANCELED, states[3]);
-        assertEquals(ActivityState.TERMINATED, states[4]);
-        assertEquals(ActivityState.FAILED, states[5]);
+        assertEquals(ActivityState.TERMINATED, states[3]);
+        assertEquals(ActivityState.FAILED, states[4]);
     }
 
     @Test
@@ -139,16 +137,12 @@ class ActivityStateTest {
     void shouldDistinguishBetweenDifferentEndStates() {
         // Given
         var completedState = ActivityState.COMPLETED;
-        var canceledState = ActivityState.CANCELED;
         var terminatedState = ActivityState.TERMINATED;
         var failedState = ActivityState.FAILED;
 
         // When & Then
-        assertNotEquals(completedState, canceledState);
         assertNotEquals(completedState, terminatedState);
         assertNotEquals(completedState, failedState);
-        assertNotEquals(canceledState, terminatedState);
-        assertNotEquals(canceledState, failedState);
         assertNotEquals(terminatedState, failedState);
     }
 

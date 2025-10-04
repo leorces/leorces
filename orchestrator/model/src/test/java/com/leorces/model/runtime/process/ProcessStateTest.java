@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Process State Tests")
 class ProcessStateTest {
 
-    private static final int EXPECTED_ENUM_COUNT = 5;
+    private static final int EXPECTED_ENUM_COUNT = 4;
 
     @Test
     @DisplayName("Should contain all expected process states")
@@ -22,7 +22,6 @@ class ProcessStateTest {
         assertEquals(EXPECTED_ENUM_COUNT, processStates.length);
         assertTrue(contains(processStates, ProcessState.ACTIVE));
         assertTrue(contains(processStates, ProcessState.COMPLETED));
-        assertTrue(contains(processStates, ProcessState.CANCELED));
         assertTrue(contains(processStates, ProcessState.TERMINATED));
         assertTrue(contains(processStates, ProcessState.INCIDENT));
     }
@@ -57,7 +56,6 @@ class ProcessStateTest {
     void shouldReturnTrueForTerminalStates() {
         // When & Then
         assertTrue(ProcessState.TERMINATED.isTerminal());
-        assertTrue(ProcessState.CANCELED.isTerminal());
         assertTrue(ProcessState.COMPLETED.isTerminal());
     }
 
@@ -140,7 +138,6 @@ class ProcessStateTest {
         // Given
         var terminalStates = new ProcessState[]{
                 ProcessState.TERMINATED,
-                ProcessState.CANCELED,
                 ProcessState.COMPLETED
         };
 

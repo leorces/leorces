@@ -165,9 +165,29 @@ class RuntimeServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should terminate process by ID")
+    void shouldTerminateProcess() {
+        //When
+        runtimeService.terminateProcess(EXECUTION_ID);
+
+        //Then
+        verify(runtimeClient).terminateProcess(EXECUTION_ID);
+    }
+
+    @Test
+    @DisplayName("Should move execution by delegating to RuntimeClient")
+    void shouldMoveExecution() {
+        // When
+        runtimeService.moveExecution(EXECUTION_ID, "activity-123", "target-def-456");
+
+        // Then
+        verify(runtimeClient).moveExecution(EXECUTION_ID, "activity-123", "target-def-456");
+    }
+
+
+    @Test
     @DisplayName("Should set single variable")
     void shouldSetSingleVariable() {
-        //Given
         //When
         runtimeService.setVariable(EXECUTION_ID, VARIABLE_KEY, VARIABLE_VALUE);
 
@@ -178,7 +198,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should set multiple variables")
     void shouldSetMultipleVariables() {
-        //Given
         //When
         runtimeService.setVariables(EXECUTION_ID, VARIABLES);
 
@@ -189,7 +208,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should set single local variable")
     void shouldSetSingleLocalVariable() {
-        //Given
         //When
         runtimeService.setVariableLocal(EXECUTION_ID, VARIABLE_KEY, VARIABLE_VALUE);
 
@@ -200,7 +218,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should set multiple local variables")
     void shouldSetMultipleLocalVariables() {
-        //Given
         //When
         runtimeService.setVariablesLocal(EXECUTION_ID, VARIABLES);
 
@@ -211,7 +228,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should correlate message with business key")
     void shouldCorrelateMessageWithBusinessKey() {
-        //Given
         //When
         runtimeService.correlateMessage(MESSAGE_NAME, BUSINESS_KEY);
 
@@ -222,7 +238,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should correlate message with correlation keys")
     void shouldCorrelateMessageWithCorrelationKeys() {
-        //Given
         //When
         runtimeService.correlateMessage(MESSAGE_NAME, CORRELATION_KEYS);
 
@@ -233,7 +248,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should correlate message with business key and process variables")
     void shouldCorrelateMessageWithBusinessKeyAndProcessVariables() {
-        //Given
         //When
         runtimeService.correlateMessage(MESSAGE_NAME, BUSINESS_KEY, VARIABLES);
 
@@ -244,7 +258,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should correlate message with correlation keys and process variables")
     void shouldCorrelateMessageWithCorrelationKeysAndProcessVariables() {
-        //Given
         //When
         runtimeService.correlateMessage(MESSAGE_NAME, CORRELATION_KEYS, VARIABLES);
 
@@ -255,7 +268,6 @@ class RuntimeServiceImplTest {
     @Test
     @DisplayName("Should correlate message with all parameters")
     void shouldCorrelateMessageWithAllParameters() {
-        //Given
         //When
         runtimeService.correlateMessage(MESSAGE_NAME, BUSINESS_KEY, VARIABLES, CORRELATION_KEYS);
 

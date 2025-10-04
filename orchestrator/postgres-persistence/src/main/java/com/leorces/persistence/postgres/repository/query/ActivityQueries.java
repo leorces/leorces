@@ -2,6 +2,13 @@ package com.leorces.persistence.postgres.repository.query;
 
 public final class ActivityQueries {
 
+    public static final String DELETE_ALL_ACTIVE_BY_DEFINITION_IDS = """
+            DELETE FROM activity
+                WHERE process_id = :processId
+                  AND activity_definition_id IN (:definitionIds)
+                  AND activity_state in ('ACTIVE', 'SCHEDULED');
+            """;
+
     public static final String CHANGE_STATE = """
             UPDATE activity
             SET activity_state = :state,
@@ -33,7 +40,7 @@ public final class ActivityQueries {
                 SELECT 1
                 FROM activity
                 WHERE process_id = :processId
-                  AND activity_state NOT IN ('COMPLETED', 'CANCELED', 'TERMINATED')
+                  AND activity_state NOT IN ('COMPLETED', 'TERMINATED')
                   AND activity_async = false
             );
             """;
@@ -44,7 +51,7 @@ public final class ActivityQueries {
                 FROM activity
                 WHERE process_id = :processId
                   AND activity_definition_id IN (:definitionIds)
-                  AND activity_state <> 'COMPLETED'
+                  AND activity_state NOT IN ('COMPLETED', 'TERMINATED')
             );
             """;
 

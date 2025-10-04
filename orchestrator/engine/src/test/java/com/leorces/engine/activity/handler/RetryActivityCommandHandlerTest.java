@@ -14,12 +14,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("RetryActivityCommandHandler Tests")
 class RetryActivityCommandHandlerTest {
 
@@ -44,11 +47,11 @@ class RetryActivityCommandHandlerTest {
 
     @BeforeEach
     void setUp() {
-        lenient().when(activityExecution.id()).thenReturn(ACTIVITY_ID);
-        lenient().when(activityExecution.definitionId()).thenReturn(DEFINITION_ID);
-        lenient().when(activityExecution.processId()).thenReturn(PROCESS_ID);
-        lenient().when(activityExecution.type()).thenReturn(ActivityType.EXTERNAL_TASK);
-        lenient().when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
+        when(activityExecution.id()).thenReturn(ACTIVITY_ID);
+        when(activityExecution.definitionId()).thenReturn(DEFINITION_ID);
+        when(activityExecution.processId()).thenReturn(PROCESS_ID);
+        when(activityExecution.type()).thenReturn(ActivityType.EXTERNAL_TASK);
+        when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
     }
 
     @Test

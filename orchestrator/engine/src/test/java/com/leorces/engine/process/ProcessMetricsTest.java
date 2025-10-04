@@ -64,13 +64,6 @@ class ProcessMetricsTest {
     }
 
     @Test
-    @DisplayName("recordProcessCancelledMetric should call incrementCounter with correct labels")
-    void recordProcessCancelledMetricShouldCallIncrementCounterWithCorrectLabels() {
-        processMetrics.recordProcessCancelledMetric(process);
-        verifyMetricCalled(PROCESS_CANCELLED);
-    }
-
-    @Test
     @DisplayName("recordProcessTerminatedMetric should call incrementCounter with correct labels")
     void recordProcessTerminatedMetricShouldCallIncrementCounterWithCorrectLabels() {
         processMetrics.recordProcessTerminatedMetric(process);

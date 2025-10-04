@@ -38,6 +38,13 @@ public class MessageIntermediateCatchEventBehavior extends AbstractActivityBehav
     }
 
     @Override
+    public ActivityExecution terminate(ActivityExecution activity) {
+        var result = activityPersistence.terminate(activity);
+        completeEventBasedGatewayActivities(result);
+        return result;
+    }
+
+    @Override
     public ActivityType type() {
         return ActivityType.MESSAGE_INTERMEDIATE_CATCH_EVENT;
     }

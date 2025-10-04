@@ -1,8 +1,6 @@
 package com.leorces.persistence;
 
-
 import java.time.Instant;
-
 
 /**
  * Persistence layer for managing distributed locks using ShedLock mechanism.

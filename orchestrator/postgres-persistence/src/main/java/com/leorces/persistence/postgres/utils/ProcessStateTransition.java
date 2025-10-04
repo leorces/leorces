@@ -11,7 +11,6 @@ public abstract class ProcessStateTransition {
         return switch (targetState) {
             case ACTIVE -> new ActiveTransition();
             case COMPLETED -> new CompletedTransition();
-            case CANCELED -> new CanceledTransition();
             case TERMINATED -> new TerminatedTransition();
             case INCIDENT -> new IncidentTransition();
         };
@@ -42,18 +41,6 @@ public abstract class ProcessStateTransition {
         public Process apply(Process process) {
             return process.toBuilder()
                     .state(ProcessState.COMPLETED)
-                    .completedAt(LocalDateTime.now())
-                    .build();
-        }
-
-    }
-
-    private static class CanceledTransition extends ProcessStateTransition {
-
-        @Override
-        public Process apply(Process process) {
-            return process.toBuilder()
-                    .state(ProcessState.CANCELED)
                     .completedAt(LocalDateTime.now())
                     .build();
         }

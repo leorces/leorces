@@ -3,7 +3,6 @@ package com.leorces.engine.activity.behaviour.subprocess;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.process.command.CancelProcessCommand;
 import com.leorces.engine.process.command.RunProcessCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.model.definition.activity.ActivityType;
@@ -32,15 +31,11 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public void cancel(ActivityExecution activity) {
-        dispatcher.dispatch(CancelProcessCommand.of(activity.id()));
-        activityPersistence.cancel(activity);
-    }
-
-    @Override
-    public void terminate(ActivityExecution activity) {
-        dispatcher.dispatch(TerminateProcessCommand.of(activity.id()));
-        activityPersistence.terminate(activity);
+    public ActivityExecution terminate(ActivityExecution activity) {
+        if (!activity.process().isInTerminalState()) {
+            dispatcher.dispatch(TerminateProcessCommand.of(activity.id(), false));
+        }
+        return activityPersistence.terminate(activity);
     }
 
     @Override

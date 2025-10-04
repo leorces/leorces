@@ -54,4 +54,5 @@ public record Process(
     public boolean isInTerminalState() {
         return state.isTerminal();
     }
+
 }

@@ -1,10 +1,8 @@
 package com.leorces.api;
 
-
 import com.leorces.model.runtime.process.Process;
 
 import java.util.Map;
-
 
 /**
  * Service for runtime process operations.
@@ -83,6 +81,29 @@ public interface RuntimeService {
      * @return the started process instance
      */
     Process startProcessByKey(String key, String businessKey, Map<String, Object> variables);
+
+    /**
+     * Terminate process execution.
+     *
+     * @param processId the unique identifier of the process
+     */
+    void terminateProcess(String processId);
+
+    /**
+     * Moves an execution within a process instance from one activity to another.
+     * <p>
+     * This operation allows dynamically changing the execution flow of a process
+     * by relocating an active token to a different activity node defined in the process model.
+     * Typical use cases include error recovery, compensation, manual correction,
+     * or continuing execution from an alternative step.
+     * </p>
+     *
+     * @param processId          the unique identifier of the process instance
+     * @param activityId         the identifier of the current activity execution to move
+     * @param targetDefinitionId the identifier of the target activity definition
+     *                           where execution should continue
+     */
+    void moveExecution(String processId, String activityId, String targetDefinitionId);
 
     /**
      * Sets a single variable in the specified execution context.

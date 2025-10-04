@@ -56,12 +56,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional
-    public ActivityExecution cancel(ActivityExecution activity) {
-        return save(activity, ActivityState.CANCELED);
-    }
-
-    @Override
     public ActivityExecution terminate(ActivityExecution activity) {
         return save(activity, ActivityState.TERMINATED);
     }
@@ -76,6 +70,12 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     @Transactional
     public void changeState(String activityId, ActivityState state) {
         activityRepository.changeState(activityId, state.name());
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllActive(String processId, List<String> definitionIds) {
+        activityRepository.deleteAllActive(processId, definitionIds);
     }
 
     @Override

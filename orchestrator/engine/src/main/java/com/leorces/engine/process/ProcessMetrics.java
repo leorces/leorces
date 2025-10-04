@@ -28,12 +28,6 @@ public class ProcessMetrics {
         );
     }
 
-    public void recordProcessCancelledMetric(Process process) {
-        withLabels(process, labels ->
-                metricService.incrementCounter(PROCESS_CANCELLED, labels)
-        );
-    }
-
     public void recordProcessTerminatedMetric(Process process) {
         withLabels(process, labels ->
                 metricService.incrementCounter(PROCESS_TERMINATED, labels)

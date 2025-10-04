@@ -1,6 +1,5 @@
 package com.leorces.persistence;
 
-
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
 import com.leorces.model.runtime.process.Process;
@@ -10,7 +9,6 @@ import com.leorces.model.runtime.process.ProcessState;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 
 /**
  * Persistence layer for managing processes throughout their lifecycle.
@@ -33,14 +31,6 @@ public interface ProcessPersistence {
      * @return the completed process
      */
     Process complete(Process process);
-
-    /**
-     * Cancels a process.
-     *
-     * @param process the process to cancel
-     * @return the cancelled process
-     */
-    Process cancel(Process process);
 
     /**
      * Terminates a process forcefully.
