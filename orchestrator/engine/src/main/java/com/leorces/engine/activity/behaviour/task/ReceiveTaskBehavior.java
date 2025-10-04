@@ -38,6 +38,13 @@ public class ReceiveTaskBehavior extends AbstractActivityBehavior implements Tri
     }
 
     @Override
+    public ActivityExecution terminate(ActivityExecution activity) {
+        var result = activityPersistence.terminate(activity);
+        completeEventBasedGatewayActivities(result);
+        return result;
+    }
+
+    @Override
     public ActivityType type() {
         return ActivityType.RECEIVE_TASK;
     }

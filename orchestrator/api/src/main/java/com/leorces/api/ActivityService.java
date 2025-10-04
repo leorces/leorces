@@ -1,11 +1,9 @@
 package com.leorces.api;
 
-
 import com.leorces.model.runtime.activity.Activity;
 
 import java.util.List;
 import java.util.Map;
-
 
 /**
  * Service for managing activity lifecycle operations.

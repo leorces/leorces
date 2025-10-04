@@ -1,5 +1,6 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
@@ -34,16 +35,27 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
         }
 
         log.debug("Terminate process: {}", processId);
-        var activeActivities = activityPersistence.findActive(processId);
-        dispatcher.dispatch(TerminateAllActivitiesCommand.of(activeActivities));
-        processPersistence.terminate(process);
-        processMetrics.recordProcessTerminatedMetric(process);
+        terminateActivities(processId);
+        terminateProcess(process, command.terminateCallActivity());
         log.debug("Process {} terminated", processId);
     }
 
     @Override
     public Class<TerminateProcessCommand> getCommandType() {
         return TerminateProcessCommand.class;
+    }
+
+    private void terminateProcess(Process process, boolean terminateCallActivity) {
+        processPersistence.terminate(process);
+        processMetrics.recordProcessTerminatedMetric(process);
+        if (process.isCallActivity() && terminateCallActivity) {
+            dispatcher.dispatch(TerminateActivityCommand.of(process.id()));
+        }
+    }
+
+    private void terminateActivities(String processId) {
+        var activeActivities = activityPersistence.findActive(processId);
+        dispatcher.dispatch(TerminateAllActivitiesCommand.of(activeActivities));
     }
 
     private Process getProcess(TerminateProcessCommand command) {

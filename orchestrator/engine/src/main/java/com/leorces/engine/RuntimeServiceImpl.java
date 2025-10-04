@@ -4,6 +4,8 @@ import com.leorces.api.RuntimeService;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
 import com.leorces.engine.process.ProcessRuntimeService;
+import com.leorces.engine.process.command.MoveExecutionCommand;
+import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.process.Process;
 import lombok.AllArgsConstructor;
@@ -69,6 +71,18 @@ public class RuntimeServiceImpl implements RuntimeService {
                                      Map<String, Object> variables) {
         log.debug("Start process by key: {} with business key: {} and variables: {}", key, businessKey, variables);
         return processRuntimeService.startByDefinitionKey(key, businessKey, variables);
+    }
+
+    @Override
+    public void terminateProcess(String processId) {
+        log.debug("Terminate process by process id: {}", processId);
+        dispatcher.dispatch(TerminateProcessCommand.of(processId));
+    }
+
+    @Override
+    public void moveExecution(String processId, String activityId, String targetDefinitionId) {
+        log.debug("Move execution from: {} to: {}", activityId, targetDefinitionId);
+        dispatcher.dispatch(MoveExecutionCommand.of(processId, activityId, targetDefinitionId));
     }
 
     @Override

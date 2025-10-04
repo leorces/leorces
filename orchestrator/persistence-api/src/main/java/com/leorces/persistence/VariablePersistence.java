@@ -1,12 +1,10 @@
 package com.leorces.persistence;
 
-
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.variable.Variable;
 
 import java.util.List;
-
 
 /**
  * Persistence layer for managing process and activity variables.

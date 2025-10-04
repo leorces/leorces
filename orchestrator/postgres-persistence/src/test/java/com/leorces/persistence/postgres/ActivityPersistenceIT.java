@@ -77,25 +77,6 @@ class ActivityPersistenceIT extends RepositoryIT {
     }
 
     @Test
-    @DisplayName("Should cancel an active activity successfully")
-    void cancel() {
-        // Given
-        var process = runOrderSubmittedProcess();
-        var activity = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
-
-        // When
-        var result = activityPersistence.cancel(activity);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(activity.id());
-        assertThat(result.state()).isEqualTo(ActivityState.CANCELED);
-        assertThat(result.definitionId()).isEqualTo(activity.definitionId());
-        assertThat(result.process()).isEqualTo(activity.process());
-        assertThat(result.retries()).isEqualTo(activity.retries());
-    }
-
-    @Test
     @DisplayName("Should terminate an active activity successfully")
     void terminate() {
         // Given
@@ -131,6 +112,24 @@ class ActivityPersistenceIT extends RepositoryIT {
         assertThat(result.definitionId()).isEqualTo(activity.definitionId());
         assertThat(result.process()).isEqualTo(activity.process());
         assertThat(result.retries()).isEqualTo(activity.retries());
+    }
+
+    @Test
+    void deleteAllActive() {
+        // Given
+        var process = runOrderSubmittedProcess();
+        var activity1 = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
+        var activity2 = activityPersistence.run(ActivityTestData.createNotificationToSellerActivityExecution(process));
+
+        var active = activityPersistence.findActive(process.id());
+        assertThat(active).hasSize(2);
+
+        // When
+        activityPersistence.deleteAllActive(process.id(), List.of(activity1.definitionId(), activity2.definitionId()));
+
+        // Then
+        var activeAfterDeletion = activityPersistence.findActive(process.id());
+        assertThat(activeAfterDeletion).hasSize(0);
     }
 
     @Test

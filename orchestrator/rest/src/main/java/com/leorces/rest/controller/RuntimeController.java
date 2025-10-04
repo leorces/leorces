@@ -3,6 +3,7 @@ package com.leorces.rest.controller;
 import com.leorces.api.RuntimeService;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.rest.model.request.CorrelateMessageRequest;
+import com.leorces.rest.model.request.ProcessModificationRequest;
 import com.leorces.rest.model.request.StartProcessByIdRequest;
 import com.leorces.rest.model.request.StartProcessByKeyRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +43,6 @@ public class RuntimeController {
             @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
     })
     @PostMapping("/processes/key")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Process> startProcessByKey(
             @Parameter(description = "Request containing process definition key, business key, and variables")
             @Valid @RequestBody StartProcessByKeyRequest request
@@ -66,7 +66,6 @@ public class RuntimeController {
             @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
     })
     @PostMapping("/processes")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Process> startProcessById(
             @Parameter(description = "Request containing process definition ID, business key, and variables")
             @Valid @RequestBody StartProcessByIdRequest request
@@ -77,6 +76,46 @@ public class RuntimeController {
                 request.variables()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    @Operation(
+            summary = "Terminate process by ID",
+            description = "Terminate a process by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_404_NOT_FOUND, description = RESPONSE_404_NOT_FOUND),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/{processId}/terminate")
+    public ResponseEntity<Process> terminateProcess(
+            @Parameter(description = "The ID of the process to terminate", required = true)
+            @PathVariable("processId") String processId
+    ) {
+        runtimeService.terminateProcess(processId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Modify process by ID",
+            description = "Process modification by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_404_NOT_FOUND, description = RESPONSE_404_NOT_FOUND),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/{processId}/modification")
+    public ResponseEntity<Void> modifyProcess(
+            @Parameter(description = "The ID of the process to modify", required = true)
+            @PathVariable("processId") String processId,
+            @Parameter(description = "Modification request")
+            @Valid @RequestBody ProcessModificationRequest request
+    ) {
+        runtimeService.moveExecution(processId, request.activityId(), request.targetDefinitionId());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -162,7 +201,6 @@ public class RuntimeController {
             @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
     })
     @PutMapping("/{executionId}/variables/local")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> setVariablesLocal(
             @Parameter(description = "The ID of the execution to set local variables for", required = true)
             @PathVariable("executionId") String executionId,

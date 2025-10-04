@@ -2,6 +2,7 @@ package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.process.Process;
 import com.leorces.rest.client.model.request.CorrelateMessageRequest;
+import com.leorces.rest.client.model.request.ProcessModificationRequest;
 import com.leorces.rest.client.model.request.StartProcessByIdRequest;
 import com.leorces.rest.client.model.request.StartProcessByKeyRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -26,8 +27,8 @@ public class RuntimeClient {
 
     private final RestClient restClient;
 
-    @Retry(name = "runtime-process")
-    @CircuitBreaker(name = "runtime-process", fallbackMethod = "startProcessFallback")
+    @Retry(name = "start-process")
+    @CircuitBreaker(name = "start-process", fallbackMethod = "startProcessFallback")
     public Process startProcessByKey(String definitionKey, String businessKey, Map<String, Object> variables) {
         try {
             return restClient.post()
@@ -55,8 +56,8 @@ public class RuntimeClient {
         }
     }
 
-    @Retry(name = "runtime-process")
-    @CircuitBreaker(name = "runtime-process", fallbackMethod = "startProcessFallback")
+    @Retry(name = "start-process")
+    @CircuitBreaker(name = "start-process", fallbackMethod = "startProcessFallback")
     public Process startProcessById(String definitionId, String businessKey, Map<String, Object> variables) {
         try {
             return restClient.post()
@@ -80,6 +81,59 @@ public class RuntimeClient {
             throw e;
         } catch (ResourceAccessException e) {
             log.error("Connection error during start process by id: definitionId={}, error={}", definitionId, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Retry(name = "terminate-process")
+    @CircuitBreaker(name = "terminate-process", fallbackMethod = "terminateProcessFallback")
+    public void terminateProcess(String processId) {
+        try {
+            restClient.put()
+                    .uri(TERMINATE_PROCESS_BY_ID_ENDPOINT.formatted(processId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpClientErrorException.BadRequest e) {
+            log.warn("Bad request for terminate process by id: processId={}, error={}", processId, e.getMessage());
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("Process not found: processId={}", processId);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            log.error("Server error during process termination by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        } catch (HttpServerErrorException.ServiceUnavailable e) {
+            log.error("Service unavailable during process termination by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        } catch (ResourceAccessException e) {
+            log.error("Connection error during process termination by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Retry(name = "move-execution")
+    @CircuitBreaker(name = "move-execution", fallbackMethod = "moveExecutionFallback")
+    public void moveExecution(String processId, String activityId, String targetDefinitionId) {
+        try {
+            restClient.put()
+                    .uri(MODIFY_PROCESS_BY_ID_ENDPOINT.formatted(processId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(new ProcessModificationRequest(activityId, targetDefinitionId))
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpClientErrorException.BadRequest e) {
+            log.warn("Bad request to modify process by id: processId={}, error={}", processId, e.getMessage());
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("Process not found: processId={}", processId);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            log.error("Server error during process modification by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        } catch (HttpServerErrorException.ServiceUnavailable e) {
+            log.error("Service unavailable during process modification by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        } catch (ResourceAccessException e) {
+            log.error("Connection error during process modification by id: processId={}, error={}", processId, e.getMessage());
             throw e;
         }
     }
@@ -160,6 +214,26 @@ public class RuntimeClient {
         } catch (ResourceAccessException e) {
             log.error("Connection error during set local variables: executionId={}, error={}", executionId, e.getMessage());
             throw e;
+        }
+    }
+
+    private void terminateProcessFallback(String processId, Exception e) {
+        if (e instanceof HttpServerErrorException || e instanceof ResourceAccessException) {
+            log.error("Service unavailable for terminate process: processId={}, error={}", processId, e.getMessage());
+        } else if (e instanceof HttpClientErrorException clientError) {
+            log.warn("Client error for terminate process: processId={}, status={}, error={}", processId, clientError.getStatusCode(), e.getMessage());
+        } else {
+            log.error("Unexpected error for terminate process: processId={}", processId, e);
+        }
+    }
+
+    private void moveExecutionFallback(String processId, String activityId, String targetDefinitionId, Exception e) {
+        if (e instanceof HttpServerErrorException || e instanceof ResourceAccessException) {
+            log.error("Service unavailable for process modification: processId={}, error={}", processId, e.getMessage());
+        } else if (e instanceof HttpClientErrorException clientError) {
+            log.warn("Client error for process modification: processId={}, status={}, error={}", processId, clientError.getStatusCode(), e.getMessage());
+        } else {
+            log.error("Unexpected error for process modification: processId={}", processId, e);
         }
     }
 

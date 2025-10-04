@@ -3,6 +3,7 @@ package com.leorces.rest.controller;
 import com.leorces.api.RuntimeService;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.rest.model.request.CorrelateMessageRequest;
+import com.leorces.rest.model.request.ProcessModificationRequest;
 import com.leorces.rest.model.request.StartProcessByIdRequest;
 import com.leorces.rest.model.request.StartProcessByKeyRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
@@ -95,6 +97,48 @@ class RuntimeControllerTest {
         // Then
         assertThat(result).isEqualTo(expectedProcess);
         verify(runtimeService).startProcessById(TEST_DEFINITION_ID, TEST_BUSINESS_KEY, variables);
+    }
+
+    @Test
+    @DisplayName("Should terminate process successfully")
+    void shouldTerminateProcessSuccessfully() {
+        // When
+        var response = subject.terminateProcess(TEST_EXECUTION_ID);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(runtimeService).terminateProcess(TEST_EXECUTION_ID);
+    }
+
+    @Test
+    @DisplayName("Should modify process successfully")
+    void shouldModifyProcessSuccessfully() {
+        // Given
+        var request = new ProcessModificationRequest("activity-123", "target-def-456");
+
+        // When
+        var response = subject.modifyProcess(TEST_EXECUTION_ID, request);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(runtimeService).moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456");
+    }
+
+    @Test
+    @DisplayName("Should modify process with different activity and target definition")
+    void shouldModifyProcessWithDifferentIds() {
+        // Given
+        var request = new ProcessModificationRequest("another-activity", "another-target");
+
+        // When
+        var response = subject.modifyProcess(TEST_EXECUTION_ID, request);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(runtimeService).moveExecution(TEST_EXECUTION_ID, "another-activity", "another-target");
     }
 
     @Test

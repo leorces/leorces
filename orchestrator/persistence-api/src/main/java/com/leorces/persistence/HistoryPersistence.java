@@ -1,12 +1,10 @@
 package com.leorces.persistence;
 
-
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
 import com.leorces.model.runtime.process.ProcessExecution;
 
 import java.util.List;
-
 
 /**
  * Persistence layer for managing process execution history.

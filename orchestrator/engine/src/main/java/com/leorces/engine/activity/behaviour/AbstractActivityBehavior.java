@@ -1,6 +1,5 @@
 package com.leorces.engine.activity.behaviour;
 
-import com.leorces.engine.activity.command.CancelAllActivitiesCommand;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
@@ -33,19 +32,18 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
         return activityPersistence.complete(activity);
     }
 
-    public void cancel(ActivityExecution activity) {
-        activityPersistence.cancel(activity);
+    @Override
+    public ActivityExecution terminate(ActivityExecution activity) {
+        return activityPersistence.terminate(activity);
     }
 
-    public void terminate(ActivityExecution activity) {
-        activityPersistence.terminate(activity);
-    }
-
+    @Override
     public boolean fail(ActivityExecution activity) {
         activityPersistence.fail(activity);
         return true;
     }
 
+    @Override
     public void retry(ActivityExecution activity) {
         dispatcher.dispatchAsync(RunActivityCommand.of(activity));
     }
@@ -61,8 +59,7 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
         if (eventBasedGatewayOpt.isEmpty()) {
             return;
         }
-        var activities = activityPersistence.findActive(processId, eventBasedGatewayOpt.get().outgoing());
-        dispatcher.dispatch(CancelAllActivitiesCommand.of(activities));
+        activityPersistence.deleteAllActive(processId, eventBasedGatewayOpt.get().outgoing());
     }
 
     private Optional<ActivityDefinition> findEventBasedGateway(ActivityExecution activity) {

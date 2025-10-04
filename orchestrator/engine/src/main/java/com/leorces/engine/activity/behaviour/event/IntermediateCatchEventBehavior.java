@@ -47,7 +47,14 @@ public class IntermediateCatchEventBehavior extends AbstractActivityBehavior imp
     @Override
     public ActivityExecution complete(ActivityExecution activity) {
         var result = activityPersistence.complete(activity);
-        completeEventBasedGatewayActivities(activity);
+        completeEventBasedGatewayActivities(result);
+        return result;
+    }
+
+    @Override
+    public ActivityExecution terminate(ActivityExecution activity) {
+        var result = activityPersistence.terminate(activity);
+        completeEventBasedGatewayActivities(result);
         return result;
     }
 

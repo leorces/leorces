@@ -12,7 +12,6 @@ public abstract class ActivityStateTransition {
             case SCHEDULED -> new CreateTransition();
             case ACTIVE -> new ActiveTransition();
             case COMPLETED -> new CompletedTransition();
-            case CANCELED -> new CanceledTransition();
             case TERMINATED -> new TerminatedTransition();
             case FAILED -> new FailedTransition();
         };
@@ -60,18 +59,6 @@ public abstract class ActivityStateTransition {
                     .updatedAt(now)
                     .startedAt(activity.startedAt() != null ? activity.startedAt() : now)
                     .completedAt(now)
-                    .build();
-        }
-
-    }
-
-    private static class CanceledTransition extends ActivityStateTransition {
-
-        @Override
-        public ActivityExecution apply(ActivityExecution activity) {
-            return activity.toBuilder()
-                    .state(ActivityState.CANCELED)
-                    .completedAt(LocalDateTime.now())
                     .build();
         }
 

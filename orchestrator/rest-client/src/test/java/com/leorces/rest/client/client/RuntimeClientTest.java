@@ -2,6 +2,7 @@ package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.process.Process;
 import com.leorces.rest.client.model.request.CorrelateMessageRequest;
+import com.leorces.rest.client.model.request.ProcessModificationRequest;
 import com.leorces.rest.client.model.request.StartProcessByIdRequest;
 import com.leorces.rest.client.model.request.StartProcessByKeyRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,6 +107,150 @@ class RuntimeClientTest {
         assertEquals("process-2", result.id());
         verify(restClient).post();
         verify(requestBodySpec).body(any(StartProcessByIdRequest.class));
+    }
+
+    @Test
+    @DisplayName("Should terminate process successfully when valid processId is provided")
+    void shouldTerminateProcessSuccessfully() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        // When
+        assertDoesNotThrow(() -> runtimeClient.terminateProcess(TEST_EXECUTION_ID));
+
+        // Then
+        verify(restClient).put();
+        verify(requestBodySpec).retrieve();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should handle bad request when terminating process")
+    void shouldHandleBadRequestWhenTerminatingProcess() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
+
+        // When & Then
+        assertDoesNotThrow(() -> runtimeClient.terminateProcess(TEST_EXECUTION_ID));
+    }
+
+    @Test
+    @DisplayName("Should throw server error when terminating process and server error occurs")
+    void shouldThrowServerErrorWhenTerminatingProcess() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "Server error", null, null, null));
+
+        // When & Then
+        assertThrows(HttpServerErrorException.class,
+                () -> runtimeClient.terminateProcess(TEST_EXECUTION_ID));
+    }
+
+    @Test
+    @DisplayName("Should throw resource access exception when terminating process and connection error occurs")
+    void shouldThrowResourceAccessExceptionWhenTerminatingProcess() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(new ResourceAccessException("Connection error"));
+
+        // When & Then
+        assertThrows(ResourceAccessException.class,
+                () -> runtimeClient.terminateProcess(TEST_EXECUTION_ID));
+    }
+
+    @Test
+    @DisplayName("Should move execution successfully when valid parameters are provided")
+    void shouldMoveExecutionSuccessfullyWhenValidParametersAreProvided() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(ProcessModificationRequest.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        // When
+        assertDoesNotThrow(() ->
+                runtimeClient.moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456"));
+
+        // Then
+        verify(restClient).put();
+        verify(requestBodySpec).body(any(ProcessModificationRequest.class));
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should handle bad request when moving execution")
+    void shouldHandleBadRequestWhenMovingExecution() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(ProcessModificationRequest.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
+
+        // When & Then
+        assertDoesNotThrow(() ->
+                runtimeClient.moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456"));
+    }
+
+    @Test
+    @DisplayName("Should throw server error when moving execution and server error occurs")
+    void shouldThrowServerErrorWhenMovingExecution() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(ProcessModificationRequest.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "Server error", null, null, null));
+
+        // When & Then
+        assertThrows(HttpServerErrorException.class,
+                () -> runtimeClient.moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456"));
+    }
+
+    @Test
+    @DisplayName("Should throw resource access exception when moving execution and connection error occurs")
+    void shouldThrowResourceAccessExceptionWhenMovingExecution() {
+        // Given
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(ProcessModificationRequest.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(new ResourceAccessException("Connection error"));
+
+        // When & Then
+        assertThrows(ResourceAccessException.class,
+                () -> runtimeClient.moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456"));
     }
 
     @Test
