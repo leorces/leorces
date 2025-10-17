@@ -74,6 +74,7 @@ public final class ActivityQueries {
                    activity.activity_type,
                    activity.activity_state,
                    activity.activity_retries,
+                   activity.activity_timeout,
                    activity.activity_failure_reason,
                    activity.activity_failure_trace,
                    activity.activity_async,
@@ -147,6 +148,12 @@ public final class ActivityQueries {
 
     public static final String FIND_ALL_BY_IDS = BASE_SELECT + """
             WHERE activity.activity_id IN (:activityIds)
+            """;
+
+    public static final String FIND_TIMED_OUT = BASE_SELECT + """
+            WHERE activity.activity_state = 'ACTIVE' OR activity.activity_state = 'SCHEDULED'
+              AND activity.activity_timeout IS NOT NULL
+              AND activity.activity_timeout < CURRENT_TIMESTAMP
             """;
 
     private ActivityQueries() {

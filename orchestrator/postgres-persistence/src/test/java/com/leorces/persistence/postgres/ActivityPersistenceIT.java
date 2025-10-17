@@ -5,6 +5,7 @@ import com.leorces.persistence.postgres.utils.ActivityTestData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -221,6 +222,28 @@ class ActivityPersistenceIT extends RepositoryIT {
         assertThat(result.getFirst().id()).isEqualTo(activity1.id());
         assertThat(result.getFirst().state()).isEqualTo(ActivityState.ACTIVE);
         assertThat(result.getFirst().processId()).isEqualTo(processId);
+    }
+
+    @Test
+    @DisplayName("Should find all timed out activities")
+    void findTimedOut() {
+        // Given
+        var process = runOrderSubmittedProcess();
+        var activity1 = ActivityTestData.createNotificationToClientActivityExecution(process).toBuilder()
+                .timeout(LocalDateTime.now().minusMinutes(1))
+                .build();
+        var activity2 = ActivityTestData.createNotificationToSellerActivityExecution(process).toBuilder()
+                .timeout(LocalDateTime.now().minusMinutes(1))
+                .build();
+
+        activityPersistence.run(activity1);
+        activityPersistence.run(activity2);
+
+        // When
+        var result = activityPersistence.findTimedOut();
+
+        // Then
+        assertThat(result).hasSize(2);
     }
 
     @Test

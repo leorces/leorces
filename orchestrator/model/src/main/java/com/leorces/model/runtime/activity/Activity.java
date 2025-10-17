@@ -15,6 +15,7 @@ public record Activity(
         List<Variable> variables,
         ActivityState state,
         int retries,
+        LocalDateTime timeout,
         ActivityFailure failure,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,

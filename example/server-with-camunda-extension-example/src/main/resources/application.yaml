@@ -32,8 +32,10 @@ leorces:
           tasks:
             notification:
               retries: 3
+              timeout: 30m
         OrderFulfillmentProcess:
           task-retries: 3
+          task-timeout: 10m
 
 logging:
   level:

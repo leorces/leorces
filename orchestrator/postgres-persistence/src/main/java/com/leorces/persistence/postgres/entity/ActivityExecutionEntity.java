@@ -49,6 +49,9 @@ public class ActivityExecutionEntity implements Persistable<String> {
     @Column("activity_retries")
     private int retries;
 
+    @Column("activity_timeout")
+    private LocalDateTime timeout;
+
     @Column("activity_failure_reason")
     private String failureReason;
 

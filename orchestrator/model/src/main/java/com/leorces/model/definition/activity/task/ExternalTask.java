@@ -16,6 +16,7 @@ public record ExternalTask(
         String name,
         String topic,
         int retries,
+        String timeout,
         ActivityType type,
         List<String> incoming,
         List<String> outgoing,

@@ -117,6 +117,14 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ActivityExecution> findTimedOut() {
+        return activityRepository.findTimedOut().stream()
+                .map(activityMapper::toExecution)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public List<Activity> poll(String topic, String processDefinitionKey, int limit) {
         var activityIds = activityQueuePersistence.poll(topic, processDefinitionKey, limit);

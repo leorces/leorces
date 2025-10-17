@@ -112,6 +112,13 @@ public interface ActivityPersistence {
     List<ActivityExecution> findFailed(String processId);
 
     /**
+     * Finds all timed out activities.
+     *
+     * @return the list of timed-out activities
+     */
+    List<ActivityExecution> findTimedOut();
+
+    /**
      * Polls for available activities to execute from a specific topic.
      *
      * @param topic                the topic name to poll from

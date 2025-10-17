@@ -59,6 +59,10 @@ public class ActivityEntity implements Persistable<String> {
     @JsonProperty("retries")
     private int retries;
 
+    @Column("activity_timeout")
+    @JsonProperty("activity_timeout")
+    private LocalDateTime timeout;
+
     @Column("activity_failure_reason")
     @JsonProperty("activity_failure_reason")
     private String failureReason;

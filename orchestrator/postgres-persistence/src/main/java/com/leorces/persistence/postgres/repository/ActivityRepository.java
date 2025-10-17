@@ -32,6 +32,9 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     @Query(FIND_ALL_FAILED_BY_PROCESS_ID)
     List<ActivityExecutionEntity> findFailed(@Param("processId") String processId);
 
+    @Query(FIND_TIMED_OUT)
+    List<ActivityExecutionEntity> findTimedOut();
+
     @Query(FIND_ALL_BY_IDS)
     List<ActivityExecutionEntity> findAllByIds(@Param("activityIds") List<String> activityIds);
 

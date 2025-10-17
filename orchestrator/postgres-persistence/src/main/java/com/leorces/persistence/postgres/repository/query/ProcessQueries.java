@@ -162,6 +162,7 @@ public final class ProcessQueries {
                        'type', activity.activity_type,
                        'state', activity.activity_state,
                        'retries', activity.activity_retries,
+                       'activity_timeout', activity.activity_timeout,
                        'activity_failure_reason', activity.activity_failure_reason,
                        'activity_failure_trace', activity.activity_failure_trace,
                        'created_at', activity.activity_created_at,

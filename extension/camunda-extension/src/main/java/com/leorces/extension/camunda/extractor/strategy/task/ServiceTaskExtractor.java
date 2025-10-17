@@ -31,6 +31,7 @@ public class ServiceTaskExtractor implements ActivityExtractionStrategy {
     private ExternalTask createExternalTask(Element element, String parentId, String processId) {
         var topic = element.getAttributeNS(CAMUNDA_NAMESPACE, "topic");
         var retries = resolveRetries(topic, processId);
+        var timeout = resolveTimeout(topic, processId);
 
         return ExternalTask.builder()
                 .id(helper.getId(element))
@@ -38,6 +39,7 @@ public class ServiceTaskExtractor implements ActivityExtractionStrategy {
                 .name(helper.getName(element))
                 .topic(topic)
                 .retries(retries)
+                .timeout(timeout)
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))
@@ -58,11 +60,32 @@ public class ServiceTaskExtractor implements ActivityExtractionStrategy {
         return resolveTaskRetries(processProperties, topic);
     }
 
+    private String resolveTimeout(String topic, String processId) {
+        if (processId == null || properties == null || properties.processes() == null) {
+            return null;
+        }
+
+        var processProperties = properties.processes().get(processId);
+        if (processProperties == null) {
+            return null;
+        }
+
+        return resolveTaskTimeout(processProperties, topic);
+    }
+
     private int resolveTaskRetries(ProcessProperties processProperties, String topic) {
         if (processProperties.tasks() != null && processProperties.tasks().containsKey(topic)) {
             return processProperties.tasks().get(topic).retries();
         }
         return processProperties.taskRetries();
+    }
+
+    private String resolveTaskTimeout(ProcessProperties processProperties, String topic) {
+        if (processProperties.tasks() != null && processProperties.tasks().containsKey(topic)) {
+            return processProperties.tasks().get(topic).timeout();
+        }
+
+        return processProperties.taskTimeout();
     }
 
 }

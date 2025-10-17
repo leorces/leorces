@@ -5,7 +5,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 
 public record TasksProperties(
-        @DefaultValue("0") int retries
+        @DefaultValue("0") int retries,
+        @DefaultValue("1h") String timeout
 ) {
 
 }
