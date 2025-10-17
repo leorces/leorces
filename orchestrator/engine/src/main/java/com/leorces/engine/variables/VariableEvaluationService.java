@@ -37,7 +37,7 @@ class VariableEvaluationService {
 
     public Map<String, Object> getVariablesAsMap(ActivityExecution activity) {
         var scope = activity.scope();
-        var variables = variablePersistence.findAll(activity.processId(), scope);
+        var variables = variablePersistence.findInScope(activity.processId(), scope);
         return variablesMapper.toMap(variables, scope);
     }
 

@@ -1,10 +1,9 @@
 package com.leorces.engine.process;
 
 import com.leorces.engine.exception.process.ProcessDefinitionNotFoundException;
+import com.leorces.engine.service.CallActivityService;
 import com.leorces.engine.variables.VariablesService;
-import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
-import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
@@ -40,7 +39,7 @@ class ProcessFactoryTest {
     private VariablesService variablesService;
 
     @Mock
-    private ExpressionEvaluator expressionEvaluator;
+    private CallActivityService callActivityService;
 
     @InjectMocks
     private ProcessFactory processFactory;
@@ -107,11 +106,9 @@ class ProcessFactoryTest {
         when(activityExecution.process()).thenReturn(Process.builder().id("p1").businessKey("bk1").build());
         when(callActivity.calledElement()).thenReturn("order-process");
         when(callActivity.calledElementVersion()).thenReturn(null);
-        when(callActivity.inheritVariables()).thenReturn(true);
-        when(callActivity.inputMappings()).thenReturn(List.of());
 
         when(definitionPersistence.findLatestByKey("order-process")).thenReturn(Optional.of(processDefinition));
-        when(variablesService.getScopedVariables(activityExecution)).thenReturn(Map.of("var1", "value1"));
+        when(callActivityService.getInputMappings(activityExecution)).thenReturn(Map.of("var1", "value1"));
         when(variablesService.toList(anyMap())).thenReturn(List.of());
 
         var process = processFactory.createByCallActivity(activityExecution);
@@ -135,23 +132,13 @@ class ProcessFactoryTest {
 
         when(callActivity.calledElement()).thenReturn("order-process");
         when(callActivity.calledElementVersion()).thenReturn(null);
-        when(callActivity.inheritVariables()).thenReturn(false);
-
-        // Input mapping with sourceExpression
-        var mapping = mock(VariableMapping.class);
-        when(mapping.sourceExpression()).thenReturn("${var1 + '_suffix'}");
-        when(mapping.target()).thenReturn("mappedVar");
-        when(mapping.source()).thenReturn(null);
-        when(mapping.variables()).thenReturn(null);
-        when(callActivity.inputMappings()).thenReturn(List.of(mapping));
 
         // Mock definition and variables
         when(definitionPersistence.findLatestByKey("order-process")).thenReturn(Optional.of(processDefinition));
         Map<String, Object> scopedVariables = Map.of("var1", "value1");
-        when(variablesService.getScopedVariables(activityExecution)).thenReturn(scopedVariables);
+        when(callActivityService.getInputMappings(activityExecution)).thenReturn(scopedVariables);
 
         // Mock expression evaluation
-        when(expressionEvaluator.evaluate("${var1 + '_suffix'}", scopedVariables, Object.class)).thenReturn("value1_suffix");
         when(variablesService.toList(anyMap())).thenReturn(List.of());
 
         var process = processFactory.createByCallActivity(activityExecution);
@@ -163,9 +150,6 @@ class ProcessFactoryTest {
         // Verify expression evaluated and result applied
         ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.forClass(Map.class);
         verify(variablesService).toList(captor.capture());
-
-        Map<String, Object> capturedVariables = captor.getValue();
-        assertThat(capturedVariables).containsEntry("mappedVar", "value1_suffix");
     }
 
 }

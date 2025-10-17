@@ -38,7 +38,6 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
                 .name(helper.getName(element))
                 .calledElement(element.getAttribute("calledElement"))
                 .calledElementVersion(getCalledElementVersion(element))
-                .inheritVariables("true".equalsIgnoreCase(element.getAttributeNS(CAMUNDA_NAMESPACE, "inheritVariables")))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))

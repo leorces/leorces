@@ -1,6 +1,7 @@
 package com.leorces.model.definition.activity.subprocess;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -17,7 +18,6 @@ public record CallActivity(
         String name,
         String calledElement,
         Integer calledElementVersion,
-        boolean inheritVariables,
         ActivityType type,
         List<String> incoming,
         List<String> outgoing,
@@ -32,4 +32,18 @@ public record CallActivity(
         return ActivityType.CALL_ACTIVITY;
     }
 
+    @JsonIgnore
+    public boolean shouldProcessAllInputMappings() {
+        return shouldProcessAllMappings(inputMappings);
+    }
+
+    @JsonIgnore
+    public boolean shouldProcessAllOutputMappings() {
+        return shouldProcessAllMappings(outputMappings);
+    }
+
+    private boolean shouldProcessAllMappings(List<VariableMapping> mappings) {
+        return mappings.stream()
+                .anyMatch(mapping -> "all".equals(mapping.variables()));
+    }
 }

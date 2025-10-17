@@ -20,8 +20,13 @@ public class VariablesService {
 
     public Map<String, Object> getScopedVariables(ActivityExecution activity) {
         var scope = activity.scope();
-        var variables = variablePersistence.findAll(activity.processId(), scope);
+        var variables = variablePersistence.findInScope(activity.processId(), scope);
         return variablesMapper.toMap(variables, scope);
+    }
+
+    public Map<String, Object> getProcessVariables(String processId) {
+        var variables = variablePersistence.findInProcess(processId);
+        return variablesMapper.toMap(variables);
     }
 
     public List<Variable> toList(Map<String, Object> variables) {

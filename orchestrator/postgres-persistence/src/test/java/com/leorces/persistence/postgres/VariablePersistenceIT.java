@@ -87,7 +87,7 @@ class VariablePersistenceIT extends RepositoryIT {
 
     @Test
     @DisplayName("Should find all variables by processId and scope")
-    void findAllVariables() {
+    void findInScopeVariables() {
         // Given
         var orderVariable = VariableTestData.createOrderVariable();
         var clientVariable = VariableTestData.createClientVariable();
@@ -105,7 +105,7 @@ class VariablePersistenceIT extends RepositoryIT {
                 .toList();
 
         // When
-        var result = variablePersistence.findAll(processId, executionDefinitionIds);
+        var result = variablePersistence.findInScope(processId, executionDefinitionIds);
 
         // Then
         assertNotNull(result);
@@ -133,13 +133,67 @@ class VariablePersistenceIT extends RepositoryIT {
 
     @Test
     @DisplayName("Should return empty list when no variables found for processId and scope")
-    void findAllVariablesWhenEmpty() {
+    void findInScopeVariablesWhenEmpty() {
         // Given
         var nonExistentProcessId = "non-existent-process-id";
         var scope = List.of("order", "client");
 
         // When
-        var result = variablePersistence.findAll(nonExistentProcessId, scope);
+        var result = variablePersistence.findInScope(nonExistentProcessId, scope);
+
+        // Then
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should find all variables in process")
+    void findInProcessVariables() {
+        // Given
+        var orderVariable = VariableTestData.createOrderVariable();
+        var clientVariable = VariableTestData.createClientVariable();
+        var process = runProcess().toBuilder()
+                .variables(List.of(orderVariable, clientVariable))
+                .build();
+
+        variablePersistence.save(process);
+        var processId = process.id();
+
+        // When
+        var result = variablePersistence.findInProcess(processId);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        var foundOrderVariable = result.stream()
+                .filter(v -> "order".equals(v.varKey()))
+                .findFirst()
+                .orElseThrow();
+        var foundClientVariable = result.stream()
+                .filter(v -> "client".equals(v.varKey()))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(processId, foundOrderVariable.processId());
+        assertEquals("order", foundOrderVariable.varKey());
+        assertEquals("{\"number\":1234}", foundOrderVariable.varValue());
+        assertEquals("map", foundOrderVariable.type());
+
+        assertEquals(processId, foundClientVariable.processId());
+        assertEquals("client", foundClientVariable.varKey());
+        assertEquals("{\"firstName\":\"Json\",\"lastName\":\"Statement\"}", foundClientVariable.varValue());
+        assertEquals("map", foundClientVariable.type());
+    }
+
+    @Test
+    @DisplayName("Should return empty list when no variables found for process")
+    void findInProcessVariablesWhenEmpty() {
+        // Given
+        var nonExistentProcessId = "non-existent-process-id";
+
+        // When
+        var result = variablePersistence.findInProcess(nonExistentProcessId);
 
         // Then
         assertNotNull(result);
@@ -152,5 +206,4 @@ class VariablePersistenceIT extends RepositoryIT {
                 .build();
         return processPersistence.run(process);
     }
-
 }

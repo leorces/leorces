@@ -47,8 +47,14 @@ public class VariablePersistenceImpl implements VariablePersistence {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Variable> findAll(String processId, List<String> scope) {
-        var variableEntities = variableRepository.findAll(processId, scope);
+    public List<Variable> findInScope(String processId, List<String> scope) {
+        var variableEntities = variableRepository.findInScope(processId, scope);
+        return variableMapper.toVariables(variableEntities);
+    }
+
+    @Override
+    public List<Variable> findInProcess(String processId) {
+        var variableEntities = variableRepository.findInProcess(processId);
         return variableMapper.toVariables(variableEntities);
     }
 
