@@ -55,6 +55,7 @@ public abstract class ActivityStateTransition {
             var now = LocalDateTime.now();
             return activity.toBuilder()
                     .state(ActivityState.COMPLETED)
+                    .failure(null)
                     .createdAt(activity.createdAt() != null ? activity.createdAt() : now)
                     .updatedAt(now)
                     .startedAt(activity.startedAt() != null ? activity.startedAt() : now)

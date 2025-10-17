@@ -47,6 +47,9 @@ class FailActivityCommandHandlerTest {
     @Mock
     private ActivityExecution activityExecution;
 
+    @Mock
+    private ActivityExecution.ActivityExecutionBuilder builder;
+
     @InjectMocks
     private FailActivityCommandHandler handler;
 
@@ -56,6 +59,9 @@ class FailActivityCommandHandlerTest {
         when(activityExecution.processId()).thenReturn(PROCESS_ID);
         when(activityExecution.definitionId()).thenReturn(DEFINITION_ID);
         when(activityExecution.type()).thenReturn(ActivityType.EXTERNAL_TASK);
+        when(activityExecution.toBuilder()).thenReturn(builder);
+        when(builder.failure(any())).thenReturn(builder);
+        when(builder.build()).thenReturn(activityExecution);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
     }
 

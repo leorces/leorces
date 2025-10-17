@@ -2,6 +2,8 @@ package com.leorces.rest.controller;
 
 import com.leorces.api.ActivityService;
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
+import com.leorces.rest.model.request.FailActivityRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,26 +89,28 @@ class ActivityControllerTest {
     }
 
     @Test
-    @DisplayName("Should fail activity with variables")
+    @DisplayName("Should fail activity")
     void shouldFailActivityWithVariables() {
         // Given
         var variables = Map.<String, Object>of(TEST_VARIABLE_KEY, TEST_VARIABLE_VALUE);
+        var failure = ActivityFailure.of("Failure reason");
+        var request = new FailActivityRequest(failure, variables);
 
         // When
-        subject.fail(TEST_ACTIVITY_ID, variables);
+        subject.fail(TEST_ACTIVITY_ID, request);
 
         // Then
-        verify(activityService).fail(TEST_ACTIVITY_ID, variables);
+        verify(activityService).fail(TEST_ACTIVITY_ID, request.failure(), request.variables());
     }
 
     @Test
-    @DisplayName("Should fail activity with null variables")
+    @DisplayName("Should fail activity with null request")
     void shouldFailActivityWithNullVariables() {
         // When
         subject.fail(TEST_ACTIVITY_ID, null);
 
         // Then
-        verify(activityService).fail(TEST_ACTIVITY_ID, Collections.emptyMap());
+        verify(activityService).fail(TEST_ACTIVITY_ID);
     }
 
     @Test
@@ -203,12 +207,14 @@ class ActivityControllerTest {
                 "timestamp", System.currentTimeMillis(),
                 "retry", false
         );
+        var failure = ActivityFailure.of("Failure reason");
+        var request = new FailActivityRequest(failure, complexVariables);
 
         // When
-        subject.fail(TEST_ACTIVITY_ID, complexVariables);
+        subject.fail(TEST_ACTIVITY_ID, request);
 
         // Then
-        verify(activityService).fail(TEST_ACTIVITY_ID, complexVariables);
+        verify(activityService).fail(TEST_ACTIVITY_ID, request.failure(), request.variables());
     }
 
     private List<Activity> createTestActivities() {

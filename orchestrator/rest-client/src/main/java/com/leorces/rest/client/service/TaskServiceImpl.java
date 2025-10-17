@@ -1,5 +1,6 @@
 package com.leorces.rest.client.service;
 
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.TaskRestClient;
 import com.leorces.rest.client.model.Task;
 import lombok.AllArgsConstructor;
@@ -39,13 +40,23 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public boolean fail(String taskId) {
-        return fail(taskId, Collections.emptyMap());
+        return fail(taskId, null, Collections.emptyMap());
     }
 
     @Override
     public boolean fail(String taskId, Map<String, Object> variables) {
+        return fail(taskId, null, variables);
+    }
+
+    @Override
+    public boolean fail(String taskId, ActivityFailure failure) {
+        return fail(taskId, failure, Collections.emptyMap());
+    }
+
+    @Override
+    public boolean fail(String taskId, ActivityFailure failure, Map<String, Object> variables) {
         try {
-            var response = taskRestClient.fail(taskId, variables);
+            var response = taskRestClient.fail(taskId, failure, variables);
             var isSuccessful = response.getStatusCode().is2xxSuccessful();
             if (!isSuccessful) {
                 log.warn("Task failure operation failed with status: {} for taskId: {}",

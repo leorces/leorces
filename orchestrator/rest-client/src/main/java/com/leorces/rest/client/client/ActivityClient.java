@@ -1,6 +1,8 @@
 package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
+import com.leorces.rest.client.model.request.FailActivityRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -89,13 +91,13 @@ public class ActivityClient {
 
     @Retry(name = "activity-fail")
     @CircuitBreaker(name = "activity-fail", fallbackMethod = "failFallback")
-    public void fail(String activityId, Map<String, Object> variables) {
+    public void fail(String activityId, ActivityFailure failure, Map<String, Object> variables) {
         try {
             restClient.put()
                     .uri(FAIL_ACTIVITY_ENDPOINT.formatted(activityId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .body(variables)
+                    .body(new FailActivityRequest(failure, variables))
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException.BadRequest e) {

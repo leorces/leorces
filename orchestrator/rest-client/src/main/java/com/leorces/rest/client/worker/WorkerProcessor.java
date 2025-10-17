@@ -2,6 +2,7 @@ package com.leorces.rest.client.worker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.TaskRestClient;
 import com.leorces.rest.client.model.Task;
 import com.leorces.rest.client.model.worker.WorkerContext;
@@ -115,7 +116,7 @@ public class WorkerProcessor {
         } catch (Exception e) {
             log.error("Task '{}' failed for topic '{}'", task.id(), topic, e);
             workerMetrics.recordTaskFailedMetrics(context);
-            boolean failedSuccessfully = service.fail(task.id());
+            boolean failedSuccessfully = service.fail(task.id(), ActivityFailure.of(e));
             if (!failedSuccessfully) {
                 log.error("Failed to mark task '{}' as failed for topic '{}'. Task may be in inconsistent state.",
                         task.id(), topic);

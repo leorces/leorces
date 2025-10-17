@@ -1,7 +1,9 @@
 package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.model.runtime.activity.ActivityState;
+import com.leorces.rest.client.model.request.FailActivityRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -139,19 +141,22 @@ class ActivityClientTest {
     @DisplayName("Should fail activity successfully when valid parameters are provided")
     void shouldFailActivitySuccessfullyWhenValidParametersAreProvided() {
         // Given
+        var failure = ActivityFailure.of("Failure reason");
+        var request = new FailActivityRequest(failure, TEST_VARIABLES);
+
         when(restClient.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
         when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(TEST_VARIABLES)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(request)).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
 
         // When
-        assertDoesNotThrow(() -> activityClient.fail(TEST_ACTIVITY_ID, TEST_VARIABLES));
+        assertDoesNotThrow(() -> activityClient.fail(TEST_ACTIVITY_ID, failure, TEST_VARIABLES));
 
         // Then
         verify(restClient).put();
-        verify(requestBodySpec).body(TEST_VARIABLES);
+        verify(requestBodySpec).body(request);
         verify(responseSpec).toBodilessEntity();
     }
 

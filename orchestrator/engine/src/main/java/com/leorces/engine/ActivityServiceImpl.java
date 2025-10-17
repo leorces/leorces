@@ -4,6 +4,7 @@ import com.leorces.api.ActivityService;
 import com.leorces.engine.activity.command.*;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.persistence.ActivityPersistence;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,13 +40,23 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public void fail(String activityId) {
-        fail(activityId, Map.of());
+        fail(activityId, null, Map.of());
     }
 
     @Override
     public void fail(String activityId, Map<String, Object> variables) {
-        log.debug("Fail activity by id: {} with variables: {}", activityId, variables);
-        dispatcher.dispatchAsync(FailActivityCommand.of(activityId, variables));
+        fail(activityId, null, variables);
+    }
+
+    @Override
+    public void fail(String activityId, ActivityFailure failure) {
+        fail(activityId, failure, Map.of());
+    }
+
+    @Override
+    public void fail(String activityId, ActivityFailure failure, Map<String, Object> variables) {
+        log.debug("Fail activity by id: {} with failure: {} and variables: {}", activityId, failure, variables);
+        dispatcher.dispatchAsync(FailActivityCommand.of(activityId, failure, variables));
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.leorces.engine;
 import com.leorces.engine.activity.command.*;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.persistence.ActivityPersistence;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,6 +73,41 @@ class ActivityServiceImplTest {
         verify(dispatcher).dispatchAsync(argThat(cmd ->
                 cmd instanceof FailActivityCommand &&
                         ((FailActivityCommand) cmd).activityId().equals(activityId)
+        ));
+        verifyNoMoreInteractions(dispatcher, activityPersistence);
+    }
+
+    @Test
+    @DisplayName("fail(activityId, failure) should dispatch FailActivityCommand with given failure and empty variables")
+    void failWithFailureDispatchesCommand() {
+        var activityId = "act-5";
+        var failure = new ActivityFailure("test-reason", "stacktrace");
+
+        service.fail(activityId, failure);
+
+        verify(dispatcher).dispatchAsync(argThat(cmd ->
+                cmd instanceof FailActivityCommand &&
+                        ((FailActivityCommand) cmd).activityId().equals(activityId) &&
+                        ((FailActivityCommand) cmd).failure().equals(failure) &&
+                        ((FailActivityCommand) cmd).variables().isEmpty()
+        ));
+        verifyNoMoreInteractions(dispatcher, activityPersistence);
+    }
+
+    @Test
+    @DisplayName("fail(activityId, failure, variables) should dispatch FailActivityCommand with given failure and variables")
+    void failWithFailureAndVariablesDispatchesCommand() {
+        var activityId = "act-6";
+        var failure = new ActivityFailure("bad-input", "trace-xyz");
+        Map<String, Object> vars = Map.of("error", "invalid-state");
+
+        service.fail(activityId, failure, vars);
+
+        verify(dispatcher).dispatchAsync(argThat(cmd ->
+                cmd instanceof FailActivityCommand &&
+                        ((FailActivityCommand) cmd).activityId().equals(activityId) &&
+                        ((FailActivityCommand) cmd).failure().equals(failure) &&
+                        ((FailActivityCommand) cmd).variables().equals(vars)
         ));
         verifyNoMoreInteractions(dispatcher, activityPersistence);
     }

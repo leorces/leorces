@@ -2,6 +2,7 @@ package com.leorces.rest.client.service;
 
 import com.leorces.api.ActivityService;
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.ActivityClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,12 +35,22 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public void fail(String activityId) {
-        fail(activityId, Map.of());
+        fail(activityId, null, Map.of());
     }
 
     @Override
     public void fail(String activityId, Map<String, Object> variables) {
-        activityClient.fail(activityId, variables);
+        fail(activityId, null, variables);
+    }
+
+    @Override
+    public void fail(String activityId, ActivityFailure failure) {
+        fail(activityId, failure, Map.of());
+    }
+
+    @Override
+    public void fail(String activityId, ActivityFailure failure, Map<String, Object> variables) {
+        activityClient.fail(activityId, failure, variables);
     }
 
     @Override

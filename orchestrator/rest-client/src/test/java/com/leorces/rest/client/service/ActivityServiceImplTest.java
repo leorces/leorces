@@ -1,6 +1,7 @@
 package com.leorces.rest.client.service;
 
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.ActivityClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,13 +67,13 @@ class ActivityServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should fail activity without variables")
+    @DisplayName("Should fail activity without failure and variables")
     void shouldFailActivityWithoutVariables() {
         //When
         activityService.fail(ACTIVITY_ID);
 
         //Then
-        verify(activityClient).fail(ACTIVITY_ID, EMPTY_VARIABLES);
+        verify(activityClient).fail(ACTIVITY_ID, null, Map.of());
     }
 
     @Test
@@ -82,7 +83,33 @@ class ActivityServiceImplTest {
         activityService.fail(ACTIVITY_ID, VARIABLES);
 
         //Then
-        verify(activityClient).fail(ACTIVITY_ID, VARIABLES);
+        verify(activityClient).fail(ACTIVITY_ID, null, VARIABLES);
+    }
+
+    @Test
+    @DisplayName("Should fail activity with failure and variables")
+    void shouldFailActivityWithFailureAndVariables() {
+        // Given
+        var failure = ActivityFailure.of("Failure reason");
+
+        //When
+        activityService.fail(ACTIVITY_ID, failure, VARIABLES);
+
+        //Then
+        verify(activityClient).fail(ACTIVITY_ID, failure, VARIABLES);
+    }
+
+    @Test
+    @DisplayName("Should fail activity with failure and without variables")
+    void shouldFailActivityWithFailureAndWithoutVariables() {
+        // Given
+        var failure = ActivityFailure.of("Failure reason");
+
+        //When
+        activityService.fail(ACTIVITY_ID, failure, Map.of());
+
+        //Then
+        verify(activityClient).fail(ACTIVITY_ID, failure, Map.of());
     }
 
     @Test

@@ -49,6 +49,12 @@ public class ActivityExecutionEntity implements Persistable<String> {
     @Column("activity_retries")
     private int retries;
 
+    @Column("activity_failure_reason")
+    private String failureReason;
+
+    @Column("activity_failure_trace")
+    private String failureTrace;
+
     @Column("activity_created_at")
     private LocalDateTime createdAt;
 

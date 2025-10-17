@@ -206,4 +206,5 @@ class VariablePersistenceIT extends RepositoryIT {
                 .build();
         return processPersistence.run(process);
     }
+
 }

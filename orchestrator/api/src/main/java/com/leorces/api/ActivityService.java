@@ -1,6 +1,7 @@
 package com.leorces.api;
 
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.model.runtime.activity.ActivityFailure;
 
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,23 @@ public interface ActivityService {
      * @param variables  the variables to set during activity failure
      */
     void fail(String activityId, Map<String, Object> variables);
+
+    /**
+     * Fails the activity with the specified ID without variables.
+     *
+     * @param activityId the unique identifier of the activity to fail
+     * @param failure    the failure reason for the activity failure
+     */
+    void fail(String activityId, ActivityFailure failure);
+
+    /**
+     * Fails the activity with the specified ID and sets the provided variables.
+     *
+     * @param activityId the unique identifier of the activity to fail
+     * @param failure    the failure reason for the activity failure
+     * @param variables  the variables to set during activity failure
+     */
+    void fail(String activityId, ActivityFailure failure, Map<String, Object> variables);
 
     /**
      * Terminates the activity with the specified ID.

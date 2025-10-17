@@ -1,6 +1,8 @@
 package com.leorces.rest.client.client;
 
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.request.FailActivityRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
@@ -66,13 +68,13 @@ public class TaskRestClient {
 
     @Retry(name = "task-update")
     @CircuitBreaker(name = "task-update", fallbackMethod = "updateFallback")
-    public ResponseEntity<Void> fail(String taskId, Map<String, Object> variables) {
+    public ResponseEntity<Void> fail(String taskId, ActivityFailure failure, Map<String, Object> variables) {
         try {
             return restClient.put()
                     .uri(FAIL_ACTIVITY_ENDPOINT.formatted(taskId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .body(variables)
+                    .body(new FailActivityRequest(failure, variables))
                     .retrieve()
                     .toBodilessEntity();
         } catch (HttpClientErrorException.BadRequest e) {

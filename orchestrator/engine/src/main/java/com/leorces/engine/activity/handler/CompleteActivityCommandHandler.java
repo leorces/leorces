@@ -11,6 +11,7 @@ import com.leorces.engine.exception.ExecutionException;
 import com.leorces.engine.variables.VariablesService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.activity.ActivityExecution;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -54,7 +55,7 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
             var behavior = behaviorResolver.resolveBehavior(activity.type());
             return behavior.complete(activity);
         } catch (Exception e) {
-            dispatcher.dispatch(FailActivityCommand.of(activity));
+            dispatcher.dispatch(FailActivityCommand.of(activity, ActivityFailure.of(e)));
             throw new ExecutionException("Activity completion failed", e);
         }
     }

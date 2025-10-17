@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.model.runtime.activity.Activity;
 import com.leorces.model.runtime.activity.ActivityExecution;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.variable.Variable;
@@ -45,6 +46,8 @@ public class ActivityMapper {
                 .type(activity.type().name())
                 .state(activity.state().name())
                 .retries(activity.retries())
+                .failureReason(activity.failure() != null ? activity.failure().reason() : null)
+                .failureTrace(activity.failure() != null ? activity.failure().trace() : null)
                 .async(activity.isAsync())
                 .createdAt(activity.createdAt())
                 .updatedAt(activity.updatedAt())
@@ -55,11 +58,13 @@ public class ActivityMapper {
 
     public ActivityExecution toExecution(ActivityExecutionEntity entity) {
         var variables = variableMapper.toVariables(entity.getVariablesJson());
+        var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
         var activity = ActivityExecution.builder()
                 .id(entity.getId())
                 .definitionId(entity.getActivityDefinitionId())
                 .state(ActivityState.valueOf(entity.getState()))
                 .retries(entity.getRetries())
+                .failure(failure)
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .startedAt(entity.getStartedAt())
@@ -99,12 +104,14 @@ public class ActivityMapper {
 
     private Activity toActivity(ActivityEntity entity, Process process) {
         var variables = variableMapper.toVariables(entity.getVariablesJson());
+        var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
         var execution = ActivityExecution.builder()
                 .id(entity.getId())
                 .definitionId(entity.getActivityDefinitionId())
                 .process(process)
                 .state(ActivityState.valueOf(entity.getState()))
                 .retries(entity.getRetries())
+                .failure(failure)
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .startedAt(entity.getStartedAt())
@@ -130,6 +137,7 @@ public class ActivityMapper {
                 .variables(execution.variables())
                 .state(execution.state())
                 .retries(execution.retries())
+                .failure(execution.failure())
                 .createdAt(execution.createdAt())
                 .updatedAt(execution.updatedAt())
                 .startedAt(execution.startedAt())

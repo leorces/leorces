@@ -1,5 +1,6 @@
 package com.leorces.rest.client.service;
 
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.TaskRestClient;
 import com.leorces.rest.client.model.Task;
 import org.junit.jupiter.api.DisplayName;
@@ -97,32 +98,33 @@ class TaskServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should fail task without variables and return true on success")
+    @DisplayName("Should fail task without failure and variables and return true on success")
     void shouldFailTaskWithoutVariablesAndReturnTrueOnSuccess() {
         //Given
         var successResponse = new ResponseEntity<Void>(HttpStatus.OK);
-        when(taskRestClient.fail(TASK_ID, EMPTY_VARIABLES)).thenReturn(successResponse);
+        when(taskRestClient.fail(TASK_ID, null, EMPTY_VARIABLES)).thenReturn(successResponse);
 
         //When
         var result = taskService.fail(TASK_ID);
 
         //Then
-        verify(taskRestClient).fail(TASK_ID, EMPTY_VARIABLES);
+        verify(taskRestClient).fail(TASK_ID, null, EMPTY_VARIABLES);
         assertThat(result).isTrue();
     }
 
     @Test
-    @DisplayName("Should fail task with variables and return true on success")
+    @DisplayName("Should fail task with failure and variables and return true on success")
     void shouldFailTaskWithVariablesAndReturnTrueOnSuccess() {
         //Given
+        var failure = ActivityFailure.of("Failure reason");
         var successResponse = new ResponseEntity<Void>(HttpStatus.OK);
-        when(taskRestClient.fail(TASK_ID, VARIABLES)).thenReturn(successResponse);
+        when(taskRestClient.fail(TASK_ID, failure, VARIABLES)).thenReturn(successResponse);
 
         //When
-        var result = taskService.fail(TASK_ID, VARIABLES);
+        var result = taskService.fail(TASK_ID, failure, VARIABLES);
 
         //Then
-        verify(taskRestClient).fail(TASK_ID, VARIABLES);
+        verify(taskRestClient).fail(TASK_ID, failure, VARIABLES);
         assertThat(result).isTrue();
     }
 
@@ -131,13 +133,13 @@ class TaskServiceImplTest {
     void shouldReturnFalseWhenTaskFailureOperationFailsWithNon2xxStatus() {
         //Given
         var errorResponse = new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
-        when(taskRestClient.fail(TASK_ID, EMPTY_VARIABLES)).thenReturn(errorResponse);
+        when(taskRestClient.fail(TASK_ID, null, EMPTY_VARIABLES)).thenReturn(errorResponse);
 
         //When
         var result = taskService.fail(TASK_ID);
 
         //Then
-        verify(taskRestClient).fail(TASK_ID, EMPTY_VARIABLES);
+        verify(taskRestClient).fail(TASK_ID, null, EMPTY_VARIABLES);
         assertThat(result).isFalse();
     }
 
@@ -145,14 +147,14 @@ class TaskServiceImplTest {
     @DisplayName("Should return false when task failure operation throws exception")
     void shouldReturnFalseWhenTaskFailureOperationThrowsException() {
         //Given
-        when(taskRestClient.fail(TASK_ID, EMPTY_VARIABLES))
+        when(taskRestClient.fail(TASK_ID, null, EMPTY_VARIABLES))
                 .thenThrow(new RuntimeException("Network error"));
 
         //When
         var result = taskService.fail(TASK_ID);
 
         //Then
-        verify(taskRestClient).fail(TASK_ID, EMPTY_VARIABLES);
+        verify(taskRestClient).fail(TASK_ID, null, EMPTY_VARIABLES);
         assertThat(result).isFalse();
     }
 

@@ -46,4 +46,5 @@ public record CallActivity(
         return mappings.stream()
                 .anyMatch(mapping -> "all".equals(mapping.variables()));
     }
+
 }

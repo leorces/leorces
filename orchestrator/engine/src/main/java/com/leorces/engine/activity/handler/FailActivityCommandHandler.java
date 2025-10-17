@@ -22,7 +22,9 @@ public class FailActivityCommandHandler implements CommandHandler<FailActivityCo
 
     @Override
     public void handle(FailActivityCommand command) {
-        var activity = getActivity(command);
+        var activity = getActivity(command).toBuilder()
+                .failure(command.failure())
+                .build();
 
         if (!canHandle(activity)) {
             log.debug("Can't fail {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());

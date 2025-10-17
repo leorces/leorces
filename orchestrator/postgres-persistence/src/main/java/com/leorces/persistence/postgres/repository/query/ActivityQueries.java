@@ -74,6 +74,8 @@ public final class ActivityQueries {
                    activity.activity_type,
                    activity.activity_state,
                    activity.activity_retries,
+                   activity.activity_failure_reason,
+                   activity.activity_failure_trace,
                    activity.activity_async,
                    activity.activity_created_at,
                    activity.activity_updated_at,

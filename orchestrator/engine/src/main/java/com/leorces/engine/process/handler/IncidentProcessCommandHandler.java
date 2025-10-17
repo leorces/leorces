@@ -6,6 +6,7 @@ import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.ProcessMetrics;
 import com.leorces.engine.process.command.IncidentProcessCommand;
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ProcessPersistence;
@@ -44,7 +45,7 @@ public class IncidentProcessCommandHandler implements CommandHandler<IncidentPro
         processPersistence.incident(process);
         processMetrics.recordProcessIncidentMetric(process);
         if (process.isCallActivity()) {
-            dispatcher.dispatchAsync(FailActivityCommand.of(process.id()));
+            dispatcher.dispatchAsync(FailActivityCommand.of(process.id(), ActivityFailure.of("Process Incident")));
         }
     }
 

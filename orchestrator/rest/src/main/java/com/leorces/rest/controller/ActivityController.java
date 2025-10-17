@@ -2,6 +2,7 @@ package com.leorces.rest.controller;
 
 import com.leorces.api.ActivityService;
 import com.leorces.model.runtime.activity.Activity;
+import com.leorces.rest.model.request.FailActivityRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -90,10 +91,15 @@ public class ActivityController {
     public ResponseEntity<Void> fail(
             @Parameter(description = "The ID of the activity to fail", required = true)
             @PathVariable("activityId") String activityId,
-            @Parameter(description = "Optional variables to set when failing the activity")
-            @Valid @RequestBody(required = false) Map<String, Object> variables
+            @Parameter(description = "Fail activity request")
+            @Valid @RequestBody(required = false) FailActivityRequest request
     ) {
-        activityService.fail(activityId, Objects.requireNonNullElse(variables, Collections.emptyMap()));
+        if (request == null) {
+            activityService.fail(activityId);
+        } else {
+            activityService.fail(activityId, request.failure(), request.variables());
+        }
+
         return ResponseEntity.noContent().build();
     }
 

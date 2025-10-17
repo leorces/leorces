@@ -1,6 +1,8 @@
 package com.leorces.rest.client.client;
 
+import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.request.FailActivityRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -92,23 +94,25 @@ class TaskRestClientTest {
     @DisplayName("Should fail task successfully when valid parameters are provided")
     void shouldFailTaskSuccessfullyWhenValidParametersAreProvided() {
         // Given
+        var failure = ActivityFailure.of("Failure reason");
+        var request = new FailActivityRequest(failure, TEST_VARIABLES);
         var expectedResponse = ResponseEntity.ok().<Void>build();
         when(restClient.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
         when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(TEST_VARIABLES)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(request)).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity()).thenReturn(expectedResponse);
 
         // When
-        var result = taskRestClient.fail(TEST_TASK_ID, TEST_VARIABLES);
+        var result = taskRestClient.fail(TEST_TASK_ID, failure, TEST_VARIABLES);
 
         // Then
         assertNotNull(result);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         verify(restClient).put();
-        verify(requestBodySpec).body(TEST_VARIABLES);
+        verify(requestBodySpec).body(request);
     }
 
     @Test
@@ -218,17 +222,19 @@ class TaskRestClientTest {
     @DisplayName("Should return bad request response when failing task with bad request")
     void shouldReturnBadRequestResponseWhenFailingTaskWithBadRequest() {
         // Given
+        var failure = ActivityFailure.of("Failure reason");
+        var request = new FailActivityRequest(failure, TEST_VARIABLES);
         when(restClient.put()).thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
         when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
         when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(TEST_VARIABLES)).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(request)).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.toBodilessEntity())
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When
-        var result = taskRestClient.fail(TEST_TASK_ID, TEST_VARIABLES);
+        var result = taskRestClient.fail(TEST_TASK_ID, failure, TEST_VARIABLES);
 
         // Then
         assertNotNull(result);
