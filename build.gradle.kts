@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = "com.leorces"
-    version = "0.1.1"
+    version = "0.1.2"
 }
 
 subprojects {
@@ -45,6 +45,10 @@ subprojects {
 
     jacoco {
         toolVersion = "0.8.13"
+    }
+
+    tasks.withType<GenerateModuleMetadata> {
+        enabled = false
     }
 
     configure<PublishingExtension> {
