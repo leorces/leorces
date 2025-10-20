@@ -59,7 +59,7 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
 
     @Modifying
     @Query(CHANGE_STATE)
-    void changeState(@Param("processId") String activityId,
+    void changeState(@Param("activityId") String activityId,
                      @Param("state") String state);
 
     @Modifying

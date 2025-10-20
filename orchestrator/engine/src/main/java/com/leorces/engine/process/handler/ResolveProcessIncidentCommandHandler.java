@@ -1,9 +1,12 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
+import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.ProcessMetrics;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
+import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
@@ -20,6 +23,7 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
 
     private final ProcessPersistence processPersistence;
     private final ActivityPersistence activityPersistence;
+    private final CommandDispatcher commandDispatcher;
     private final ProcessMetrics processMetrics;
 
     @Override
@@ -46,13 +50,20 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
         processPersistence.changeState(process.id(), ProcessState.ACTIVE);
         processMetrics.recordProcessRecoveredMetrics(process);
         if (process.isCallActivity()) {
-            activityPersistence.changeState(process.id(), ActivityState.ACTIVE);
+            var callActivity = getCallActivity(process.id());
+            activityPersistence.changeState(callActivity.id(), ActivityState.ACTIVE);
+            commandDispatcher.dispatch(ResolveProcessIncidentCommand.of(callActivity.processId()));
         }
     }
 
     private Process getProcess(ResolveProcessIncidentCommand command) {
         return processPersistence.findById(command.processId())
                 .orElseThrow(ProcessNotFoundException::new);
+    }
+
+    private ActivityExecution getCallActivity(String activityId) {
+        return activityPersistence.findById(activityId)
+                .orElseThrow(() -> ActivityNotFoundException.activityNotFoundById(activityId));
     }
 
 }
