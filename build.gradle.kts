@@ -1,17 +1,19 @@
 plugins {
     alias(libs.plugins.java)
     alias(libs.plugins.spring.dependency.management)
+    `maven-publish` apply false
     jacoco
 }
 
 allprojects {
     group = "com.leorces"
-    version = "0.0.1-SNAPSHOT"
+    version = "0.1.0"
 }
 
 subprojects {
     apply(plugin = "java-library")
     apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "maven-publish")
     apply(plugin = "jacoco")
 
     java {
@@ -44,5 +46,23 @@ subprojects {
 
     jacoco {
         toolVersion = "0.8.13"
+    }
+
+    configure<PublishingExtension> {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/leorces/leorces")
+                credentials {
+                    username = System.getenv("USERNAME")
+                    password = System.getenv("TOKEN")
+                }
+            }
+        }
+        publications {
+            register<MavenPublication>("gpr") {
+                from(components["java"])
+            }
+        }
     }
 }
