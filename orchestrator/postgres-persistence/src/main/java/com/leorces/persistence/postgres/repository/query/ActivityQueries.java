@@ -31,7 +31,7 @@ public final class ActivityQueries {
                 FROM activity
                 WHERE process_id = :processId
                   AND activity_parent_definition_id = :definitionId
-                  AND activity_completed_at IS NULL
+                  AND activity_state in ('COMPLETED', 'TERMINATED')
             )
             """;
 
@@ -154,6 +154,7 @@ public final class ActivityQueries {
             WHERE activity.activity_state = 'ACTIVE' OR activity.activity_state = 'SCHEDULED'
               AND activity.activity_timeout IS NOT NULL
               AND activity.activity_timeout < CURRENT_TIMESTAMP
+            LIMIT :limit
             """;
 
     private ActivityQueries() {

@@ -16,13 +16,27 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FailActivitiesByTimeoutCommandHandler implements CommandHandler<FailActivitiesByTimeoutCommand> {
 
+    private static final int BATCH_SIZE = 100;
+
     private final ActivityPersistence activityPersistence;
     private final CommandDispatcher dispatcher;
 
     @Override
     public void handle(FailActivitiesByTimeoutCommand command) {
-        activityPersistence.findTimedOut()
-                .forEach(this::failActivity);
+        int timedOutCount;
+
+        do {
+            log.debug("Starting failure of timed out activities");
+            var activities = activityPersistence.findTimedOut(BATCH_SIZE);
+
+            if (activities.isEmpty()) {
+                log.debug("No timed out activities found");
+                return;
+            }
+
+            activities.forEach(this::failActivity);
+            timedOutCount = activities.size();
+        } while (timedOutCount >= BATCH_SIZE);
     }
 
     @Override

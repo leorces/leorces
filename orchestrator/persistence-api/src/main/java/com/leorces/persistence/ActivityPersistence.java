@@ -114,9 +114,10 @@ public interface ActivityPersistence {
     /**
      * Finds all timed out activities.
      *
+     * @param limit the maximum number of activities to retrieve
      * @return the list of timed-out activities
      */
-    List<ActivityExecution> findTimedOut();
+    List<ActivityExecution> findTimedOut(int limit);
 
     /**
      * Polls for available activities to execute from a specific topic.

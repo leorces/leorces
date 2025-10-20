@@ -54,6 +54,9 @@ CREATE TABLE IF NOT EXISTS activity
     activity_started_at           TIMESTAMP,
     activity_completed_at         TIMESTAMP,
     activity_retries              INTEGER   NOT NULL DEFAULT 0,
+    activity_timeout        TIMESTAMP,
+    activity_failure_reason TEXT,
+    activity_failure_trace  TEXT,
     activity_async                BOOLEAN   NOT NULL,
     process_id                    TEXT      NOT NULL,
     process_definition_id         TEXT      NOT NULL,
@@ -65,11 +68,11 @@ CREATE TABLE IF NOT EXISTS activity
 
 CREATE INDEX IF NOT EXISTS idx_activity_process_state_active
     ON activity (process_id, activity_state)
-    WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
+    WHERE activity_state IN ('ACTIVE', 'SCHEDULED', 'COMPLETED', 'TERMINATED');
 
-CREATE INDEX IF NOT EXISTS idx_activity_process_incomplete
-    ON activity (process_id)
-    WHERE activity_completed_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_activity_timeout
+    ON activity (activity_timeout)
+    WHERE activity_timeout IS NOT NULL;
 
 -- Create the activity_queue table
 CREATE TABLE IF NOT EXISTS activity_queue
@@ -83,9 +86,6 @@ CREATE TABLE IF NOT EXISTS activity_queue
     -- Primary key constraint
     CONSTRAINT pk_activity_queue PRIMARY KEY (activity_id)
 );
-
-CREATE INDEX IF NOT EXISTS idx_activity_queue_topic_key
-    ON activity_queue (activity_queue_topic, process_definition_key);
 
 -- Create the execution_variable table
 CREATE TABLE IF NOT EXISTS variable

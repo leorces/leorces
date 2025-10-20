@@ -7,6 +7,4 @@
 
     <!-- Include all changelog files -->
     <include file="changes/01-init.sql" relativeToChangelogFile="true"/>
-    <include file="changes/02-add-activity-failure.sql" relativeToChangelogFile="true"/>
-    <include file="changes/03-add-activity-timeout.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

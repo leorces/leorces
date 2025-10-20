@@ -27,6 +27,8 @@ import static org.mockito.Mockito.*;
 @DisplayName("FailActivitiesByTimeoutCommandHandler Tests")
 class FailActivitiesByTimeoutCommandHandlerTest {
 
+    private static final int BATCH_SIZE = 100;
+
     @Mock
     private ActivityPersistence activityPersistence;
 
@@ -64,14 +66,14 @@ class FailActivitiesByTimeoutCommandHandlerTest {
     @DisplayName("Should fail all timed out activities")
     void shouldFailAllTimedOutActivities() {
         // Given
-        when(activityPersistence.findTimedOut()).thenReturn(List.of(activity1, activity2));
+        when(activityPersistence.findTimedOut(BATCH_SIZE)).thenReturn(List.of(activity1, activity2));
         var command = new FailActivitiesByTimeoutCommand();
 
         // When
         handler.handle(command);
 
         // Then
-        verify(activityPersistence).findTimedOut();
+        verify(activityPersistence).findTimedOut(BATCH_SIZE);
         verify(dispatcher, times(2)).dispatchAsync(any(FailActivityCommand.class));
 
         // Verify that each command contains expected activity and failure
@@ -96,14 +98,14 @@ class FailActivitiesByTimeoutCommandHandlerTest {
     @DisplayName("Should handle empty timed out activity list without errors")
     void shouldHandleEmptyTimedOutActivities() {
         // Given
-        when(activityPersistence.findTimedOut()).thenReturn(List.of());
+        when(activityPersistence.findTimedOut(BATCH_SIZE)).thenReturn(List.of());
         var command = new FailActivitiesByTimeoutCommand();
 
         // When
         handler.handle(command);
 
         // Then
-        verify(activityPersistence).findTimedOut();
+        verify(activityPersistence).findTimedOut(BATCH_SIZE);
         verify(dispatcher, never()).dispatchAsync(any());
     }
 
@@ -111,7 +113,7 @@ class FailActivitiesByTimeoutCommandHandlerTest {
     @DisplayName("Should call failActivity() for each activity individually")
     void shouldCallFailActivityIndividually() {
         // Given
-        when(activityPersistence.findTimedOut()).thenReturn(List.of(activity1, activity2));
+        when(activityPersistence.findTimedOut(BATCH_SIZE)).thenReturn(List.of(activity1, activity2));
         var command = new FailActivitiesByTimeoutCommand();
 
         // When
@@ -135,7 +137,7 @@ class FailActivitiesByTimeoutCommandHandlerTest {
     @DisplayName("Should dispatch FailActivityCommand with Timeout failure reason")
     void shouldDispatchFailActivityCommandWithTimeoutFailure() {
         // Given
-        when(activityPersistence.findTimedOut()).thenReturn(List.of(activity1));
+        when(activityPersistence.findTimedOut(BATCH_SIZE)).thenReturn(List.of(activity1));
         var command = new FailActivitiesByTimeoutCommand();
 
         // When

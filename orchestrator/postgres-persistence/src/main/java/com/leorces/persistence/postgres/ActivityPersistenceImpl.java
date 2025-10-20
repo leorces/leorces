@@ -118,8 +118,8 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ActivityExecution> findTimedOut() {
-        return activityRepository.findTimedOut().stream()
+    public List<ActivityExecution> findTimedOut(int limit) {
+        return activityRepository.findTimedOut(limit).stream()
                 .map(activityMapper::toExecution)
                 .toList();
     }

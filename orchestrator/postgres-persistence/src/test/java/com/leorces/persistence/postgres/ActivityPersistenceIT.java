@@ -240,7 +240,7 @@ class ActivityPersistenceIT extends RepositoryIT {
         activityPersistence.run(activity2);
 
         // When
-        var result = activityPersistence.findTimedOut();
+        var result = activityPersistence.findTimedOut(10);
 
         // Then
         assertThat(result).hasSize(2);
