@@ -1,8 +1,10 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.ProcessMetrics;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
+import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
@@ -33,6 +35,9 @@ class ResolveProcessIncidentCommandHandlerTest {
 
     @Mock
     private ActivityPersistence activityPersistence;
+
+    @Mock
+    private CommandDispatcher dispatcher;
 
     @Mock
     private ProcessMetrics processMetrics;
@@ -70,6 +75,14 @@ class ResolveProcessIncidentCommandHandlerTest {
         when(processPersistence.findById(PROCESS_ID)).thenReturn(Optional.of(incidentProcess));
         when(activityPersistence.isAnyFailed(PROCESS_ID)).thenReturn(false);
 
+        var mockActivity = ActivityExecution.builder()
+                .id(PROCESS_ID)
+                .process(incidentProcess)
+                .state(ActivityState.FAILED)
+                .build();
+
+        when(activityPersistence.findById(PROCESS_ID)).thenReturn(Optional.of(mockActivity));
+
         // When
         handler.handle(command);
 
@@ -77,6 +90,11 @@ class ResolveProcessIncidentCommandHandlerTest {
         verify(processPersistence).changeState(PROCESS_ID, ProcessState.ACTIVE);
         verify(processMetrics).recordProcessRecoveredMetrics(incidentProcess);
         verify(activityPersistence).changeState(PROCESS_ID, ActivityState.ACTIVE);
+
+        verify(dispatcher).dispatch(argThat(cmd ->
+                cmd instanceof ResolveProcessIncidentCommand(String processId) &&
+                        PROCESS_ID.equals(processId)
+        ));
     }
 
     @Test
