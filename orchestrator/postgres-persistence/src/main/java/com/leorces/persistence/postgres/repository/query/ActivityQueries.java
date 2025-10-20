@@ -151,7 +151,7 @@ public final class ActivityQueries {
             """;
 
     public static final String FIND_TIMED_OUT = BASE_SELECT + """
-            WHERE activity.activity_state = 'ACTIVE' OR activity.activity_state = 'SCHEDULED'
+            WHERE (activity.activity_state = 'ACTIVE' OR activity.activity_state = 'SCHEDULED')
               AND activity.activity_timeout IS NOT NULL
               AND activity.activity_timeout < CURRENT_TIMESTAMP
             LIMIT :limit
