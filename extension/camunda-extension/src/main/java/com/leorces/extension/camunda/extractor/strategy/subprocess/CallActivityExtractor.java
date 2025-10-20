@@ -87,10 +87,7 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
                 .source(getStringOrNull(mapping.getAttribute("source")))
                 .target(getStringOrNull(mapping.getAttribute("target")))
                 .sourceExpression(getStringOrNull(mapping.getAttribute("sourceExpression")))
-                .expression(getStringOrNull(mapping.getAttribute("expression")))
                 .variables(getStringOrNull(mapping.getAttribute("variables")))
-                .businessKey(mapping.getAttribute("businessKey"))
-                .local("true".equalsIgnoreCase(mapping.getAttribute("local")))
                 .build();
     }
 

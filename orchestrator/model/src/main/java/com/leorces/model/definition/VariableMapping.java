@@ -9,10 +9,7 @@ public record VariableMapping(
         String source,
         String target,
         String sourceExpression,
-        String expression,
-        String variables,
-        String businessKey,
-        boolean local
+        String variables
 ) {
 
 }
