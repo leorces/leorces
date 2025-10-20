@@ -23,7 +23,7 @@ public class CompactionScheduler implements SchedulingConfigurer {
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        if (!compactionProperties.enable()) {
+        if (!compactionProperties.enabled()) {
             log.info("Compaction is disabled, scheduler not registered.");
             return;
         }

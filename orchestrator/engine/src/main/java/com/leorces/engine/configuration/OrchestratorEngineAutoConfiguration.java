@@ -7,7 +7,9 @@ import com.leorces.common.service.MetricService;
 import com.leorces.common.service.impl.MetricServiceImpl;
 import com.leorces.common.service.impl.MicrometerMetricService;
 import com.leorces.engine.configuration.properties.CompactionProperties;
+import com.leorces.engine.configuration.properties.EngineProperties;
 import com.leorces.engine.configuration.properties.MetricsProperties;
+import com.leorces.engine.configuration.properties.ProcessProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +32,10 @@ import java.util.concurrent.Executors;
 @AutoConfiguration
 @RequiredArgsConstructor
 @EnableConfigurationProperties({
+        EngineProperties.class,
+        MetricsProperties.class,
         CompactionProperties.class,
-        MetricsProperties.class
+        ProcessProperties.class
 })
 public class OrchestratorEngineAutoConfiguration {
 

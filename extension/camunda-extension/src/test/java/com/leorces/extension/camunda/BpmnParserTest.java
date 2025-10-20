@@ -136,7 +136,6 @@ class BpmnParserTest {
         // Verify external task-specific properties if it's an external task
         if (processOrderFulfillmentTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("process-order-fulfillment");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0); // Default retries should be non-negative
         }
 
         // Verify OrderFulfillment subprocess end event
@@ -167,7 +166,6 @@ class BpmnParserTest {
         // Verify external task specific properties
         if (orderNotificationTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         var finishedNotificationTask = processDefinition.activities().stream()
@@ -184,7 +182,6 @@ class BpmnParserTest {
         // Verify external task specific properties
         if (finishedNotificationTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify total number of activities matches expected count
@@ -261,7 +258,6 @@ class BpmnParserTest {
         assertThat(courierDeliveryTask.get().outputs()).isEmpty();
         if (courierDeliveryTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("courier-delivery");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify express delivery service task
@@ -278,7 +274,6 @@ class BpmnParserTest {
         assertThat(expressDeliveryTask.get().outputs()).isEmpty();
         if (expressDeliveryTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("express-delivery");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify postal delivery service task
@@ -295,7 +290,6 @@ class BpmnParserTest {
         assertThat(postalDeliveryTask.get().outputs()).isEmpty();
         if (postalDeliveryTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("postal-delivery");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify exclusive gateway (merge)
@@ -354,7 +348,6 @@ class BpmnParserTest {
         assertThat(sellerNotificationDelivered.get().outputs()).isEmpty();
         if (sellerNotificationDelivered.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify client notification (order delivered)
@@ -371,7 +364,6 @@ class BpmnParserTest {
         assertThat(clientNotificationDelivered.get().outputs()).isEmpty();
         if (clientNotificationDelivered.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify seller notification (order rejected)
@@ -388,7 +380,6 @@ class BpmnParserTest {
         assertThat(sellerNotificationRejected.get().outputs()).isEmpty();
         if (sellerNotificationRejected.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify client notification (order rejected)
@@ -405,7 +396,6 @@ class BpmnParserTest {
         assertThat(clientNotificationRejected.get().outputs()).isEmpty();
         if (clientNotificationRejected.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify end event 1
@@ -596,7 +586,6 @@ class BpmnParserTest {
         assertThat(debitTask.get().outputs()).isEmpty();
         if (debitTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("debit");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify deposit service task
@@ -613,7 +602,6 @@ class BpmnParserTest {
         assertThat(depositTask.get().outputs()).isEmpty();
         if (depositTask.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("deposit");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify payment transaction end event
@@ -656,7 +644,6 @@ class BpmnParserTest {
         assertThat(paymentSuccessNotification.get().outputs()).isEmpty();
         if (paymentSuccessNotification.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify payment rejected notification
@@ -673,7 +660,6 @@ class BpmnParserTest {
         assertThat(paymentRejectedNotification.get().outputs()).isEmpty();
         if (paymentRejectedNotification.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify main process end event
@@ -764,7 +750,6 @@ class BpmnParserTest {
         assertThat(paymentFailedNotification.get().outputs()).isEmpty();
         if (paymentFailedNotification.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify payment failed terminate end event
@@ -853,7 +838,6 @@ class BpmnParserTest {
         assertThat(notificationToClient.get().outputs()).isEmpty();
         if (notificationToClient.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify notification to seller send task
@@ -870,7 +854,6 @@ class BpmnParserTest {
         assertThat(notificationToSeller.get().outputs()).isEmpty();
         if (notificationToSeller.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify parallel gateway (join)
@@ -1035,7 +1018,6 @@ class BpmnParserTest {
         assertThat(paymentCanceledNotification.get().outputs()).isEmpty();
         if (paymentCanceledNotification.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify payment timeout notification send task
@@ -1052,7 +1034,6 @@ class BpmnParserTest {
         assertThat(paymentTimeoutNotification.get().outputs()).isEmpty();
         if (paymentTimeoutNotification.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify payment canceled end event
@@ -1117,7 +1098,6 @@ class BpmnParserTest {
         assertThat(paymentRejectedNotification.get().outputs()).isEmpty();
         if (paymentRejectedNotification.get() instanceof ExternalTask externalTask) {
             assertThat(externalTask.topic()).isEqualTo("notification");
-            assertThat(externalTask.retries()).isGreaterThanOrEqualTo(0);
         }
 
         // Verify payment failed terminate end event

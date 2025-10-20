@@ -19,23 +19,24 @@ management:
       show-details: always
 
 leorces:
-  engine:
-    compaction:
-      enable: true
-      batch-size: 2000
-      cron: 0 0 0 * * *
   extension:
     camunda:
       bpmn-path: bpmn
-      processes:
-        OrderSubmittedProcess:
-          tasks:
-            notification:
-              retries: 3
-              timeout: 30m
-        OrderFulfillmentProcess:
-          task-retries: 3
-          task-timeout: 10m
+  processes:
+    OrderSubmittedProcess:
+      activities:
+        notification:
+          retries: 3
+          timeout: 30m
+    OrderFulfillmentProcess:
+      activity-retries: 3
+      activity-timeout: 10m
+  compaction:
+    enabled: true
+    batch-size: 2000
+    cron: 0 0 0 * * *
+  metrics:
+    enabled: true
 
 logging:
   level:

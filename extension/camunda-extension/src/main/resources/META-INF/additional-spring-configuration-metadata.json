@@ -5,11 +5,6 @@
       "type": "java.lang.String",
       "defaultValue": "bpmn",
       "description": "Path to the directory containing BPMN files for the Camunda extension."
-    },
-    {
-      "name": "leorces.extension.camunda.processes",
-      "type": "java.util.Map<java.lang.String,com.leorces.extension.camunda.configuration.properties.ProcessProperties>",
-      "description": "Map of process configurations keyed by process name."
     }
   ],
   "groups": [
@@ -17,16 +12,6 @@
       "name": "leorces.extension.camunda",
       "type": "com.leorces.extension.camunda.configuration.properties.CamundaProperties",
       "description": "Configuration properties for Camunda extension."
-    },
-    {
-      "name": "leorces.extension.camunda.processes",
-      "type": "com.leorces.extension.camunda.configuration.properties.ProcessProperties",
-      "description": "Configuration properties for individual processes."
-    },
-    {
-      "name": "leorces.extension.camunda.processes.tasks",
-      "type": "com.leorces.extension.camunda.configuration.properties.TasksProperties",
-      "description": "Configuration properties for individual tasks within a process."
     }
   ]
 }

@@ -1,29 +1,89 @@
 {
   "properties": [
     {
-      "name": "leorces.engine.compaction.enable",
+      "name": "leorces.compaction.enabled",
       "type": "java.lang.Boolean",
       "defaultValue": false,
       "description": "Whether compaction of completed process instances is enabled."
     },
     {
-      "name": "leorces.engine.compaction.batch-size",
+      "name": "leorces.compaction.batch-size",
       "type": "java.lang.Integer",
       "defaultValue": 1000,
       "description": "Number of process instances to compact in one batch."
     },
     {
-      "name": "leorces.engine.compaction.cron",
+      "name": "leorces.compaction.cron",
       "type": "java.lang.String",
       "defaultValue": "0 0 0 * * *",
       "description": "Cron expression defining when compaction should run. Example: '0 0 0 * * *' for midnight every day."
+    },
+    {
+      "name": "leorces.metrics.enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Whether metrics collection is enabled for the engine."
+    },
+    {
+      "name": "leorces.processes",
+      "type": "java.util.Map<java.lang.String, com.leorces.engine.configuration.properties.ProcessProperties>",
+      "description": "Map of process definitions, keyed by process name."
+    },
+    {
+      "name": "leorces.processes.*.activity-retries",
+      "type": "java.lang.Integer",
+      "defaultValue": 0,
+      "description": "Number of retry attempts for each activity in this process."
+    },
+    {
+      "name": "leorces.processes.*.activity-timeout",
+      "type": "java.lang.String",
+      "defaultValue": "1h",
+      "description": "Default timeout for activities in this process (e.g., '1h', '30m')."
+    },
+    {
+      "name": "leorces.processes.*.activities",
+      "type": "java.util.Map<java.lang.String, com.leorces.engine.configuration.properties.ActivityProperties>",
+      "description": "Activity-level overrides for specific activities in the process."
+    },
+    {
+      "name": "leorces.processes.*.activities.*.retries",
+      "type": "java.lang.Integer",
+      "defaultValue": 0,
+      "description": "Number of retry attempts for this specific activity."
+    },
+    {
+      "name": "leorces.processes.*.activities.*.timeout",
+      "type": "java.lang.String",
+      "defaultValue": "1h",
+      "description": "Timeout duration for this specific activity (e.g., '1h', '30m')."
     }
   ],
   "groups": [
     {
-      "name": "leorces.engine.compaction",
+      "name": "leorces",
+      "type": "com.leorces.engine.configuration.properties.EngineProperties",
+      "description": "Main configuration group for Leorces Engine."
+    },
+    {
+      "name": "leorces.compaction",
       "type": "com.leorces.engine.configuration.properties.CompactionProperties",
       "description": "Settings for compaction of completed process instances."
+    },
+    {
+      "name": "leorces.metrics",
+      "type": "com.leorces.engine.configuration.properties.MetricsProperties",
+      "description": "Settings for metrics collection in the engine."
+    },
+    {
+      "name": "leorces.processes",
+      "type": "java.util.Map<java.lang.String, com.leorces.engine.configuration.properties.ProcessProperties>",
+      "description": "Process-level configuration, allowing per-process overrides."
+    },
+    {
+      "name": "leorces.processes.*.activities",
+      "type": "java.util.Map<java.lang.String, com.leorces.engine.configuration.properties.ActivityProperties>",
+      "description": "Activity-level configuration overrides for specific activities within a process."
     }
   ]
 }
