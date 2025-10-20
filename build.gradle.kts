@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.java)
     alias(libs.plugins.spring.dependency.management)
-    `maven-publish` apply false
     jacoco
 }
 
