@@ -87,7 +87,6 @@ public abstract class ActivityStateTransition {
                     .createdAt(activity.createdAt() != null ? activity.createdAt() : now)
                     .updatedAt(now)
                     .startedAt(activity.startedAt() != null ? activity.startedAt() : now)
-                    .completedAt(now)
                     .build();
         }
 
