@@ -38,7 +38,6 @@ public class HistoryPersistenceImpl implements HistoryPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PageableData<ProcessExecution> findAll(Pageable pageable) {
         var pageableResult = historyRepository.findAll(pageable);
         return new PageableData<>(historyMapper.toExecutions(pageableResult.data()), pageableResult.total());

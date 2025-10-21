@@ -9,7 +9,6 @@ import com.leorces.persistence.postgres.repository.VariableRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,7 +21,6 @@ public class VariablePersistenceImpl implements VariablePersistence {
     private final VariableMapper variableMapper;
 
     @Override
-    @Transactional
     public List<Variable> save(Process process) {
         var entities = variableMapper.toEntities(process);
         variableRepository.saveAll(entities);
@@ -30,7 +28,6 @@ public class VariablePersistenceImpl implements VariablePersistence {
     }
 
     @Override
-    @Transactional
     public List<Variable> save(ActivityExecution activity) {
         var entities = variableMapper.toEntities(activity);
         variableRepository.saveAll(entities);
@@ -38,7 +35,6 @@ public class VariablePersistenceImpl implements VariablePersistence {
     }
 
     @Override
-    @Transactional
     public List<Variable> update(List<Variable> variables) {
         var variableEntities = variableMapper.toEntities(variables);
         variableRepository.saveAll(variableEntities);
@@ -46,7 +42,6 @@ public class VariablePersistenceImpl implements VariablePersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Variable> findInScope(String processId, List<String> scope) {
         var variableEntities = variableRepository.findInScope(processId, scope);
         return variableMapper.toVariables(variableEntities);

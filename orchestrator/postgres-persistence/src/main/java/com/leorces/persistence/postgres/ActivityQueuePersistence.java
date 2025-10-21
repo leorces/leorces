@@ -20,7 +20,6 @@ public class ActivityQueuePersistence {
 
     private final ActivityQueueRepository activityQueueRepository;
 
-    @Transactional
     public void push(ActivityExecution activity) {
         activityQueueRepository.save(buildActivityQueueItem(activity));
     }

@@ -41,28 +41,24 @@ public class DefinitionPersistenceImpl implements DefinitionPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<ProcessDefinition> findById(String definitionId) {
         return definitionRepository.findById(definitionId)
                 .map(definitionMapper::toDefinition);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<ProcessDefinition> findLatestByKey(String key) {
         return definitionRepository.findLatestByKey(key)
                 .map(definitionMapper::toDefinition);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<ProcessDefinition> findByKeyAndVersion(String key, Integer version) {
         return definitionRepository.findByKeyAndVersion(key, version)
                 .map(definitionMapper::toDefinition);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PageableData<ProcessDefinition> findAll(Pageable pageable) {
         var pageableResult = definitionRepository.findAll(pageable);
         return new PageableData<>(definitionMapper.toDefinitions(pageableResult.data()), pageableResult.total());

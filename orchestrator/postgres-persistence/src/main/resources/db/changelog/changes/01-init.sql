@@ -66,10 +66,6 @@ CREATE TABLE IF NOT EXISTS activity
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_activity_process_state_active
-    ON activity (process_id, activity_state)
-    WHERE activity_state IN ('ACTIVE', 'SCHEDULED', 'COMPLETED', 'TERMINATED');
-
 CREATE INDEX IF NOT EXISTS idx_activity_timeout
     ON activity (activity_timeout)
     WHERE activity_timeout IS NOT NULL;

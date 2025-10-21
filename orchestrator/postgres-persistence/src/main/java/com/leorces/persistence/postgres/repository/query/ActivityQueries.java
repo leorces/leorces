@@ -78,29 +78,15 @@ public final class ActivityQueries {
                    activity.activity_failure_reason,
                    activity.activity_failure_trace,
                    activity.activity_async,
-                   activity.activity_created_at,
-                   activity.activity_updated_at,
-                   activity.activity_started_at,
-                   activity.activity_completed_at,
             
                    process.root_process_id,
                    process.process_parent_id,
                    process.process_business_key,
                    process.process_state,
-                   process.process_created_at,
-                   process.process_updated_at,
-                   process.process_started_at,
-                   process.process_completed_at,
             
                    definition.definition_id,
                    definition.definition_key,
-                   definition.definition_name,
                    definition.definition_version,
-                   definition.definition_schema,
-                   definition.definition_origin,
-                   definition.definition_deployment,
-                   definition.definition_created_at,
-                   definition.definition_updated_at,
                    definition.definition_data,
             
                    (SELECT COALESCE(json_agg(json_build_object(
@@ -110,9 +96,7 @@ public final class ActivityQueries {
                        'execution_definition_id', variable.execution_definition_id,
                        'var_key', variable.variable_key,
                        'var_value', variable.variable_value,
-                       'type', variable.variable_type,
-                       'created_at', variable.variable_created_at,
-                       'updated_at', variable.variable_updated_at
+                       'type', variable.variable_type
                    )), '[]'::json)
                    FROM variable
                    WHERE variable.process_id = activity.process_id) variables_json
@@ -142,8 +126,8 @@ public final class ActivityQueries {
             """;
 
     public static final String FIND_ALL_FAILED_BY_PROCESS_ID = BASE_SELECT + """
-                    WHERE activity.process_id = :processId
-                      AND (activity.activity_state = 'FAILED')
+            WHERE activity.process_id = :processId
+              AND (activity.activity_state = 'FAILED')
             """;
 
     public static final String FIND_ALL_BY_IDS = BASE_SELECT + """

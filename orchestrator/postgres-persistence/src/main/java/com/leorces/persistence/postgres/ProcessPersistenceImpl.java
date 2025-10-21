@@ -40,46 +40,39 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    @Transactional
     public Process complete(Process process) {
         return save(ProcessStateTransition.to(ProcessState.COMPLETED).apply(process), false);
     }
 
     @Override
-    @Transactional
     public Process terminate(Process process) {
         return save(ProcessStateTransition.to(ProcessState.TERMINATED).apply(process), false);
     }
 
     @Override
-    @Transactional
     public Process incident(Process process) {
         return save(ProcessStateTransition.to(ProcessState.INCIDENT).apply(process), false);
     }
 
 
     @Override
-    @Transactional
     public void changeState(String processId, ProcessState state) {
         processRepository.changeState(processId, state.name());
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<Process> findById(String processId) {
         return processRepository.findById(processId)
                 .map(processMapper::toProcess);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<ProcessExecution> findExecutionById(String processId) {
         return processRepository.findByIdWithActivities(processId)
                 .map(processMapper::toExecution);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Process> findByBusinessKey(String businessKey) {
         return processRepository.findAllByBusinessKey(businessKey).stream()
                 .map(processMapper::toProcess)
@@ -87,7 +80,6 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Process> findByVariables(Map<String, Object> variables) {
         if (variables == null || variables.isEmpty()) {
             return Collections.emptyList();
@@ -101,7 +93,6 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Process> findByBusinessKeyAndVariables(String businessKey, Map<String, Object> variables) {
         if (variables == null || variables.isEmpty()) {
             return Collections.emptyList();
@@ -115,7 +106,6 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ProcessExecution> findAllFullyCompleted(int limit) {
         return processRepository.findAllFullyCompleted(limit).stream()
                 .map(processMapper::toExecution)
@@ -123,7 +113,6 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PageableData<Process> findAll(Pageable pageable) {
         var result = processRepository.findAll(pageable);
         return new PageableData<>(processMapper.toProcesses(result.data()), result.total());

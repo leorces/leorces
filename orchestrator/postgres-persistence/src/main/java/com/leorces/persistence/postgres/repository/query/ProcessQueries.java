@@ -20,11 +20,6 @@ public final class ProcessQueries {
                    definition.definition_key,
                    definition.definition_name,
                    definition.definition_version,
-                   definition.definition_schema,
-                   definition.definition_origin,
-                   definition.definition_deployment,
-                   definition.definition_created_at,
-                   definition.definition_updated_at,
                    definition.definition_data,
             
                    (SELECT COALESCE(json_agg(json_build_object(
@@ -34,9 +29,7 @@ public final class ProcessQueries {
                        'execution_definition_id', variable.execution_definition_id,
                        'var_key', variable.variable_key,
                        'var_value', variable.variable_value,
-                       'type', variable.variable_type,
-                       'created_at', variable.variable_created_at,
-                       'updated_at', variable.variable_updated_at
+                       'type', variable.variable_type
                    )), '[]'::json)
                    FROM variable
                    WHERE variable.execution_id = process.process_id) variables_json

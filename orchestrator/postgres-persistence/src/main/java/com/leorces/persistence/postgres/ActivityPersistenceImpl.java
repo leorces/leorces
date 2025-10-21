@@ -50,7 +50,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional
     public ActivityExecution complete(ActivityExecution activity) {
         return save(activity, ActivityState.COMPLETED);
     }
@@ -61,13 +60,11 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional
     public ActivityExecution fail(ActivityExecution activity) {
         return save(activity, ActivityState.FAILED);
     }
 
     @Override
-    @Transactional
     public void changeState(String activityId, ActivityState state) {
         activityRepository.changeState(activityId, state.name());
     }
@@ -79,21 +76,18 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<ActivityExecution> findById(String id) {
         return activityRepository.findById(id)
                 .map(activityMapper::toExecution);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<ActivityExecution> findByDefinitionId(String processId, String definitionId) {
         return activityRepository.findByDefinitionId(processId, definitionId)
                 .map(activityMapper::toExecution);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ActivityExecution> findActive(String processId, List<String> definitionIds) {
         return activityRepository.findActive(processId, definitionIds).stream()
                 .map(activityMapper::toExecution)
@@ -101,7 +95,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ActivityExecution> findActive(String processId) {
         return activityRepository.findActive(processId).stream()
                 .map(activityMapper::toExecution)
@@ -109,7 +102,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ActivityExecution> findFailed(String processId) {
         return activityRepository.findFailed(processId).stream()
                 .map(activityMapper::toExecution)
@@ -117,7 +109,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ActivityExecution> findTimedOut(int limit) {
         return activityRepository.findTimedOut(limit).stream()
                 .map(activityMapper::toExecution)
@@ -140,25 +131,21 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean isAnyFailed(String processId) {
         return activityRepository.isAnyFailed(processId);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean isAllCompleted(String processId, String parentDefinitionId) {
         return activityRepository.isAllCompleted(processId, parentDefinitionId);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean isAllCompleted(String processId) {
         return activityRepository.isAllCompleted(processId);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public boolean isAllCompleted(String processId, List<String> definitionIds) {
         return activityRepository.isAllCompleted(processId, definitionIds);
     }
