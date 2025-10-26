@@ -55,6 +55,10 @@ public class ActivityEntity implements Persistable<String> {
     @JsonProperty("state")
     private String state;
 
+    @Column("activity_topic")
+    @JsonProperty("topic")
+    private String topic;
+
     @Column("activity_retries")
     @JsonProperty("retries")
     private int retries;

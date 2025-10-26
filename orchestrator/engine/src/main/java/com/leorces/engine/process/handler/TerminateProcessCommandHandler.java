@@ -46,7 +46,7 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
     }
 
     private void terminateProcess(Process process, boolean terminateCallActivity) {
-        processPersistence.terminate(process);
+        processPersistence.terminate(process.id());
         processMetrics.recordProcessTerminatedMetric(process);
         if (process.isCallActivity() && terminateCallActivity) {
             dispatcher.dispatch(TerminateActivityCommand.of(process.id()));

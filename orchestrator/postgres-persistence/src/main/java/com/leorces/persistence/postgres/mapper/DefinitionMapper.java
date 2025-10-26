@@ -73,6 +73,10 @@ public class DefinitionMapper {
     }
 
     public ProcessDefinition toDefinition(ProcessEntity entity) {
+        if (entity.getDefinitionData() == null) {
+            return null;
+        }
+
         var data = fromJson(entity.getDefinitionData());
         return ProcessDefinition.builder()
                 .id(entity.getProcessDefinitionId())

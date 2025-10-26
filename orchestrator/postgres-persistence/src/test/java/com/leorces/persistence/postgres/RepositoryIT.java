@@ -39,8 +39,6 @@ public abstract class RepositoryIT {
     @Autowired
     protected HistoryPersistence historyPersistence;
     @Autowired
-    protected ActivityQueuePersistence activityQueuePersistence;
-    @Autowired
     protected DefinitionRepository definitionRepository;
     @Autowired
     protected ProcessRepository processRepository;
@@ -50,8 +48,6 @@ public abstract class RepositoryIT {
     protected VariableRepository variableRepository;
     @Autowired
     protected ShedlockRepository shedlockRepository;
-    @Autowired
-    protected ActivityQueueRepository activityQueueRepository;
     @Autowired
     protected HistoryRepository historyRepository;
 
@@ -88,7 +84,6 @@ public abstract class RepositoryIT {
         activityRepository.deleteAll();
         variableRepository.deleteAll();
         shedlockRepository.deleteAll();
-        activityQueueRepository.deleteAll();
         historyRepository.deleteAll();
     }
 

@@ -31,9 +31,8 @@ leorces:
       OrderSubmittedProcess:
         workers:
           notification:
-            interval: 250
-            time-unit: milliseconds
-            initial-delay: 100
+            interval: 5
+            time-unit: seconds
             max-concurrent-tasks: 100
       OrderPaymentProcess:
         workers:

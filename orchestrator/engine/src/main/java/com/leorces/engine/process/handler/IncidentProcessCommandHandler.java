@@ -42,7 +42,7 @@ public class IncidentProcessCommandHandler implements CommandHandler<IncidentPro
     }
 
     private void incidentProcess(Process process) {
-        processPersistence.incident(process);
+        processPersistence.incident(process.id());
         processMetrics.recordProcessIncidentMetric(process);
         if (process.isCallActivity()) {
             dispatcher.dispatchAsync(FailActivityCommand.of(process.id(), ActivityFailure.of("Process Incident")));

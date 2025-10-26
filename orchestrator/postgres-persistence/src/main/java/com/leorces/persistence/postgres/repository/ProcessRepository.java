@@ -56,6 +56,18 @@ public interface ProcessRepository extends CrudRepository<ProcessEntity, String>
     @Query(CHANGE_STATE)
     void changeState(@Param("processId") String processId, @Param("state") String state);
 
+    @Modifying
+    @Query(COMPLETE)
+    void complete(@Param("processId") String processId);
+
+    @Modifying
+    @Query(TERMINATE)
+    void terminate(@Param("processId") String processId);
+
+    @Modifying
+    @Query(INCIDENT)
+    void incident(@Param("processId") String processId);
+
     default PageableData<ProcessEntity> findAll(Pageable pageable) {
         var orderName = pageable.order() != null ? pageable.order().name() : Pageable.Direction.DESC.name();
         var data = findAllWithPagination(

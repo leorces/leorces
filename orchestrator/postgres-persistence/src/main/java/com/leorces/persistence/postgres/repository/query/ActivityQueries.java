@@ -31,8 +31,8 @@ public final class ActivityQueries {
                 FROM activity
                 WHERE process_id = :processId
                   AND activity_parent_definition_id = :definitionId
-                  AND activity_state in ('COMPLETED', 'TERMINATED')
-            )
+                  AND activity_completed_at IS NULL
+            );
             """;
 
     public static final String IS_ALL_COMPLETED_BY_PROCESS_ID = """
@@ -40,8 +40,8 @@ public final class ActivityQueries {
                 SELECT 1
                 FROM activity
                 WHERE process_id = :processId
-                  AND activity_state NOT IN ('COMPLETED', 'TERMINATED')
                   AND activity_async = false
+                  AND activity_completed_at IS NULL
             );
             """;
 
@@ -51,16 +51,56 @@ public final class ActivityQueries {
                 FROM activity
                 WHERE process_id = :processId
                   AND activity_definition_id IN (:definitionIds)
-                  AND activity_state NOT IN ('COMPLETED', 'TERMINATED')
+                  AND activity_completed_at IS NULL
             );
             """;
 
-    public static final String UPDATE_STATUS_BATCH = """
-            UPDATE activity
-            SET activity_state = :newState,
-                activity_updated_at = CURRENT_TIMESTAMP,
-                activity_started_at = CASE WHEN :newState = 'ACTIVE' THEN CURRENT_TIMESTAMP ELSE activity_started_at END
-            WHERE activity_id IN (:activityIds)
+    public static final String POLL = """
+            WITH polled AS (
+                    SELECT activity_id,
+                           process_id,
+                           activity_definition_id,
+                           activity_parent_definition_id,
+                           process_definition_id,
+                           process_definition_key,
+                           activity_type,
+                           activity_state,
+                           activity_retries,
+                           activity_timeout,
+                           activity_failure_reason,
+                           activity_failure_trace,
+                           activity_async,
+                           activity_created_at,
+                           activity_updated_at,
+                           activity_started_at,
+                           activity_completed_at
+                    FROM activity
+                    WHERE activity_topic = :topic
+                      AND activity_state = 'SCHEDULED'
+                      AND process_definition_key = :processDefinitionKey
+                    ORDER BY activity_created_at ASC
+                    LIMIT :limit
+                    FOR UPDATE SKIP LOCKED
+                )
+                SELECT
+                    polled.*,
+                    COALESCE(variables.variables_json, '[]'::json) AS variables_json
+                FROM polled
+                LEFT JOIN LATERAL (
+                    SELECT json_agg(
+                               jsonb_build_object(
+                                   'id', variable.variable_id,
+                                   'process_id', variable.process_id,
+                                   'execution_id', variable.execution_id,
+                                   'execution_definition_id', variable.execution_definition_id,
+                                   'var_key', variable.variable_key,
+                                   'var_value', variable.variable_value,
+                                   'type', variable.variable_type
+                               )
+                           ) AS variables_json
+                    FROM variable
+                    WHERE variable.execution_id = polled.process_id
+                ) AS variables ON TRUE;
             """;
 
     private static final String BASE_SELECT = """
@@ -89,20 +129,25 @@ public final class ActivityQueries {
                    definition.definition_version,
                    definition.definition_data,
             
-                   (SELECT COALESCE(json_agg(json_build_object(
-                       'id', variable.variable_id,
-                       'process_id', variable.process_id,
-                       'execution_id', variable.execution_id,
-                       'execution_definition_id', variable.execution_definition_id,
-                       'var_key', variable.variable_key,
-                       'var_value', variable.variable_value,
-                       'type', variable.variable_type
-                   )), '[]'::json)
-                   FROM variable
-                   WHERE variable.process_id = activity.process_id) variables_json
+                   COALESCE(variables.variables_json, '[]'::json) AS variables_json
             FROM activity
             LEFT JOIN process ON activity.process_id = process.process_id
             LEFT JOIN definition ON activity.process_definition_id = definition.definition_id
+            LEFT JOIN LATERAL (
+                SELECT json_agg(
+                           jsonb_build_object(
+                               'id', variable.variable_id,
+                               'process_id', variable.process_id,
+                               'execution_id', variable.execution_id,
+                               'execution_definition_id', variable.execution_definition_id,
+                               'var_key', variable.variable_key,
+                               'var_value', variable.variable_value,
+                               'type', variable.variable_type
+                           )
+                       ) AS variables_json
+                FROM variable
+                WHERE variable.execution_id = activity.process_id
+            ) AS variables ON TRUE
             """;
 
     public static final String FIND_BY_ID = BASE_SELECT + """
@@ -117,21 +162,17 @@ public final class ActivityQueries {
     public static final String FIND_ALL_ACTIVE_BY_DEFINITION_IDS = BASE_SELECT + """
             WHERE activity.process_id = :processId
               AND activity.activity_definition_id IN (:definitionIds)
-              AND (activity.activity_state = 'ACTIVE' OR activity.activity_state = 'SCHEDULED')
+              AND activity_completed_at IS NULL
             """;
 
     public static final String FIND_ALL_ACTIVE_BY_PROCESS_ID = BASE_SELECT + """
             WHERE activity.process_id = :processId
-              AND (activity.activity_state = 'ACTIVE' OR activity.activity_state = 'SCHEDULED')
+              AND activity_completed_at IS NULL
             """;
 
     public static final String FIND_ALL_FAILED_BY_PROCESS_ID = BASE_SELECT + """
             WHERE activity.process_id = :processId
               AND (activity.activity_state = 'FAILED')
-            """;
-
-    public static final String FIND_ALL_BY_IDS = BASE_SELECT + """
-            WHERE activity.activity_id IN (:activityIds)
             """;
 
     public static final String FIND_TIMED_OUT = BASE_SELECT + """

@@ -71,7 +71,7 @@ class TerminateProcessCommandHandlerTest {
         handler.handle(command);
 
         // Then
-        verify(processPersistence).terminate(activeProcess);
+        verify(processPersistence).terminate(activeProcess.id());
         verify(processMetrics).recordProcessTerminatedMetric(activeProcess);
         verify(dispatcher).dispatch(any());
     }
@@ -88,7 +88,7 @@ class TerminateProcessCommandHandlerTest {
 
         // Then
         verifyNoInteractions(activityPersistence, processMetrics, dispatcher);
-        verify(processPersistence, never()).terminate(terminatedProcess);
+        verify(processPersistence, never()).terminate(terminatedProcess.id());
     }
 
     @Test

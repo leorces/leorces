@@ -4,10 +4,25 @@ server:
 spring:
   application:
     name: leorces
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/leorces
     username: leorces
     password: admin123
+    hikari:
+      maximum-pool-size: 15
+      minimum-idle: 10
+      idle-timeout: 60000
+      max-lifetime: 1800000
+      connection-timeout: 60000
+      leak-detection-threshold: 20000
+  cache:
+    type: caffeine
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
 
 management:
   endpoints:

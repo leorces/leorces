@@ -61,7 +61,7 @@ class IncidentProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(processPersistence).incident(process);
+        verify(processPersistence).incident(process.id());
         verify(processMetrics).recordProcessIncidentMetric(process);
         verify(dispatcher, never()).dispatchAsync(any());
     }
@@ -83,7 +83,7 @@ class IncidentProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(processPersistence).incident(process);
+        verify(processPersistence).incident(process.id());
         verify(processMetrics).recordProcessIncidentMetric(process);
 
         ArgumentCaptor<FailActivityCommand> captor = ArgumentCaptor.forClass(FailActivityCommand.class);
@@ -109,7 +109,7 @@ class IncidentProcessCommandHandlerTest {
         handler.handle(command);
 
         verifyNoInteractions(processMetrics, dispatcher);
-        verify(processPersistence, never()).incident(process);
+        verify(processPersistence, never()).incident(process.id());
     }
 
     @Test

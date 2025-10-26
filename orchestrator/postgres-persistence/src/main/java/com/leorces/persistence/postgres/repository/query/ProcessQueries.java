@@ -22,19 +22,24 @@ public final class ProcessQueries {
                    definition.definition_version,
                    definition.definition_data,
             
-                   (SELECT COALESCE(json_agg(json_build_object(
-                       'id', variable.variable_id,
-                       'process_id', variable.process_id,
-                       'execution_id', variable.execution_id,
-                       'execution_definition_id', variable.execution_definition_id,
-                       'var_key', variable.variable_key,
-                       'var_value', variable.variable_value,
-                       'type', variable.variable_type
-                   )), '[]'::json)
-                   FROM variable
-                   WHERE variable.execution_id = process.process_id) variables_json
+                   COALESCE(variables.variables_json, '[]'::json) AS variables_json
             FROM process
             LEFT JOIN definition ON process.process_definition_id = definition.definition_id
+            LEFT JOIN LATERAL (
+                SELECT json_agg(
+                           jsonb_build_object(
+                               'id', v.variable_id,
+                               'process_id', v.process_id,
+                               'execution_id', v.execution_id,
+                               'execution_definition_id', v.execution_definition_id,
+                               'var_key', v.variable_key,
+                               'var_value', v.variable_value,
+                               'type', v.variable_type
+                           )
+                       ) AS variables_json
+                FROM variable v
+                WHERE v.execution_id = process.process_id
+            ) AS variables ON TRUE
             """;
 
     public static final String FIND_BY_ID = BASE_SELECT + """
@@ -84,7 +89,9 @@ public final class ProcessQueries {
                 FROM variable
                 WHERE variable.execution_id = process.process_id
                 GROUP BY variable.execution_id
-                HAVING COUNT(DISTINCT CASE WHEN variable.variable_key = ANY(:variableKeys) AND variable.variable_value::text = ANY(:variableValues) THEN variable.variable_key END) = :variableCount
+                HAVING COUNT(DISTINCT CASE WHEN variable.variable_key = ANY(:variableKeys)
+                                            AND variable.variable_value::text = ANY(:variableValues)
+                                            THEN variable.variable_key END) = :variableCount
             )
             """;
 
@@ -95,13 +102,38 @@ public final class ProcessQueries {
                 FROM variable
                 WHERE variable.execution_id = process.process_id
                 GROUP BY variable.execution_id
-                HAVING COUNT(DISTINCT CASE WHEN variable.variable_key = ANY(:variableKeys) AND variable.variable_value::text = ANY(:variableValues) THEN variable.variable_key END) = :variableCount
+                HAVING COUNT(DISTINCT CASE WHEN variable.variable_key = ANY(:variableKeys)
+                                            AND variable.variable_value::text = ANY(:variableValues)
+                                            THEN variable.variable_key END) = :variableCount
               )
             """;
 
     public static final String CHANGE_STATE = """
             UPDATE process
             SET process_state = :state,
+                process_updated_at = NOW()
+            WHERE process_id = :processId;
+            """;
+
+    public static final String COMPLETE = """
+            UPDATE process
+            SET process_state = 'COMPLETED',
+                process_updated_at = NOW(),
+                process_completed_at = NOW()
+            WHERE process_id = :processId;
+            """;
+
+    public static final String TERMINATE = """
+            UPDATE process
+            SET process_state = 'TERMINATED',
+                process_updated_at = NOW(),
+                process_completed_at = NOW()
+            WHERE process_id = :processId;
+            """;
+
+    public static final String INCIDENT = """
+            UPDATE process
+            SET process_state = 'INCIDENT',
                 process_updated_at = NOW()
             WHERE process_id = :processId;
             """;
@@ -131,56 +163,70 @@ public final class ProcessQueries {
                    definition.definition_updated_at,
                    definition.definition_data,
             
-                   (SELECT COALESCE(json_agg(json_build_object(
-                       'id', variable.variable_id,
-                       'process_id', variable.process_id,
-                       'execution_id', variable.execution_id,
-                       'execution_definition_id', variable.execution_definition_id,
-                       'var_key', variable.variable_key,
-                       'var_value', variable.variable_value,
-                       'type', variable.variable_type,
-                       'created_at', variable.variable_created_at,
-                       'updated_at', variable.variable_updated_at
-                   )), '[]'::json)
-                   FROM variable
-                   WHERE variable.execution_id = process.process_id) variables_json,
-            
-                   (SELECT COALESCE(json_agg(json_build_object(
-                       'id', activity.activity_id,
-                       'process_id', activity.process_id,
-                       'activity_definition_id', activity.activity_definition_id,
-                       'parent_activity_definition_id', activity.activity_parent_definition_id,
-                       'process_definition_id', activity.process_definition_id,
-                       'process_definition_key', activity.process_definition_key,
-                       'type', activity.activity_type,
-                       'state', activity.activity_state,
-                       'retries', activity.activity_retries,
-                       'activity_timeout', activity.activity_timeout,
-                       'activity_failure_reason', activity.activity_failure_reason,
-                       'activity_failure_trace', activity.activity_failure_trace,
-                       'created_at', activity.activity_created_at,
-                       'updated_at', activity.activity_updated_at,
-                       'started_at', activity.activity_started_at,
-                       'completed_at', activity.activity_completed_at,
-                       'async', activity.activity_async,
-                       'variablesJson', (SELECT COALESCE(json_agg(json_build_object(
-                           'id', activity_variable.variable_id,
-                           'process_id', activity_variable.process_id,
-                           'execution_id', activity_variable.execution_id,
-                           'execution_definition_id', activity_variable.execution_definition_id,
-                           'var_key', activity_variable.variable_key,
-                           'var_value', activity_variable.variable_value,
-                           'type', activity_variable.variable_type,
-                           'created_at', activity_variable.variable_created_at,
-                           'updated_at', activity_variable.variable_updated_at
-                       )), '[]'::json)
-                       FROM variable activity_variable
-                       WHERE activity_variable.execution_id = activity.activity_id)
-                   )), '[]'::json)
-                   FROM activity
-                   WHERE activity.process_id = process.process_id) activities_json
+                   COALESCE(proc_vars.variables_json, '[]'::json) AS variables_json,
+                   COALESCE(acts.activities_json, '[]'::json) AS activities_json
             FROM process
             LEFT JOIN definition ON process.process_definition_id = definition.definition_id
+            LEFT JOIN LATERAL (
+                SELECT json_agg(
+                           jsonb_build_object(
+                               'id', v.variable_id,
+                               'process_id', v.process_id,
+                               'execution_id', v.execution_id,
+                               'execution_definition_id', v.execution_definition_id,
+                               'var_key', v.variable_key,
+                               'var_value', v.variable_value,
+                               'type', v.variable_type,
+                               'created_at', v.variable_created_at,
+                               'updated_at', v.variable_updated_at
+                           )
+                       ) AS variables_json
+                FROM variable v
+                WHERE v.execution_id = process.process_id
+            ) AS proc_vars ON TRUE
+            LEFT JOIN LATERAL (
+                SELECT json_agg(
+                           jsonb_build_object(
+                               'id', a.activity_id,
+                               'process_id', a.process_id,
+                               'activity_definition_id', a.activity_definition_id,
+                               'parent_activity_definition_id', a.activity_parent_definition_id,
+                               'process_definition_id', a.process_definition_id,
+                               'process_definition_key', a.process_definition_key,
+                               'type', a.activity_type,
+                               'state', a.activity_state,
+                               'retries', a.activity_retries,
+                               'activity_timeout', a.activity_timeout,
+                               'activity_failure_reason', a.activity_failure_reason,
+                               'activity_failure_trace', a.activity_failure_trace,
+                               'created_at', a.activity_created_at,
+                               'updated_at', a.activity_updated_at,
+                               'started_at', a.activity_started_at,
+                               'completed_at', a.activity_completed_at,
+                               'async', a.activity_async,
+                               'variablesJson', COALESCE(act_vars.variables_json, '[]'::json)
+                           )
+                       ) AS activities_json
+                FROM activity a
+                LEFT JOIN LATERAL (
+                    SELECT json_agg(
+                               jsonb_build_object(
+                                   'id', av.variable_id,
+                                   'process_id', av.process_id,
+                                   'execution_id', av.execution_id,
+                                   'execution_definition_id', av.execution_definition_id,
+                                   'var_key', av.variable_key,
+                                   'var_value', av.variable_value,
+                                   'type', av.variable_type,
+                                   'created_at', av.variable_created_at,
+                                   'updated_at', av.variable_updated_at
+                               )
+                           ) AS variables_json
+                    FROM variable av
+                    WHERE av.execution_id = a.activity_id
+                ) AS act_vars ON TRUE
+                WHERE a.process_id = process.process_id
+            ) AS acts ON TRUE
             """;
 
     public static final String FIND_BY_ID_WITH_ACTIVITIES = BASE_SELECT_WITH_ACTIVITIES + """

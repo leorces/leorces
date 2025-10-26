@@ -41,6 +41,12 @@ CREATE TABLE IF NOT EXISTS process
     CONSTRAINT pk_process PRIMARY KEY (process_id)
 );
 
+CREATE INDEX idx_process_state_defkey_created
+    ON process (process_state, process_definition_key, process_created_at DESC);
+
+CREATE INDEX idx_process_business
+    ON process (process_business_key);
+
 -- Create the activity table
 CREATE TABLE IF NOT EXISTS activity
 (
@@ -49,6 +55,7 @@ CREATE TABLE IF NOT EXISTS activity
     activity_parent_definition_id TEXT,
     activity_type                 TEXT      NOT NULL,
     activity_state                TEXT      NOT NULL,
+    activity_topic TEXT,
     activity_created_at           TIMESTAMP NOT NULL,
     activity_updated_at           TIMESTAMP NOT NULL,
     activity_started_at           TIMESTAMP,
@@ -66,22 +73,17 @@ CREATE TABLE IF NOT EXISTS activity
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_activity_timeout
-    ON activity (activity_timeout)
-    WHERE activity_timeout IS NOT NULL;
+CREATE INDEX idx_activity_incomplete
+    ON activity (process_id, activity_definition_id, activity_parent_definition_id, activity_async, activity_state,
+                 activity_timeout)
+    WHERE activity_completed_at IS NULL;
 
--- Create the activity_queue table
-CREATE TABLE IF NOT EXISTS activity_queue
-(
-    activity_queue_topic      TEXT      NOT NULL,
-    activity_id               TEXT      NOT NULL,
-    process_definition_key    TEXT      NOT NULL,
-    activity_queue_created_at TIMESTAMP NOT NULL,
-    activity_queue_updated_at TIMESTAMP NOT NULL,
+CREATE INDEX IF NOT EXISTS idx_activity_topic_defkey_created
+    ON activity (activity_topic, process_definition_key, activity_state, activity_created_at)
+    WHERE activity_state = 'SCHEDULED';
 
-    -- Primary key constraint
-    CONSTRAINT pk_activity_queue PRIMARY KEY (activity_id)
-);
+CREATE INDEX idx_activity_by_state
+    ON activity (process_id, activity_state);
 
 -- Create the execution_variable table
 CREATE TABLE IF NOT EXISTS variable
@@ -100,8 +102,7 @@ CREATE TABLE IF NOT EXISTS variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_variable_process_id
-    ON variable (process_id);
+CREATE INDEX IF NOT EXISTS idx_variable_execution_id ON variable (execution_id);
 
 -- Create the history table
 CREATE TABLE IF NOT EXISTS history

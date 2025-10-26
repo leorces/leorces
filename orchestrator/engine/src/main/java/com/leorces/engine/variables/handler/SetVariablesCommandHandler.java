@@ -36,6 +36,10 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
         var process = command.process();
         var variables = command.variables();
 
+        if (variables.isEmpty()) {
+            return;
+        }
+
         if (process != null) {
             setProcessVariables(process, variables);
             return;

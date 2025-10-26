@@ -43,7 +43,7 @@ public class CompleteProcessCommandHandler implements CommandHandler<CompletePro
     }
 
     private void completeProcess(Process process) {
-        processPersistence.complete(process);
+        processPersistence.complete(process.id());
         processMetrics.recordProcessCompletedMetric(process);
         if (process.isCallActivity()) {
             dispatcher.dispatchAsync(CompleteActivityCommand.of(process.id()));
@@ -55,7 +55,9 @@ public class CompleteProcessCommandHandler implements CommandHandler<CompletePro
     }
 
     private Process getProcess(CompleteProcessCommand command) {
-        return processPersistence.findById(command.processId())
+        return command.process() != null
+                ? command.process()
+                : processPersistence.findById(command.processId())
                 .orElseThrow(ProcessNotFoundException::new);
     }
 

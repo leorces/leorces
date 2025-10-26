@@ -22,6 +22,11 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     Optional<ActivityExecutionEntity> findByDefinitionId(@Param("processId") String processId,
                                                          @Param("definitionId") String definitionId);
 
+    @Query(POLL)
+    List<ActivityExecutionEntity> poll(@Param("topic") String topic,
+                                       @Param("processDefinitionKey") String processDefinitionKey,
+                                       @Param("limit") int limit);
+
     @Query(FIND_ALL_ACTIVE_BY_DEFINITION_IDS)
     List<ActivityExecutionEntity> findActive(@Param("processId") String processId,
                                              @Param("definitionIds") List<String> definitionIds);
@@ -34,9 +39,6 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
 
     @Query(FIND_TIMED_OUT)
     List<ActivityExecutionEntity> findTimedOut(@Param("limit") int limit);
-
-    @Query(FIND_ALL_BY_IDS)
-    List<ActivityExecutionEntity> findAllByIds(@Param("activityIds") List<String> activityIds);
 
     @Query(IS_ANY_FAILED)
     boolean isAnyFailed(@Param("processId") String processId);
@@ -51,11 +53,6 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     @Query(IS_ALL_COMPLETED)
     boolean isAllCompleted(@Param("processId") String processId,
                            @Param("definitionIds") List<String> definitionIds);
-
-    @Modifying
-    @Query(UPDATE_STATUS_BATCH)
-    int updateStatusBatch(@Param("activityIds") List<String> activityIds,
-                          @Param("newState") String newState);
 
     @Modifying
     @Query(CHANGE_STATE)

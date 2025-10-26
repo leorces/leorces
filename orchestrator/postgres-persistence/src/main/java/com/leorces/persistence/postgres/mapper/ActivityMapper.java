@@ -3,6 +3,7 @@ package com.leorces.persistence.postgres.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leorces.model.definition.activity.task.ExternalTask;
 import com.leorces.model.runtime.activity.Activity;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityFailure;
@@ -45,6 +46,7 @@ public class ActivityMapper {
                 .processDefinitionKey(activity.processDefinitionKey())
                 .type(activity.type().name())
                 .state(activity.state().name())
+                .topic(getTopic(activity))
                 .retries(activity.retries())
                 .timeout(activity.timeout())
                 .failureReason(activity.failure() != null ? activity.failure().reason() : null)
@@ -80,8 +82,23 @@ public class ActivityMapper {
     }
 
     public Activity toActivity(ActivityExecutionEntity entity) {
-        var execution = toExecution(entity);
-        return toActivity(execution);
+        var variables = variableMapper.toVariables(entity.getVariablesJson());
+        var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
+        return Activity.builder()
+                .id(entity.getId())
+                .definitionId(entity.getDefinitionId())
+                .variables(variables)
+                .state(ActivityState.valueOf(entity.getState()))
+                .retries(entity.getRetries())
+                .timeout(entity.getTimeout())
+                .failure(failure)
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .startedAt(entity.getStartedAt())
+                .completedAt(entity.getCompletedAt())
+                .build();
+//        var execution = toExecution(entity);
+//        return toActivity(execution);
     }
 
     public List<Activity> toActivities(PGobject activitiesJson, Process process) {
@@ -147,6 +164,15 @@ public class ActivityMapper {
                 .startedAt(execution.startedAt())
                 .completedAt(execution.completedAt())
                 .build();
+    }
+
+    private String getTopic(ActivityExecution activity) {
+        var definition = activity.definition();
+        if (definition instanceof ExternalTask) {
+            return ((ExternalTask) definition).topic();
+        } else {
+            return null;
+        }
     }
 
 }

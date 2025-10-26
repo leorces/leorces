@@ -149,7 +149,7 @@ class ActivityPersistenceIT extends RepositoryIT {
         assertThat(foundActivity.id()).isEqualTo(activity.id());
         assertThat(foundActivity.definitionId()).isEqualTo(activity.definitionId());
         assertThat(foundActivity.state()).isEqualTo(activity.state());
-        assertThat(foundActivity.variables()).hasSize(4);
+        assertThat(foundActivity.variables()).hasSize(2);
 
         // When & Then - non-existent activity
         var nonExistentResult = activityPersistence.findById("non-existent-id");
@@ -249,7 +249,6 @@ class ActivityPersistenceIT extends RepositoryIT {
     @Test
     @DisplayName("Should poll activities by topic and process definition key")
     void poll() {
-        // Given - This method interacts with ActivityQueue which requires specific setup
         var processDefinitionKey = "order-submitted-process";
         var topic = "notification";
         var limit = 5;
@@ -259,7 +258,7 @@ class ActivityPersistenceIT extends RepositoryIT {
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result).isEmpty(); // No activities in queue initially
+        assertThat(result).isEmpty();
     }
 
     @Test

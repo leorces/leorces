@@ -27,26 +27,23 @@ public interface ProcessPersistence {
     /**
      * Completes a process successfully.
      *
-     * @param process the process to complete
-     * @return the completed process
+     * @param processId the process identifier
      */
-    Process complete(Process process);
+    void complete(String processId);
 
     /**
      * Terminates a process forcefully.
      *
-     * @param process the process to terminate
-     * @return the terminated process
+     * @param processId the process identifier
      */
-    Process terminate(Process process);
+    void terminate(String processId);
 
     /**
      * Marks a process as having an incident.
      *
-     * @param process the process to mark with incident
-     * @return the process with incident state
+     * @param processId the process identifier
      */
-    Process incident(Process process);
+    void incident(String processId);
 
     /**
      * Changes the state of a process by its identifier.

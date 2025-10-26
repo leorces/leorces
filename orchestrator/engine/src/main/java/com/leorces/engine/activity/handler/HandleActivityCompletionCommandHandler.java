@@ -65,7 +65,7 @@ public class HandleActivityCompletionCommandHandler implements CommandHandler<Ha
         if (hasParentActivity(activity)) {
             completeParentActivity(activity);
         } else if (!activity.isAsync()) {
-            dispatcher.dispatchAsync(CompleteProcessCommand.of(activity.processId()));
+            dispatcher.dispatchAsync(CompleteProcessCommand.of(activity.process()));
         }
     }
 

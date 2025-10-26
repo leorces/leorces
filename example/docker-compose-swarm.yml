@@ -1,0 +1,96 @@
+version: '3.8'
+
+x-common-deploy: &common-deploy
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    max_attempts: 3
+
+networks:
+  leorces-network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  pg_conf:
+
+services:
+  postgres:
+    image: postgres:16.1
+    container_name: postgres
+    environment:
+      POSTGRES_DB: leorces
+      POSTGRES_USER: leorces
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5432:5432"
+    networks:
+      - leorces-network
+    volumes:
+      - ./postgresql.conf:/etc/postgresql/postgresql.conf
+    command: [ "postgres", "-c", "config_file=/etc/postgresql/postgresql.conf" ]
+    deploy:
+      <<: *common-deploy
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 2G
+        reservations:
+          cpus: "1"
+          memory: 2G
+
+  server-example:
+    image: leorces/server-example:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/leorces
+      - SPRING_DATASOURCE_USERNAME=leorces
+      - SPRING_DATASOURCE_PASSWORD=admin123
+    networks:
+      - leorces-network
+    depends_on:
+      - postgres
+    deploy:
+      <<: *common-deploy
+      replicas: 5
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4G
+        reservations:
+          cpus: "1"
+          memory: 1G
+
+  client-example:
+    image: leorces/client-example:latest
+    ports:
+      - "8081:8081"
+    environment:
+      - LEORCES_REST_HOST=http://server-example:8080
+    networks:
+      - leorces-network
+    depends_on:
+      - postgres
+    deploy:
+      <<: *common-deploy
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      resources:
+        limits:
+          cpus: "1"
+          memory: 3G
+        reservations:
+          cpus: "1"
+          memory: 1G

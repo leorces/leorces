@@ -10,6 +10,7 @@ import com.leorces.persistence.postgres.utils.IdGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -20,20 +21,21 @@ public class ProcessMapper {
     private final ActivityMapper activityMapper;
     private final VariableMapper variableMapper;
 
-    public ProcessEntity toEntity(Process process, boolean isNew) {
+    public ProcessEntity toNewEntity(Process process) {
+        var now = LocalDateTime.now();
+        var businessKey = process.businessKey() != null ? process.businessKey() : IdGenerator.getNewId();
         return ProcessEntity.builder()
-                .isNew(isNew)
+                .isNew(true)
                 .id(process.id() == null ? IdGenerator.getNewId() : process.id())
                 .rootProcessId(process.rootProcessId())
                 .parentProcessId(process.parentId())
-                .businessKey(process.businessKey())
+                .businessKey(businessKey)
                 .processDefinitionId(process.definitionId())
                 .processDefinitionKey(process.definitionKey())
-                .state(process.state().name())
-                .createdAt(process.createdAt())
-                .updatedAt(process.updatedAt())
-                .startedAt(process.startedAt())
-                .completedAt(process.completedAt())
+                .state(ProcessState.ACTIVE.name())
+                .createdAt(now)
+                .updatedAt(now)
+                .startedAt(now)
                 .build();
     }
 

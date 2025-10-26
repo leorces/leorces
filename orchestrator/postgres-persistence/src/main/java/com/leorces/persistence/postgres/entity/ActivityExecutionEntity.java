@@ -15,9 +15,9 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder(toBuilder = true)
 @Table(name = "activity")
 public class ActivityExecutionEntity implements Persistable<String> {
 
@@ -45,6 +45,9 @@ public class ActivityExecutionEntity implements Persistable<String> {
 
     @Column("activity_state")
     private String state;
+
+    @Column("activity_topic")
+    private String topic;
 
     @Column("activity_retries")
     private int retries;

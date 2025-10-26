@@ -66,7 +66,7 @@ class CompleteProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(processPersistence).complete(process);
+        verify(processPersistence).complete(process.id());
         verify(processMetrics).recordProcessCompletedMetric(process);
         verify(dispatcher, never()).dispatchAsync(any());
     }
@@ -89,7 +89,7 @@ class CompleteProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(processPersistence).complete(process);
+        verify(processPersistence).complete(process.id());
         verify(processMetrics).recordProcessCompletedMetric(process);
 
         ArgumentCaptor<CompleteActivityCommand> captor = ArgumentCaptor.forClass(CompleteActivityCommand.class);
@@ -116,7 +116,7 @@ class CompleteProcessCommandHandlerTest {
         handler.handle(command);
 
         verifyNoInteractions(activityPersistence, processMetrics, dispatcher);
-        verify(processPersistence, never()).complete(process);
+        verify(processPersistence, never()).complete(process.id());
     }
 
     @Test
@@ -128,7 +128,7 @@ class CompleteProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(processPersistence, never()).complete(process);
+        verify(processPersistence, never()).complete(process.id());
         verify(processMetrics, never()).recordProcessCompletedMetric(process);
         verify(dispatcher, never()).dispatchAsync(any());
     }

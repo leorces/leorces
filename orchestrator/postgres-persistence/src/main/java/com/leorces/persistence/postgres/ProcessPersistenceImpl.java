@@ -9,7 +9,6 @@ import com.leorces.persistence.ProcessPersistence;
 import com.leorces.persistence.VariablePersistence;
 import com.leorces.persistence.postgres.mapper.ProcessMapper;
 import com.leorces.persistence.postgres.repository.ProcessRepository;
-import com.leorces.persistence.postgres.utils.ProcessStateTransition;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,8 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     @Override
     @Transactional
     public Process run(Process process) {
-        var newProcess = save(ProcessStateTransition.to(ProcessState.ACTIVE).apply(process), true);
+        log.debug("Run process: {}", process.definitionKey());
+        var newProcess = save(process);
         var newVariables = variablePersistence.save(newProcess);
         return newProcess.toBuilder()
                 .variables(newVariables)
@@ -40,40 +40,46 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    public Process complete(Process process) {
-        return save(ProcessStateTransition.to(ProcessState.COMPLETED).apply(process), false);
+    public void complete(String processId) {
+        log.debug("Complete process: {}", processId);
+        processRepository.complete(processId);
     }
 
     @Override
-    public Process terminate(Process process) {
-        return save(ProcessStateTransition.to(ProcessState.TERMINATED).apply(process), false);
+    public void terminate(String processId) {
+        log.debug("Terminate process: {}", processId);
+        processRepository.terminate(processId);
     }
 
     @Override
-    public Process incident(Process process) {
-        return save(ProcessStateTransition.to(ProcessState.INCIDENT).apply(process), false);
+    public void incident(String processId) {
+        log.debug("Incident process: {}", processId);
+        processRepository.incident(processId);
     }
-
 
     @Override
     public void changeState(String processId, ProcessState state) {
+        log.debug("Change process: {} state to: {}", processId, state);
         processRepository.changeState(processId, state.name());
     }
 
     @Override
     public Optional<Process> findById(String processId) {
+        log.debug("Finding process by id: {}", processId);
         return processRepository.findById(processId)
                 .map(processMapper::toProcess);
     }
 
     @Override
     public Optional<ProcessExecution> findExecutionById(String processId) {
+        log.debug("Finding process execution by id: {}", processId);
         return processRepository.findByIdWithActivities(processId)
                 .map(processMapper::toExecution);
     }
 
     @Override
     public List<Process> findByBusinessKey(String businessKey) {
+        log.debug("Finding all processes by business key: {}", businessKey);
         return processRepository.findAllByBusinessKey(businessKey).stream()
                 .map(processMapper::toProcess)
                 .toList();
@@ -85,6 +91,7 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
             return Collections.emptyList();
         }
 
+        log.debug("Finding all processes by variables: {}", variables);
         var variableKeys = extractVariableKeys(variables);
         var variableValues = extractVariableValues(variables);
         return processRepository.findByVariables(variableKeys, variableValues, variables.size()).stream()
@@ -98,6 +105,7 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
             return Collections.emptyList();
         }
 
+        log.debug("Finding all processes by business key: {} and variables: {}", businessKey, variables);
         var variableKeys = extractVariableKeys(variables);
         var variableValues = extractVariableValues(variables);
         return processRepository.findByBusinessKeyAndVariables(businessKey, variableKeys, variableValues, variables.size()).stream()
@@ -107,6 +115,7 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
 
     @Override
     public List<ProcessExecution> findAllFullyCompleted(int limit) {
+        log.debug("Finding all fully completed processes with limit: {}", limit);
         return processRepository.findAllFullyCompleted(limit).stream()
                 .map(processMapper::toExecution)
                 .toList();
@@ -114,15 +123,18 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
 
     @Override
     public PageableData<Process> findAll(Pageable pageable) {
+        log.debug("Finding all processes with pageable: {}", pageable);
         var result = processRepository.findAll(pageable);
         return new PageableData<>(processMapper.toProcesses(result.data()), result.total());
     }
 
-    private Process save(Process process, boolean isNew) {
-        var entity = processMapper.toEntity(process, isNew);
+    private Process save(Process process) {
+        var entity = processMapper.toNewEntity(process);
         var newEntity = processRepository.save(entity);
         return process.toBuilder()
                 .id(newEntity.getId())
+                .businessKey(newEntity.getBusinessKey())
+                .state(ProcessState.valueOf(newEntity.getState()))
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .startedAt(entity.getStartedAt())
