@@ -29,7 +29,7 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
 
     @Query(FIND_ALL_ACTIVE_BY_DEFINITION_IDS)
     List<ActivityExecutionEntity> findActive(@Param("processId") String processId,
-                                             @Param("definitionIds") List<String> definitionIds);
+                                             @Param("definitionIds") String[] definitionIds);
 
     @Query(FIND_ALL_ACTIVE_BY_PROCESS_ID)
     List<ActivityExecutionEntity> findActive(@Param("processId") String processId);
@@ -52,7 +52,7 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
 
     @Query(IS_ALL_COMPLETED)
     boolean isAllCompleted(@Param("processId") String processId,
-                           @Param("definitionIds") List<String> definitionIds);
+                           @Param("definitionIds") String[] definitionIds);
 
     @Modifying
     @Query(CHANGE_STATE)
@@ -62,6 +62,6 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     @Modifying
     @Query(DELETE_ALL_ACTIVE_BY_DEFINITION_IDS)
     void deleteAllActive(@Param("processId") String activityId,
-                         @Param("definitionIds") List<String> definitionIds);
+                         @Param("definitionIds") String[] definitionIds);
 
 }

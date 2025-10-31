@@ -2,7 +2,7 @@
 
 --changeset leorces:1
 -- Create the process_definition table
-CREATE TABLE IF NOT EXISTS definition
+CREATE TABLE definition
 (
     definition_id         TEXT      NOT NULL,
     definition_key        TEXT      NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS definition
 );
 
 -- Create the process table
-CREATE TABLE IF NOT EXISTS process
+CREATE TABLE process
 (
     process_id             TEXT      NOT NULL,
     root_process_id        TEXT,
@@ -48,7 +48,7 @@ CREATE INDEX idx_process_business
     ON process (process_business_key);
 
 -- Create the activity table
-CREATE TABLE IF NOT EXISTS activity
+CREATE TABLE activity
 (
     activity_id                   TEXT      NOT NULL,
     activity_definition_id        TEXT      NOT NULL,
@@ -73,20 +73,20 @@ CREATE TABLE IF NOT EXISTS activity
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)
 );
 
-CREATE INDEX idx_activity_incomplete
-    ON activity (process_id, activity_definition_id, activity_parent_definition_id, activity_async, activity_state,
-                 activity_timeout)
-    WHERE activity_completed_at IS NULL;
+CREATE INDEX idx_activity_process_state_completed
+    ON activity (process_id, activity_state, activity_completed_at);
 
-CREATE INDEX IF NOT EXISTS idx_activity_topic_defkey_created
+CREATE INDEX idx_activity_topic_scheduled
     ON activity (activity_topic, process_definition_key, activity_state, activity_created_at)
     WHERE activity_state = 'SCHEDULED';
 
-CREATE INDEX idx_activity_by_state
-    ON activity (process_id, activity_state);
+CREATE INDEX idx_activity_timeout_active_scheduled
+    ON activity (activity_timeout)
+    WHERE activity_state IN ('ACTIVE', 'SCHEDULED')
+        AND activity_timeout IS NOT NULL;
 
 -- Create the execution_variable table
-CREATE TABLE IF NOT EXISTS variable
+CREATE TABLE variable
 (
     variable_id             TEXT      NOT NULL,
     variable_key            TEXT      NOT NULL,
@@ -102,10 +102,13 @@ CREATE TABLE IF NOT EXISTS variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_variable_execution_id ON variable (execution_id);
+CREATE INDEX idx_variable_execution_id ON variable (execution_id);
+
+CREATE INDEX idx_variable_execution_lookup
+    ON variable (execution_id, variable_key, variable_value);
 
 -- Create the history table
-CREATE TABLE IF NOT EXISTS history
+CREATE TABLE history
 (
     process_id           TEXT      NOT NULL,
     root_process_id      TEXT,

@@ -37,9 +37,4 @@ public class ActivityFactory {
         return createActivity(definition, process);
     }
 
-    public ActivityExecution getByDefinitionId(String definitionId, String processId) {
-        return activityPersistence.findByDefinitionId(processId, definitionId)
-                .orElseThrow(() -> ActivityNotFoundException.activityNotFoundByProcessAndDefinition(processId, definitionId));
-    }
-
 }

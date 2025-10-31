@@ -81,6 +81,26 @@ public class ActivityMapper {
                 .build();
     }
 
+    public ActivityExecution toBaseExecution(ActivityExecutionEntity entity) {
+        var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
+        var process = Process.builder()
+                .id(entity.getProcessId())
+                .build();
+        return ActivityExecution.builder()
+                .id(entity.getId())
+                .definitionId(entity.getActivityDefinitionId())
+                .state(ActivityState.valueOf(entity.getState()))
+                .retries(entity.getRetries())
+                .timeout(entity.getTimeout())
+                .failure(failure)
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
+                .startedAt(entity.getStartedAt())
+                .completedAt(entity.getCompletedAt())
+                .process(process)
+                .build();
+    }
+
     public Activity toActivity(ActivityExecutionEntity entity) {
         var variables = variableMapper.toVariables(entity.getVariablesJson());
         var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
@@ -97,8 +117,6 @@ public class ActivityMapper {
                 .startedAt(entity.getStartedAt())
                 .completedAt(entity.getCompletedAt())
                 .build();
-//        var execution = toExecution(entity);
-//        return toActivity(execution);
     }
 
     public List<Activity> toActivities(PGobject activitiesJson, Process process) {

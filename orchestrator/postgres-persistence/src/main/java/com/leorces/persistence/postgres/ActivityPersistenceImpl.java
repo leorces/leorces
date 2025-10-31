@@ -5,7 +5,6 @@ import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.persistence.ActivityPersistence;
 import com.leorces.persistence.VariablePersistence;
-import com.leorces.persistence.postgres.entity.ActivityExecutionEntity;
 import com.leorces.persistence.postgres.mapper.ActivityMapper;
 import com.leorces.persistence.postgres.repository.ActivityRepository;
 import com.leorces.persistence.postgres.utils.ActivityStateTransition;
@@ -14,8 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,7 +75,7 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     @Transactional
     public void deleteAllActive(String processId, List<String> definitionIds) {
         log.debug("Delete all active activities for process: {} and definition ids: {}", processId, definitionIds);
-        activityRepository.deleteAllActive(processId, definitionIds);
+        activityRepository.deleteAllActive(processId, definitionIds.toArray(String[]::new));
     }
 
     @Override
@@ -98,8 +95,8 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     @Override
     public List<ActivityExecution> findActive(String processId, List<String> definitionIds) {
         log.debug("Finding all active activities for process: {} and definition ids: {}", processId, definitionIds);
-        return activityRepository.findActive(processId, definitionIds).stream()
-                .map(activityMapper::toExecution)
+        return activityRepository.findActive(processId, definitionIds.toArray(definitionIds.toArray(new String[0]))).stream()
+                .map(activityMapper::toBaseExecution)
                 .toList();
     }
 
@@ -107,7 +104,7 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     public List<ActivityExecution> findActive(String processId) {
         log.debug("Finding all active activities for process: {}", processId);
         return activityRepository.findActive(processId).stream()
-                .map(activityMapper::toExecution)
+                .map(activityMapper::toBaseExecution)
                 .toList();
     }
 
@@ -115,7 +112,7 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     public List<ActivityExecution> findFailed(String processId) {
         log.debug("Finding all failed activities for process: {}", processId);
         return activityRepository.findFailed(processId).stream()
-                .map(activityMapper::toExecution)
+                .map(activityMapper::toBaseExecution)
                 .toList();
     }
 
@@ -130,16 +127,7 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     @Override
     @Transactional
     public List<Activity> poll(String topic, String processDefinitionKey, int limit) {
-        var activities = activityRepository.poll(topic, processDefinitionKey, limit).stream()
-                .map(this::updatePooledActivity)
-                .toList();
-
-        if (activities.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        activityRepository.saveAll(activities);
-        return activities.stream()
+        return activityRepository.poll(topic, processDefinitionKey, limit).stream()
                 .map(activityMapper::toActivity)
                 .toList();
     }
@@ -165,7 +153,7 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     @Override
     public boolean isAllCompleted(String processId, List<String> definitionIds) {
         log.debug("Checking if all activity completed for process: {} and definition ids: {}", processId, definitionIds);
-        return activityRepository.isAllCompleted(processId, definitionIds);
+        return activityRepository.isAllCompleted(processId, definitionIds.toArray(String[]::new));
     }
 
     private ActivityExecution save(ActivityExecution activity, ActivityState state) {
@@ -177,16 +165,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
         var savedEntity = activityRepository.save(entity);
         return activity.toBuilder()
                 .id(savedEntity.getId())
-                .build();
-    }
-
-    private ActivityExecutionEntity updatePooledActivity(ActivityExecutionEntity activity) {
-        var now = LocalDateTime.now();
-        return activity.toBuilder()
-                .isNew(false)
-                .state(ActivityState.ACTIVE.name())
-                .startedAt(now)
-                .updatedAt(now)
                 .build();
     }
 

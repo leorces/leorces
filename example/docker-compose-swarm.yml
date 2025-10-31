@@ -37,8 +37,8 @@ services:
           - node.role == manager
       resources:
         limits:
-          cpus: "1"
-          memory: 2G
+          cpus: "2"
+          memory: 4G
         reservations:
           cpus: "1"
           memory: 2G
@@ -57,7 +57,7 @@ services:
       - postgres
     deploy:
       <<: *common-deploy
-      replicas: 5
+      replicas: 4
       update_config:
         parallelism: 1
         delay: 10s

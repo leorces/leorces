@@ -46,13 +46,38 @@ public final class ProcessQueries {
             WHERE process.process_id = :processId
             """;
 
-    public static final String FIND_ALL_WITH_PAGINATION = BASE_SELECT + """
-            WHERE (:filter IS NULL OR :filter = '' OR
-                   LOWER(process.process_id) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(process.process_definition_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(process.process_business_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(definition.definition_name) LIKE LOWER(CONCAT('%', :filter, '%')))
-              AND (:state IS NULL OR :state = '' OR :state = 'all' OR process.process_state = :state)
+    public static final String FIND_ALL_WITH_PAGINATION = """
+            SELECT
+                process.process_id,
+                process.root_process_id,
+                process.process_parent_id,
+                process.process_definition_id,
+                process.process_definition_key,
+                process.process_business_key,
+                process.process_state,
+                process.process_created_at,
+                process.process_updated_at,
+                process.process_started_at,
+                process.process_completed_at,
+            
+                definition.definition_id,
+                definition.definition_key,
+                definition.definition_name,
+                definition.definition_version,
+                definition.definition_data
+            FROM process
+            LEFT JOIN definition ON process.process_definition_id = definition.definition_id
+            WHERE
+                (
+                    :filter IS NULL OR :filter = '' OR
+                    LOWER(process.process_id) LIKE LOWER(CONCAT('%', :filter, '%')) OR
+                    LOWER(process.process_definition_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
+                    LOWER(process.process_business_key) LIKE LOWER(CONCAT('%', :filter, '%'))
+                )
+                AND
+                (
+                    :state IS NULL OR :state = '' OR :state = 'all' OR process.process_state = :state
+                )
             ORDER BY
                 CASE WHEN :sort_by_field = 'created_at' AND :order = 'ASC' THEN process.process_created_at END ASC,
                 CASE WHEN :sort_by_field = 'created_at' AND :order = 'DESC' THEN process.process_created_at END DESC,
@@ -64,7 +89,7 @@ public final class ProcessQueries {
                 CASE WHEN :sort_by_field = 'completed_at' AND :order = 'DESC' THEN process.process_completed_at END DESC,
                 process.process_created_at DESC
             OFFSET :offset
-            LIMIT :limit
+            LIMIT :limit;
             """;
 
     public static final String FIND_ALL_BY_BUSINESS_KEY = BASE_SELECT + """
@@ -234,21 +259,20 @@ public final class ProcessQueries {
             """;
 
     public static final String FIND_ALL_FULLY_COMPLETED = BASE_SELECT_WITH_ACTIVITIES + """
-            WHERE process.process_state != 'ACTIVE'
-              AND process.process_state != 'INCIDENT'
+            WHERE process.process_state NOT IN ('ACTIVE', 'INCIDENT')
               AND (process.root_process_id IS NULL OR NOT EXISTS (
-                  SELECT 1
-                  FROM process root_process
+                  SELECT 1 FROM process root_process
                   WHERE root_process.process_id = process.root_process_id
-                    AND (root_process.process_state = 'ACTIVE'
-                         OR root_process.process_state = 'INCIDENT')
+                    AND root_process.process_state IN ('ACTIVE', 'INCIDENT')
+                  LIMIT 1
               ))
               AND NOT EXISTS (
-                  SELECT 1
-                  FROM activity activity_check
-                  WHERE activity_check.process_id = process.process_id
-                    AND activity_check.activity_completed_at IS NULL
+                  SELECT 1 FROM activity
+                  WHERE activity.process_id = process.process_id
+                    AND activity.activity_completed_at IS NULL
+                  LIMIT 1
               )
+            ORDER BY process.process_completed_at ASC
             LIMIT :limit
             """;
 
