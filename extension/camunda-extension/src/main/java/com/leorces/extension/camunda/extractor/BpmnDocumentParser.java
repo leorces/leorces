@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor;
 
-
 import com.leorces.extension.camunda.exception.BpmnParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-
 
 /**
  * Component responsible for parsing BPMN XML documents.

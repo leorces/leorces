@@ -1,6 +1,7 @@
 package com.leorces.engine.activity.behaviour.event;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.behaviour.TriggerableActivityBehaviour;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
@@ -31,17 +32,17 @@ public class MessageIntermediateCatchEventBehavior extends AbstractActivityBehav
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        completeEventBasedGatewayActivities(result);
-        return result;
+    public ActivityCompletionResult complete(ActivityExecution activity) {
+        var completedActivity = activityPersistence.complete(activity);
+        completeEventBasedGatewayActivities(completedActivity);
+        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
     }
 
     @Override
-    public ActivityExecution terminate(ActivityExecution activity) {
-        var result = activityPersistence.terminate(activity);
-        completeEventBasedGatewayActivities(result);
-        return result;
+    public ActivityCompletionResult terminate(ActivityExecution activity) {
+        var terminatedActivity = activityPersistence.terminate(activity);
+        completeEventBasedGatewayActivities(terminatedActivity);
+        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
     }
 
     @Override

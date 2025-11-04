@@ -118,6 +118,11 @@ public record ActivityExecution(
     }
 
     @JsonIgnore
+    public boolean hasParent() {
+        return parentDefinitionId() != null;
+    }
+
+    @JsonIgnore
     public boolean isAsync() {
         return ActivityUtils.isAsync(this);
     }

@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor.strategy.gateway;
 
-
 import com.leorces.extension.camunda.extractor.BpmnConditionExtractor;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @Component
 @RequiredArgsConstructor

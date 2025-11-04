@@ -30,9 +30,9 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
         }
 
         log.debug("Terminate {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
-        behaviorResolver.resolveBehavior(activity.type()).terminate(activity);
+        var result = behaviorResolver.resolveBehavior(activity.type()).terminate(activity);
         if (!command.withInterruption()) {
-            dispatcher.dispatch(HandleActivityCompletionCommand.of(activity));
+            dispatcher.dispatch(HandleActivityCompletionCommand.of(result));
         }
         log.debug("Activity {} with definitionId: {} and processId: {} terminated", activity.type(), activity.definitionId(), activity.processId());
     }
@@ -43,9 +43,15 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
     }
 
     private ActivityExecution getActivity(TerminateActivityCommand command) {
-        return command.activity() == null
-                ? activityFactory.getById(command.activityId())
-                : command.activity();
+        if (command.activity() != null) {
+            return command.activity();
+        }
+
+        if (command.activityId() != null) {
+            return activityFactory.getById(command.activityId());
+        }
+
+        return activityFactory.getByDefinitionId(command.definitionId(), command.processId());
     }
 
     private boolean canHandle(ActivityExecution activity) {

@@ -3,6 +3,7 @@ package com.leorces.engine.activity.handler;
 import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
@@ -85,7 +86,7 @@ class CompleteActivityCommandHandlerTest {
         when(activityExecution.outputs()).thenReturn(OUTPUT_MAPPINGS);
         when(process.isInTerminalState()).thenReturn(false);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
-        when(activityBehavior.complete(activityExecution)).thenReturn(activityExecution);
+        when(activityBehavior.complete(activityExecution)).thenReturn(ActivityCompletionResult.completed(activityExecution, List.of()));
         when(variablesService.evaluate(activityExecution, OUTPUT_MAPPINGS)).thenReturn(List.of(outputVariable));
         when(variablesService.toMap(List.of(outputVariable))).thenReturn(OUTPUT_VARIABLES);
     }

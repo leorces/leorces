@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor.strategy.event;
 
-
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
 import java.util.List;
-
 
 @Component
 @RequiredArgsConstructor

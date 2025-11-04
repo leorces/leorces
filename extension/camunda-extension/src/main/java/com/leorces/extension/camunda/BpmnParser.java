@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda;
 
-
 import com.leorces.extension.camunda.exception.BpmnParseException;
 import com.leorces.extension.camunda.extractor.BpmnDocumentParser;
 import com.leorces.model.definition.ErrorItem;
@@ -16,7 +15,6 @@ import org.w3c.dom.Element;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 
 /**
  * Service for parsing BPMN files using DOM parser.

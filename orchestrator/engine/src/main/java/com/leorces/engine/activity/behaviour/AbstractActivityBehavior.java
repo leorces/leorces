@@ -28,13 +28,15 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        return activityPersistence.complete(activity);
+    public ActivityCompletionResult complete(ActivityExecution activity) {
+        var completedActivity = activityPersistence.complete(activity);
+        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
     }
 
     @Override
-    public ActivityExecution terminate(ActivityExecution activity) {
-        return activityPersistence.terminate(activity);
+    public ActivityCompletionResult terminate(ActivityExecution activity) {
+        var terminatedActivity = activityPersistence.terminate(activity);
+        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
     }
 
     @Override

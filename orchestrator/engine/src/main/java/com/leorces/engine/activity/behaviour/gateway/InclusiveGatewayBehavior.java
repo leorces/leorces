@@ -1,5 +1,6 @@
 package com.leorces.engine.activity.behaviour.gateway;
 
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.activity.GatewayException;
 import com.leorces.engine.variables.VariablesService;
@@ -27,14 +28,15 @@ public class InclusiveGatewayBehavior extends AbstractGatewayBehavior {
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
+    public ActivityCompletionResult complete(ActivityExecution activity) {
         var nextActivities = getNextActivities(activity);
 
         if (nextActivities.isEmpty()) {
             throw GatewayException.noValidPath(activity);
         }
 
-        return activityPersistence.complete(activity);
+        var completedActivity = activityPersistence.complete(activity);
+        return ActivityCompletionResult.completed(completedActivity, nextActivities);
     }
 
     @Override

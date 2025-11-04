@@ -8,6 +8,8 @@ import lombok.Builder;
 public record TerminateActivityCommand(
         String activityId,
         ActivityExecution activity,
+        String processId,
+        String definitionId,
         boolean withInterruption
 ) implements ExecutionCommand {
 
@@ -28,6 +30,14 @@ public record TerminateActivityCommand(
     public static TerminateActivityCommand of(String activityId, boolean withInterruption) {
         return TerminateActivityCommand.builder()
                 .activityId(activityId)
+                .withInterruption(withInterruption)
+                .build();
+    }
+
+    public static TerminateActivityCommand of(String processId, String definitionId, boolean withInterruption) {
+        return TerminateActivityCommand.builder()
+                .processId(processId)
+                .definitionId(definitionId)
                 .withInterruption(withInterruption)
                 .build();
     }

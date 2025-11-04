@@ -1,14 +1,14 @@
 package com.leorces.engine.activity.command;
 
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.core.ExecutionCommand;
-import com.leorces.model.runtime.activity.ActivityExecution;
 
 public record HandleActivityCompletionCommand(
-        ActivityExecution activity
+        ActivityCompletionResult result
 ) implements ExecutionCommand {
 
-    public static HandleActivityCompletionCommand of(ActivityExecution activity) {
-        return new HandleActivityCompletionCommand(activity);
+    public static HandleActivityCompletionCommand of(ActivityCompletionResult result) {
+        return new HandleActivityCompletionCommand(result);
     }
 
 }

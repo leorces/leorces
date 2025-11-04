@@ -1,13 +1,11 @@
 package com.leorces.extension.camunda.extractor;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * Component responsible for extracting input and output parameters from BPMN elements.

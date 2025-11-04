@@ -1,9 +1,7 @@
 package com.leorces.extension.camunda.extractor;
 
-
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
-
 
 @Component
 public class BpmnMessageExtractor {

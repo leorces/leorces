@@ -10,9 +10,9 @@ public interface ActivityBehavior {
 
     void run(ActivityExecution activity);
 
-    ActivityExecution complete(ActivityExecution activity);
+    ActivityCompletionResult complete(ActivityExecution activity);
 
-    ActivityExecution terminate(ActivityExecution activity);
+    ActivityCompletionResult terminate(ActivityExecution activity);
 
     boolean fail(ActivityExecution activity);
 

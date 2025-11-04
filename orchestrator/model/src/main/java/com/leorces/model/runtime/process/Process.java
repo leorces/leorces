@@ -50,6 +50,10 @@ public record Process(
         return state == ProcessState.ACTIVE;
     }
 
+    public boolean isRootProcess() {
+        return parentId == null;
+    }
+
     @JsonIgnore
     public boolean isInTerminalState() {
         return state.isTerminal();

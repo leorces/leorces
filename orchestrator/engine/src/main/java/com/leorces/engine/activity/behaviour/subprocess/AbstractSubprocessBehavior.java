@@ -1,6 +1,7 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
@@ -24,9 +25,22 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
     }
 
     @Override
-    public ActivityExecution terminate(ActivityExecution activity) {
+    public ActivityCompletionResult complete(ActivityExecution activity) {
+        var isAllChildActivitiesCompleted = activityPersistence.isAllCompleted(activity.processId(), getChildActivityIds(activity));
+
+        if (!isAllChildActivitiesCompleted) {
+            return ActivityCompletionResult.incompleted(activity, getNextActivities(activity));
+        }
+
+        var completedActivity = activityPersistence.complete(activity);
+        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
+    }
+
+    @Override
+    public ActivityCompletionResult terminate(ActivityExecution activity) {
         terminateChildActivities(activity);
-        return activityPersistence.terminate(activity);
+        var terminatedActivity = activityPersistence.terminate(activity);
+        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
     }
 
     protected abstract ActivityDefinition getStartEvent(ActivityExecution activity);

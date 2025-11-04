@@ -54,9 +54,6 @@ public class CallActivityService {
         );
     }
 
-    /**
-     * Универсальный метод для обработки input/output маппингов CallActivity.
-     */
     private Map<String, Object> resolveMappings(List<VariableMapping> mappings,
                                                 Map<String, Object> sourceVars,
                                                 boolean includeAll) {

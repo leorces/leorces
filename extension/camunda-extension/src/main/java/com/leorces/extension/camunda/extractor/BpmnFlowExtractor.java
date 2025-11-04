@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -8,7 +7,6 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 /**
  * Component responsible for extracting flow references from BPMN elements.

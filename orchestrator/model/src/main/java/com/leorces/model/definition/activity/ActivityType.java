@@ -33,5 +33,13 @@ public enum ActivityType {
     // SubProcess
     SUBPROCESS,
     EVENT_SUBPROCESS,
-    CALL_ACTIVITY,
+    CALL_ACTIVITY;
+
+    public boolean isSubprocess() {
+        return this == SUBPROCESS || this == EVENT_SUBPROCESS;
+    }
+
+    public boolean isEventSubprocess() {
+        return this == EVENT_SUBPROCESS;
+    }
 }

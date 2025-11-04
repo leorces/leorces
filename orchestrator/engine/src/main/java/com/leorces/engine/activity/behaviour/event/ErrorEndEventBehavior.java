@@ -1,6 +1,7 @@
 package com.leorces.engine.activity.behaviour.event;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateErrorCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -20,10 +21,10 @@ public class ErrorEndEventBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        dispatcher.dispatch(CorrelateErrorCommand.of(activity));
-        return result;
+    public ActivityCompletionResult complete(ActivityExecution activity) {
+        var completedActivity = activityPersistence.complete(activity);
+        dispatcher.dispatch(CorrelateErrorCommand.of(completedActivity));
+        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
     }
 
     @Override

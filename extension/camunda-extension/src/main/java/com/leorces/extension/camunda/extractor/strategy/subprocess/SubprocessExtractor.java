@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor.strategy.subprocess;
 
-
 import com.leorces.extension.camunda.BpmnActivityParser;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
@@ -13,7 +12,6 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Component
 public class SubprocessExtractor implements ActivityExtractionStrategy {
@@ -36,13 +34,21 @@ public class SubprocessExtractor implements ActivityExtractionStrategy {
     }
 
     public List<ActivityDefinition> extractSubprocesses(Element processElement, String parentId, String processId) {
-        var subprocesses = processElement.getElementsByTagNameNS(BPMN_NAMESPACE, "subProcess");
         var result = new ArrayList<ActivityDefinition>();
 
-        for (int i = 0; i < subprocesses.getLength(); i++) {
-            var element = (Element) subprocesses.item(i);
-            result.add(createSubprocess(element, parentId));
-            result.addAll(activityParser.extractActivities(element, element.getAttribute("id"), processId));
+        for (int i = 0; i < processElement.getChildNodes().getLength(); i++) {
+            var node = processElement.getChildNodes().item(i);
+
+            if (!(node instanceof Element child)) {
+                continue;
+            }
+
+            if (!"subProcess".equals(child.getLocalName()) || !BPMN_NAMESPACE.equals(child.getNamespaceURI())) {
+                continue;
+            }
+
+            result.add(createSubprocess(child, parentId));
+            result.addAll(activityParser.extractActivities(child, child.getAttribute("id"), processId));
         }
 
         return result;

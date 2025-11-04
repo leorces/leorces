@@ -1,6 +1,7 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.RunProcessCommand;
@@ -31,10 +32,10 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public ActivityExecution complete(ActivityExecution activity) {
-        var result = activityPersistence.complete(activity);
-        processOutputMappings(activity);
-        return result;
+    public ActivityCompletionResult complete(ActivityExecution activity) {
+        var completedActivity = activityPersistence.complete(activity);
+        processOutputMappings(completedActivity);
+        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
     }
 
     @Override
@@ -44,11 +45,13 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public ActivityExecution terminate(ActivityExecution activity) {
+    public ActivityCompletionResult terminate(ActivityExecution activity) {
         if (!activity.process().isInTerminalState()) {
             dispatcher.dispatch(TerminateProcessCommand.of(activity.id(), false));
         }
-        return activityPersistence.terminate(activity);
+
+        var terminatedActivity = activityPersistence.terminate(activity);
+        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
     }
 
     @Override

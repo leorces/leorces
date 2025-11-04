@@ -1,6 +1,5 @@
 package com.leorces.model.utils;
 
-
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -9,8 +8,6 @@ import com.leorces.model.runtime.activity.ActivityExecution;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
-
 
 public final class ActivityUtils {
 
@@ -19,12 +16,15 @@ public final class ActivityUtils {
     }
 
     public static List<String> buildScope(ActivityExecution activity) {
-        var parentActivityDefinitionIds = findParentActivities(activity).stream()
+        var parentsAndSelf = findParentActivities(activity).stream()
                 .map(ActivityDefinition::id)
-                .toList()
-                .reversed();
-        return Stream.concat(parentActivityDefinitionIds.stream(), Stream.of(activity.processDefinitionId()))
                 .toList();
+        var parentsOnly = parentsAndSelf.isEmpty() ? List.<String>of() : parentsAndSelf.subList(0, parentsAndSelf.size() - 1);
+        var scope = new ArrayList<String>(parentsOnly.size() + 2);
+        scope.add(activity.definitionId());
+        scope.addAll(parentsOnly);
+        scope.add(activity.processDefinitionId());
+        return scope;
     }
 
     public static boolean isAsync(ActivityExecution activity) {

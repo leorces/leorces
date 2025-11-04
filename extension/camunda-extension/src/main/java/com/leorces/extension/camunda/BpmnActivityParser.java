@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda;
 
-
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 @Component

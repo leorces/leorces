@@ -83,9 +83,6 @@ public class ActivityMapper {
 
     public ActivityExecution toBaseExecution(ActivityExecutionEntity entity) {
         var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
-        var process = Process.builder()
-                .id(entity.getProcessId())
-                .build();
         return ActivityExecution.builder()
                 .id(entity.getId())
                 .definitionId(entity.getActivityDefinitionId())
@@ -97,7 +94,7 @@ public class ActivityMapper {
                 .updatedAt(entity.getUpdatedAt())
                 .startedAt(entity.getStartedAt())
                 .completedAt(entity.getCompletedAt())
-                .process(process)
+                .process(processMapper.toProcess(entity))
                 .build();
     }
 

@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.configuration;
 
-
 import com.leorces.extension.camunda.CamundaExtensionService;
 import com.leorces.extension.camunda.configuration.properties.CamundaProperties;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationListener;
-
 
 @Slf4j
 @AutoConfiguration

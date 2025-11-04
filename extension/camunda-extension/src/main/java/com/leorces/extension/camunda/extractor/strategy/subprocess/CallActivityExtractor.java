@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor.strategy.subprocess;
 
-
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.VariableMapping;
@@ -12,7 +11,6 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Component
 @RequiredArgsConstructor

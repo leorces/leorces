@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda.extractor.strategy;
 
-
 import com.leorces.extension.camunda.extractor.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -8,7 +7,6 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 import java.util.Map;
-
 
 @Component
 @RequiredArgsConstructor

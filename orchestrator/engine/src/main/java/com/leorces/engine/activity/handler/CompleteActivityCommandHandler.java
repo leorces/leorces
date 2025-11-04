@@ -2,6 +2,7 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
@@ -39,9 +40,15 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
         }
 
         log.debug("Complete {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
-        var completedActivity = completeActivity(activity);
-        processVariables(completedActivity, command.variables());
-        dispatcher.dispatchAsync(HandleActivityCompletionCommand.of(completedActivity));
+        var result = completeActivity(activity);
+
+        if (!result.isCompleted()) {
+            log.debug("Activity {} with definitionId: {} and processId: {} not completed", activity.type(), activity.definitionId(), activity.processId());
+            return;
+        }
+
+        processVariables(result.activity(), command.variables());
+        dispatcher.dispatchAsync(HandleActivityCompletionCommand.of(result));
         log.debug("Activity {} with definitionId: {} and processId: {} completed", activity.type(), activity.definitionId(), activity.processId());
     }
 
@@ -50,7 +57,7 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
         return CompleteActivityCommand.class;
     }
 
-    private ActivityExecution completeActivity(ActivityExecution activity) {
+    private ActivityCompletionResult completeActivity(ActivityExecution activity) {
         try {
             var behavior = behaviorResolver.resolveBehavior(activity.type());
             return behavior.complete(activity);
