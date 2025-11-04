@@ -1,6 +1,5 @@
 package com.leorces.model.definition;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 @Builder(toBuilder = true)
 public record ProcessDefinition(

@@ -1,6 +1,5 @@
 package com.leorces.model.runtime.process;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.runtime.variable.Variable;
@@ -9,7 +8,6 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-
 
 @Builder(toBuilder = true)
 public record Process(

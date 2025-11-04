@@ -1,10 +1,8 @@
 package com.leorces.model.pagination;
 
-
 import lombok.Builder;
 
 import java.util.Locale;
-
 
 @Builder(toBuilder = true)
 public record Pageable(

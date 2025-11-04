@@ -1,6 +1,5 @@
 package com.leorces.model.runtime.activity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 
 @Builder(toBuilder = true)
 public record ActivityExecution(

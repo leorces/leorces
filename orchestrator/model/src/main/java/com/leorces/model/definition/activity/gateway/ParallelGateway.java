@@ -1,6 +1,5 @@
 package com.leorces.model.definition.activity.gateway;
 
-
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import lombok.Builder;
@@ -8,7 +7,6 @@ import lombok.Builder;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 
 @Builder(toBuilder = true)
 public record ParallelGateway(

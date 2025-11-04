@@ -1,6 +1,5 @@
 package com.leorces.model.definition.activity;
 
-
 public enum ActivityType {
     // Task
     EXTERNAL_TASK,

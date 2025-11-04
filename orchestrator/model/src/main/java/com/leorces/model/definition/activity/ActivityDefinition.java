@@ -1,9 +1,7 @@
 package com.leorces.model.definition.activity;
 
-
 import java.util.List;
 import java.util.Map;
-
 
 public interface ActivityDefinition {
 

@@ -1,6 +1,5 @@
 package com.leorces.model.definition.activity.subprocess;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -9,7 +8,6 @@ import lombok.Builder;
 
 import java.util.List;
 import java.util.Map;
-
 
 @Builder(toBuilder = true)
 public record CallActivity(

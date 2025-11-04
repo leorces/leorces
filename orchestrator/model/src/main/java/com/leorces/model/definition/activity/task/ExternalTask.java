@@ -1,13 +1,11 @@
 package com.leorces.model.definition.activity.task;
 
-
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import lombok.Builder;
 
 import java.util.List;
 import java.util.Map;
-
 
 @Builder(toBuilder = true)
 public record ExternalTask(

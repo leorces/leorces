@@ -1,13 +1,11 @@
 package com.leorces.model.definition.activity.task;
 
-
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.definition.activity.MessageActivityDefinition;
 import lombok.Builder;
 
 import java.util.List;
 import java.util.Map;
-
 
 @Builder(toBuilder = true)
 public record ReceiveTask(

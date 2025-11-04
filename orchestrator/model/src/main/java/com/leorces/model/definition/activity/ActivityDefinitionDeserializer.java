@@ -1,6 +1,5 @@
 package com.leorces.model.definition.activity;
 
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -18,7 +17,6 @@ import com.leorces.model.definition.activity.task.ExternalTask;
 import com.leorces.model.definition.activity.task.ReceiveTask;
 
 import java.io.IOException;
-
 
 public class ActivityDefinitionDeserializer extends JsonDeserializer<ActivityDefinition> {
 
