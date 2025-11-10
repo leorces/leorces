@@ -4,8 +4,8 @@ import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.definition.activity.ErrorActivityDefinition;
-import com.leorces.model.definition.activity.event.ErrorBoundaryEvent;
-import com.leorces.model.definition.activity.event.ErrorStartEvent;
+import com.leorces.model.definition.activity.event.boundary.ErrorBoundaryEvent;
+import com.leorces.model.definition.activity.event.start.ErrorStartEvent;
 import com.leorces.model.runtime.process.Process;
 import org.springframework.stereotype.Component;
 

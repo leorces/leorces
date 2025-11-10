@@ -2,12 +2,12 @@ package com.leorces.engine.activity.behaviour.subprocess;
 
 
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
-import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 
 @Component
@@ -19,13 +19,15 @@ public class SubprocessBehavior extends AbstractSubprocessBehavior {
     }
 
     @Override
-    protected ActivityDefinition getStartEvent(ActivityExecution activity) {
-        var definitionId = activity.definition().id();
-        return activity.processDefinition().activities().stream()
-                .filter(activityDefinition -> definitionId.equals(activityDefinition.parentId()))
-                .filter(activityDefinition -> activityDefinition.type() == ActivityType.START_EVENT)
-                .findFirst()
-                .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(activity.definition().id()));
+    public void complete(ActivityExecution activity, Map<String, Object> variables) {
+        var isAllChildActivitiesCompleted = activityPersistence.isAllCompleted(activity.processId(), getChildActivityIds(activity));
+
+        if (!isAllChildActivitiesCompleted) {
+            return;
+        }
+
+        var completedSubprocess = activityPersistence.complete(activity);
+        postComplete(completedSubprocess, variables);
     }
 
     @Override

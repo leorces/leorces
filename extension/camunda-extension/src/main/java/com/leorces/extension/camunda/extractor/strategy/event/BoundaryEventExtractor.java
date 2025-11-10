@@ -3,7 +3,7 @@ package com.leorces.extension.camunda.extractor.strategy.event;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.definition.activity.event.*;
+import com.leorces.model.definition.activity.event.boundary.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;

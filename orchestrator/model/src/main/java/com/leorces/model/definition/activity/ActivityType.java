@@ -41,4 +41,10 @@ public enum ActivityType {
     public boolean isEventSubprocess() {
         return this == EVENT_SUBPROCESS;
     }
+
+    public boolean isStartEvent() {
+        return this == START_EVENT
+                || this == MESSAGE_START_EVENT
+                || this == ERROR_START_EVENT;
+    }
 }

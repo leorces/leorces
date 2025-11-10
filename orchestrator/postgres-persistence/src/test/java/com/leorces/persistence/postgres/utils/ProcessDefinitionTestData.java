@@ -2,10 +2,10 @@ package com.leorces.persistence.postgres.utils;
 
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.ProcessDefinitionMetadata;
-import com.leorces.model.definition.activity.event.EndEvent;
-import com.leorces.model.definition.activity.event.IntermediateCatchEvent;
-import com.leorces.model.definition.activity.event.MessageStartEvent;
-import com.leorces.model.definition.activity.event.StartEvent;
+import com.leorces.model.definition.activity.event.end.EndEvent;
+import com.leorces.model.definition.activity.event.intermediate.IntermediateCatchEvent;
+import com.leorces.model.definition.activity.event.start.MessageStartEvent;
+import com.leorces.model.definition.activity.event.start.StartEvent;
 import com.leorces.model.definition.activity.gateway.ParallelGateway;
 import com.leorces.model.definition.activity.subprocess.EventSubprocess;
 import com.leorces.model.definition.activity.task.ExternalTask;

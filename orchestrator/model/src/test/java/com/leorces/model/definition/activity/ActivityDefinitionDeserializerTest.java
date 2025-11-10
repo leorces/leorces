@@ -2,9 +2,9 @@ package com.leorces.model.definition.activity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.leorces.model.definition.activity.event.EndEvent;
-import com.leorces.model.definition.activity.event.ErrorEndEvent;
-import com.leorces.model.definition.activity.event.StartEvent;
+import com.leorces.model.definition.activity.event.end.EndEvent;
+import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
+import com.leorces.model.definition.activity.event.start.StartEvent;
 import com.leorces.model.definition.activity.gateway.ExclusiveGateway;
 import com.leorces.model.definition.activity.gateway.InclusiveGateway;
 import com.leorces.model.definition.activity.gateway.ParallelGateway;

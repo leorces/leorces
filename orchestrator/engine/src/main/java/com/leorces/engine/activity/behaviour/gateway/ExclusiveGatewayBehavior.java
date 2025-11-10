@@ -1,6 +1,5 @@
 package com.leorces.engine.activity.behaviour.gateway;
 
-import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.activity.GatewayException;
 import com.leorces.engine.variables.VariablesService;
@@ -13,6 +12,7 @@ import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ExclusiveGatewayBehavior extends AbstractGatewayBehavior {
@@ -28,15 +28,15 @@ public class ExclusiveGatewayBehavior extends AbstractGatewayBehavior {
     }
 
     @Override
-    public ActivityCompletionResult complete(ActivityExecution activity) {
+    public void complete(ActivityExecution activity, Map<String, Object> variables) {
         var nextActivities = getNextActivities(activity);
 
         if (nextActivities.size() != 1) {
             throw GatewayException.noValidPath(activity);
         }
 
-        var completedActivity = activityPersistence.complete(activity);
-        return ActivityCompletionResult.completed(completedActivity, nextActivities);
+        var completedGateway = activityPersistence.complete(activity);
+        handleActivityCompletion(completedGateway, nextActivities);
     }
 
     @Override

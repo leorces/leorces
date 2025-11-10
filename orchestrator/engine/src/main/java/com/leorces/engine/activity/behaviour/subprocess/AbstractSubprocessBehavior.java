@@ -1,10 +1,10 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
-import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
@@ -25,36 +25,31 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
     }
 
     @Override
-    public ActivityCompletionResult complete(ActivityExecution activity) {
-        var isAllChildActivitiesCompleted = activityPersistence.isAllCompleted(activity.processId(), getChildActivityIds(activity));
-
-        if (!isAllChildActivitiesCompleted) {
-            return ActivityCompletionResult.incompleted(activity, getNextActivities(activity));
-        }
-
-        var completedActivity = activityPersistence.complete(activity);
-        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
-    }
-
-    @Override
-    public ActivityCompletionResult terminate(ActivityExecution activity) {
+    public void terminate(ActivityExecution activity, boolean withInterruption) {
         terminateChildActivities(activity);
         var terminatedActivity = activityPersistence.terminate(activity);
-        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
+        postTerminate(terminatedActivity, withInterruption);
     }
 
-    protected abstract ActivityDefinition getStartEvent(ActivityExecution activity);
+    protected List<String> getChildActivityIds(ActivityExecution activity) {
+        return activity.childActivities().stream()
+                .map(ActivityDefinition::id)
+                .toList();
+    }
+
+    private ActivityDefinition getStartEvent(ActivityExecution activity) {
+        var definitionId = activity.definition().id();
+        return activity.processDefinition().activities().stream()
+                .filter(activityDefinition -> definitionId.equals(activityDefinition.parentId()))
+                .filter(activityDefinition -> activityDefinition.type().isStartEvent())
+                .findFirst()
+                .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(activity.definition().id()));
+    }
 
     private void terminateChildActivities(ActivityExecution activity) {
         var childActivityIds = getChildActivityIds(activity);
         var childActivities = activityPersistence.findActive(activity.processId(), childActivityIds);
         dispatcher.dispatch(TerminateAllActivitiesCommand.of(childActivities));
-    }
-
-    private List<String> getChildActivityIds(ActivityExecution activity) {
-        return activity.childActivities().stream()
-                .map(ActivityDefinition::id)
-                .toList();
     }
 
 }

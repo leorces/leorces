@@ -3,9 +3,9 @@ package com.leorces.extension.camunda.extractor.strategy.event;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.definition.activity.event.ErrorStartEvent;
-import com.leorces.model.definition.activity.event.MessageStartEvent;
-import com.leorces.model.definition.activity.event.StartEvent;
+import com.leorces.model.definition.activity.event.start.ErrorStartEvent;
+import com.leorces.model.definition.activity.event.start.MessageStartEvent;
+import com.leorces.model.definition.activity.event.start.StartEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -45,6 +45,7 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .messageReference(helper.getMessageName(messageDefinition))
+                .isInterrupting(!"false".equals(element.getAttribute("isInterrupting")))
                 .build();
     }
 

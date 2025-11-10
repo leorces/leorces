@@ -9,7 +9,7 @@ import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.IncidentProcessCommand;
 import com.leorces.engine.service.ErrorHandlerResolver;
 import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.definition.activity.event.ErrorEndEvent;
+import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.ActivityPersistence;

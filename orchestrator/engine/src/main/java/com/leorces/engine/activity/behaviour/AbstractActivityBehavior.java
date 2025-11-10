@@ -1,14 +1,18 @@
 package com.leorces.engine.activity.behaviour;
 
 import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.activity.command.HandleActivityCompletionWithNextActivitiesCommand;
+import com.leorces.engine.activity.command.HandleActivityCompletionWithoutNextActivitiesCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public abstract class AbstractActivityBehavior implements ActivityBehavior {
@@ -28,15 +32,15 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
     }
 
     @Override
-    public ActivityCompletionResult complete(ActivityExecution activity) {
+    public void complete(ActivityExecution activity, Map<String, Object> variables) {
         var completedActivity = activityPersistence.complete(activity);
-        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
+        postComplete(completedActivity, variables);
     }
 
     @Override
-    public ActivityCompletionResult terminate(ActivityExecution activity) {
+    public void terminate(ActivityExecution activity, boolean withInterruption) {
         var terminatedActivity = activityPersistence.terminate(activity);
-        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
+        postTerminate(terminatedActivity, withInterruption);
     }
 
     @Override
@@ -62,6 +66,25 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
             return;
         }
         activityPersistence.deleteAllActive(processId, eventBasedGatewayOpt.get().outgoing());
+    }
+
+    protected void postComplete(ActivityExecution completedActivity, Map<String, Object> variables) {
+        dispatcher.dispatch(SetActivityVariablesCommand.of(completedActivity, variables));
+        handleActivityCompletion(completedActivity, getNextActivities(completedActivity));
+    }
+
+    protected void postTerminate(ActivityExecution terminatedActivity, boolean withInterruption) {
+        if (!withInterruption) {
+            handleActivityCompletion(terminatedActivity, getNextActivities(terminatedActivity));
+        }
+    }
+
+    protected void handleActivityCompletion(ActivityExecution activity, List<ActivityDefinition> nextActivities) {
+        if (nextActivities.isEmpty()) {
+            dispatcher.dispatch(HandleActivityCompletionWithoutNextActivitiesCommand.of(activity));
+        } else {
+            dispatcher.dispatch(HandleActivityCompletionWithNextActivitiesCommand.of(activity.process(), nextActivities));
+        }
     }
 
     private Optional<ActivityDefinition> findEventBasedGateway(ActivityExecution activity) {

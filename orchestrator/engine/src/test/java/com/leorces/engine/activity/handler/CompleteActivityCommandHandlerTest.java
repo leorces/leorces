@@ -3,19 +3,14 @@ package com.leorces.engine.activity.handler;
 import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
-import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
-import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.ExecutionException;
-import com.leorces.engine.variables.VariablesService;
-import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
-import com.leorces.model.runtime.variable.Variable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,13 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,15 +37,10 @@ class CompleteActivityCommandHandlerTest {
     private static final String ACTIVITY_ID = "activity-id";
     private static final String PROCESS_ID = "process-id";
     private static final String DEFINITION_ID = "definition-id";
-    private static final Map<String, Object> INPUT_VARIABLES = Map.of("inputVar", "inputValue");
-    private static final Map<String, Object> OUTPUT_VARIABLES = Map.of("outputVar", "outputValue");
-    private static final Map<String, Object> OUTPUT_MAPPINGS = Map.of("outputMapping", "value");
+    private static final Map<String, Object> VARIABLES = Map.of("var1", "val1");
 
     @Mock
     private ActivityBehaviorResolver behaviorResolver;
-
-    @Mock
-    private VariablesService variablesService;
 
     @Mock
     private ActivityFactory activityFactory;
@@ -68,9 +57,6 @@ class CompleteActivityCommandHandlerTest {
     @Mock
     private Process process;
 
-    @Mock
-    private Variable outputVariable;
-
     @InjectMocks
     private CompleteActivityCommandHandler handler;
 
@@ -83,184 +69,81 @@ class CompleteActivityCommandHandlerTest {
         when(activityExecution.state()).thenReturn(ActivityState.ACTIVE);
         when(activityExecution.isInTerminalState()).thenReturn(false);
         when(activityExecution.process()).thenReturn(process);
-        when(activityExecution.outputs()).thenReturn(OUTPUT_MAPPINGS);
         when(process.isInTerminalState()).thenReturn(false);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
-        when(activityBehavior.complete(activityExecution)).thenReturn(ActivityCompletionResult.completed(activityExecution, List.of()));
-        when(variablesService.evaluate(activityExecution, OUTPUT_MAPPINGS)).thenReturn(List.of(outputVariable));
-        when(variablesService.toMap(List.of(outputVariable))).thenReturn(OUTPUT_VARIABLES);
     }
 
     @Test
     @DisplayName("Should return correct command type")
     void shouldReturnCorrectCommandType() {
-        // Given & When
-        var commandType = handler.getCommandType();
-
-        // Then
-        assertThat(commandType).isEqualTo(CompleteActivityCommand.class);
+        assertThat(handler.getCommandType()).isEqualTo(CompleteActivityCommand.class);
     }
 
     @Test
-    @DisplayName("Should complete activity with provided activity and variables")
-    void shouldCompleteActivityWithProvidedActivityAndVariables() {
-        // Given
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
+    @DisplayName("Should complete activity successfully when activity is provided")
+    void shouldCompleteActivitySuccessfullyWhenActivityProvided() {
+        var command = CompleteActivityCommand.of(activityExecution, VARIABLES);
 
-        // When
         handler.handle(command);
 
-        // Then
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
-        verify(activityBehavior).complete(activityExecution);
-        verify(variablesService).evaluate(activityExecution, OUTPUT_MAPPINGS);
-        verify(variablesService).toMap(List.of(outputVariable));
-        verify(dispatcher).dispatch(any(SetVariablesCommand.class));
-        verify(dispatcher).dispatchAsync(any(HandleActivityCompletionCommand.class));
+        verify(activityBehavior).complete(activityExecution, VARIABLES);
+        verify(dispatcher, never()).dispatch(isA(FailActivityCommand.class));
     }
 
     @Test
-    @DisplayName("Should complete activity with activity ID")
-    void shouldCompleteActivityWithActivityId() {
-        // Given
-        var command = CompleteActivityCommand.of(ACTIVITY_ID, INPUT_VARIABLES);
+    @DisplayName("Should complete activity successfully when retrieved by ID")
+    void shouldCompleteActivitySuccessfullyWhenRetrievedById() {
         when(activityFactory.getById(ACTIVITY_ID)).thenReturn(activityExecution);
+        var command = CompleteActivityCommand.of(ACTIVITY_ID, VARIABLES);
 
-        // When
         handler.handle(command);
 
-        // Then
         verify(activityFactory).getById(ACTIVITY_ID);
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
-        verify(activityBehavior).complete(activityExecution);
-        verify(dispatcher).dispatch(any(SetVariablesCommand.class));
-        verify(dispatcher).dispatchAsync(any(HandleActivityCompletionCommand.class));
+        verify(activityBehavior).complete(activityExecution, VARIABLES);
+        verify(dispatcher, never()).dispatch(isA(FailActivityCommand.class));
     }
 
     @Test
-    @DisplayName("Should combine input and output variables correctly")
-    void shouldCombineInputAndOutputVariablesCorrectly() {
-        // Given
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verify(dispatcher).dispatch(argThat(cmd -> {
-            if (cmd instanceof SetVariablesCommand setVarCmd) {
-                var variables = setVarCmd.variables();
-                return variables.containsKey("inputVar") &&
-                        variables.containsKey("outputVar") &&
-                        "inputValue".equals(variables.get("inputVar")) &&
-                        "outputValue".equals(variables.get("outputVar"));
-            }
-            return false;
-        }));
-    }
-
-    @Test
-    @DisplayName("Should handle empty variables")
-    void shouldHandleEmptyVariables() {
-        // Given
-        var command = CompleteActivityCommand.of(activityExecution, Collections.emptyMap());
-        when(variablesService.toMap(List.of(outputVariable))).thenReturn(Collections.emptyMap());
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verify(dispatcher).dispatch(any(SetVariablesCommand.class));
-        verify(dispatcher).dispatchAsync(any(HandleActivityCompletionCommand.class));
-    }
-
-    @Test
-    @DisplayName("Should complete activity when in terminal state but process is not in terminal state")
-    void shouldCompleteActivityWhenInTerminalStateButProcessNotInTerminalState() {
-        // Given
-        when(activityExecution.state()).thenReturn(ActivityState.COMPLETED);
-        when(activityExecution.isInTerminalState()).thenReturn(true);
-        // process.isInTerminalState() returns false by default, so canHandle() will return true
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
-        verify(activityBehavior).complete(activityExecution);
-        verify(dispatcher).dispatch(any(SetVariablesCommand.class));
-        verify(dispatcher).dispatchAsync(any(HandleActivityCompletionCommand.class));
-    }
-
-    @Test
-    @DisplayName("Should not complete activity when both activity and process are in terminal state")
-    void shouldNotCompleteActivityWhenBothActivityAndProcessInTerminalState() {
-        // Given
-        when(activityExecution.state()).thenReturn(ActivityState.COMPLETED);
+    @DisplayName("Should not complete activity if both activity and process are in terminal state")
+    void shouldNotCompleteActivityIfBothInTerminalState() {
         when(activityExecution.isInTerminalState()).thenReturn(true);
         when(process.isInTerminalState()).thenReturn(true);
-        // All conditions in canHandle() OR logic are false: state != null && isInTerminalState && process.isInTerminalState
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
+        when(activityExecution.state()).thenReturn(ActivityState.COMPLETED);
 
-        // When
+        var command = CompleteActivityCommand.of(activityExecution, VARIABLES);
         handler.handle(command);
 
-        // Then
         verify(behaviorResolver, never()).resolveBehavior(any());
-        verify(activityBehavior, never()).complete(any());
+        verify(activityBehavior, never()).complete(any(), any());
         verify(dispatcher, never()).dispatch(any());
-        verify(dispatcher, never()).dispatchAsync(any());
     }
 
     @Test
-    @DisplayName("Should dispatch fail command and throw exception when completion fails")
-    void shouldDispatchFailCommandAndThrowExceptionWhenCompletionFails() {
-        // Given
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
-        var exception = new RuntimeException("Completion failed");
-        when(activityBehavior.complete(activityExecution)).thenThrow(exception);
+    @DisplayName("Should dispatch FailActivityCommand and throw ExecutionException when completion fails")
+    void shouldDispatchFailActivityCommandWhenCompletionFails() {
+        var command = CompleteActivityCommand.of(activityExecution, VARIABLES);
+        var exception = new RuntimeException("failure");
+        doThrow(exception).when(activityBehavior).complete(activityExecution, VARIABLES);
 
-        // When & Then
         assertThatThrownBy(() -> handler.handle(command))
                 .isInstanceOf(ExecutionException.class)
                 .hasMessageContaining("Activity completion failed")
                 .hasCause(exception);
 
-        verify(dispatcher).dispatch(any(FailActivityCommand.class));
+        verify(dispatcher).dispatch(isA(FailActivityCommand.class));
     }
 
     @Test
-    @DisplayName("Should handle different activity types")
-    void shouldHandleDifferentActivityTypes() {
-        // Given
-        when(activityExecution.type()).thenReturn(ActivityType.RECEIVE_TASK);
-        when(behaviorResolver.resolveBehavior(ActivityType.RECEIVE_TASK)).thenReturn(activityBehavior);
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verify(behaviorResolver).resolveBehavior(ActivityType.RECEIVE_TASK);
-        verify(activityBehavior).complete(activityExecution);
-        verify(dispatcher).dispatchAsync(any(HandleActivityCompletionCommand.class));
-    }
-
-    @Test
-    @DisplayName("Should handle activity with null state")
+    @DisplayName("Should handle activity with null state (still process it)")
     void shouldHandleActivityWithNullState() {
-        // Given
         when(activityExecution.state()).thenReturn(null);
-        var command = CompleteActivityCommand.of(activityExecution, INPUT_VARIABLES);
+        var command = CompleteActivityCommand.of(activityExecution, VARIABLES);
 
-        // When
         handler.handle(command);
 
-        // Then
-        verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
-        verify(activityBehavior).complete(activityExecution);
-        verify(dispatcher).dispatchAsync(any(HandleActivityCompletionCommand.class));
+        verify(activityBehavior).complete(activityExecution, VARIABLES);
     }
 
 }

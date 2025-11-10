@@ -1,7 +1,6 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
-import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.RunProcessCommand;
@@ -12,6 +11,8 @@ import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class CallActivityBehavior extends AbstractActivityBehavior {
@@ -32,10 +33,10 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public ActivityCompletionResult complete(ActivityExecution activity) {
-        var completedActivity = activityPersistence.complete(activity);
-        processOutputMappings(completedActivity);
-        return ActivityCompletionResult.completed(completedActivity, getNextActivities(completedActivity));
+    public void complete(ActivityExecution activity, Map<String, Object> variables) {
+        var completedCallActivity = activityPersistence.complete(activity);
+        processOutputMappings(completedCallActivity);
+        postComplete(completedCallActivity, variables);
     }
 
     @Override
@@ -45,13 +46,13 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public ActivityCompletionResult terminate(ActivityExecution activity) {
+    public void terminate(ActivityExecution activity, boolean withInterruption) {
         if (!activity.process().isInTerminalState()) {
             dispatcher.dispatch(TerminateProcessCommand.of(activity.id(), false));
         }
 
         var terminatedActivity = activityPersistence.terminate(activity);
-        return ActivityCompletionResult.completed(terminatedActivity, getNextActivities(terminatedActivity));
+        postTerminate(terminatedActivity, withInterruption);
     }
 
     @Override

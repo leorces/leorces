@@ -2,12 +2,9 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionWithoutNextActivitiesCommand;
-import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.CompleteProcessCommand;
-import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +20,7 @@ import org.mockito.quality.Strictness;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,86 +49,65 @@ class HandleActivityCompletionWithoutNextActivitiesCommandHandlerTest {
     }
 
     @Test
-    @DisplayName("Should complete process when no parent and not async")
+    @DisplayName("Should complete process when activity has no parent")
     void shouldCompleteProcessWhenNoParent() {
+        // given
         when(activity.hasParent()).thenReturn(false);
-        when(activity.isAsync()).thenReturn(false);
-        when(activity.type()).thenReturn(ActivityType.EXTERNAL_TASK);
         var command = HandleActivityCompletionWithoutNextActivitiesCommand.of(activity);
 
+        // when
         handler.handle(command);
 
-        verify(dispatcher).dispatchAsync(any(CompleteProcessCommand.class));
+        // then
+        verify(dispatcher).dispatch(CompleteProcessCommand.of("process-id"));
+        verifyNoMoreInteractions(dispatcher);
     }
 
     @Test
-    @DisplayName("Should complete parent activity when has parent and not async")
+    @DisplayName("Should complete parent activity when activity has parent")
     void shouldCompleteParentActivityWhenHasParent() {
+        // given
         when(activity.hasParent()).thenReturn(true);
-        when(activity.isAsync()).thenReturn(false);
-        when(activity.type()).thenReturn(ActivityType.EXTERNAL_TASK);
         when(activity.parentDefinitionId()).thenReturn("parent-def-id");
-        when(activityPersistence.findByDefinitionId("process-id", "parent-def-id")).thenReturn(Optional.of(parentActivity));
+        when(activityPersistence.findByDefinitionId("process-id", "parent-def-id"))
+                .thenReturn(Optional.of(parentActivity));
         var command = HandleActivityCompletionWithoutNextActivitiesCommand.of(activity);
 
+        // when
         handler.handle(command);
 
+        // then
+        verify(activityPersistence).findByDefinitionId("process-id", "parent-def-id");
         verify(dispatcher).dispatchAsync(CompleteActivityCommand.of(parentActivity));
+        verifyNoMoreInteractions(dispatcher);
     }
 
     @Test
-    @DisplayName("Should throw exception when parent activity not found")
+    @DisplayName("Should throw ActivityNotFoundException when parent not found")
     void shouldThrowWhenParentNotFound() {
+        // given
         when(activity.hasParent()).thenReturn(true);
-        when(activity.isAsync()).thenReturn(false);
-        when(activity.type()).thenReturn(ActivityType.EXTERNAL_TASK);
-        when(activity.parentDefinitionId()).thenReturn("missing-id");
-        when(activityPersistence.findByDefinitionId("process-id", "missing-id")).thenReturn(Optional.empty());
+        when(activity.parentDefinitionId()).thenReturn("missing-def-id");
+        when(activityPersistence.findByDefinitionId("process-id", "missing-def-id"))
+                .thenReturn(Optional.empty());
         var command = HandleActivityCompletionWithoutNextActivitiesCommand.of(activity);
 
+        // expect
         assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(ActivityNotFoundException.class);
+                .isInstanceOf(ActivityNotFoundException.class)
+                .hasMessageContaining("missing-def-id");
+
+        // and no commands dispatched
+        verify(dispatcher, never()).dispatch(any());
+        verify(dispatcher, never()).dispatchAsync(any());
     }
 
     @Test
-    @DisplayName("Should skip handling for ERROR_END_EVENT")
-    void shouldSkipErrorEndEvent() {
-        when(activity.type()).thenReturn(ActivityType.ERROR_END_EVENT);
-        var command = HandleActivityCompletionWithoutNextActivitiesCommand.of(activity);
-
-        handler.handle(command);
-
-        verifyNoInteractions(dispatcher);
-    }
-
-    @Test
-    @DisplayName("Should terminate process for TERMINATE_END_EVENT without parent")
-    void shouldTerminateProcessWithoutParent() {
-        when(activity.type()).thenReturn(ActivityType.TERMINATE_END_EVENT);
-        when(activity.hasParent()).thenReturn(false);
-        var command = HandleActivityCompletionWithoutNextActivitiesCommand.of(activity);
-
-        handler.handle(command);
-
-        verify(dispatcher).dispatch(any(TerminateProcessCommand.class));
-    }
-
-    @Test
-    @DisplayName("Should terminate parent and process for TERMINATE_END_EVENT with parent")
-    void shouldTerminateParentAndProcess() {
-        when(activity.type()).thenReturn(ActivityType.TERMINATE_END_EVENT);
-        when(activity.hasParent()).thenReturn(true);
-        when(activity.parentDefinitionId()).thenReturn("parent-id");
-        when(activityPersistence.findByDefinitionId("process-id", "parent-id")).thenReturn(Optional.of(parentActivity));
-        when(parentActivity.id()).thenReturn("parent-activity-id");
-        when(parentActivity.type()).thenReturn(ActivityType.SUBPROCESS);
-
-        var command = HandleActivityCompletionWithoutNextActivitiesCommand.of(activity);
-
-        handler.handle(command);
-
-        verify(dispatcher).dispatch(TerminateActivityCommand.of("parent-activity-id"));
-        verify(dispatcher).dispatch(TerminateProcessCommand.of("process-id"));
+    @DisplayName("Should return correct command type")
+    void shouldReturnCorrectCommandType() {
+        // expect
+        assertThat(handler.getCommandType())
+                .isEqualTo(HandleActivityCompletionWithoutNextActivitiesCommand.class);
     }
 
 }

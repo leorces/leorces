@@ -2,23 +2,16 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
-import com.leorces.engine.activity.behaviour.ActivityCompletionResult;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
-import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.exception.ExecutionException;
-import com.leorces.engine.variables.VariablesService;
-import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityFailure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -26,7 +19,6 @@ import java.util.Map;
 public class CompleteActivityCommandHandler implements CommandHandler<CompleteActivityCommand> {
 
     private final ActivityBehaviorResolver behaviorResolver;
-    private final VariablesService variablesService;
     private final ActivityFactory activityFactory;
     private final CommandDispatcher dispatcher;
 
@@ -40,44 +32,18 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
         }
 
         log.debug("Complete {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
-        var result = completeActivity(activity);
-
-        if (!result.isCompleted()) {
-            log.debug("Activity {} with definitionId: {} and processId: {} not completed", activity.type(), activity.definitionId(), activity.processId());
-            return;
-        }
-
-        processVariables(result.activity(), command.variables());
-        dispatcher.dispatchAsync(HandleActivityCompletionCommand.of(result));
-        log.debug("Activity {} with definitionId: {} and processId: {} completed", activity.type(), activity.definitionId(), activity.processId());
-    }
-
-    @Override
-    public Class<CompleteActivityCommand> getCommandType() {
-        return CompleteActivityCommand.class;
-    }
-
-    private ActivityCompletionResult completeActivity(ActivityExecution activity) {
         try {
-            var behavior = behaviorResolver.resolveBehavior(activity.type());
-            return behavior.complete(activity);
+            behaviorResolver.resolveBehavior(activity.type()).complete(activity, command.variables());
+            log.debug("Activity {} with definitionId: {} and processId: {} completed", activity.type(), activity.definitionId(), activity.processId());
         } catch (Exception e) {
             dispatcher.dispatch(FailActivityCommand.of(activity, ActivityFailure.of(e)));
             throw new ExecutionException("Activity completion failed", e);
         }
     }
 
-    private void processVariables(ActivityExecution activity, Map<String, Object> variables) {
-        var outputVariables = variablesService.evaluate(activity, activity.outputs());
-        var outputVariablesMap = variablesService.toMap(outputVariables);
-        var combinedVariables = combineVariables(variables, outputVariablesMap);
-        dispatcher.dispatch(SetVariablesCommand.of(activity.process(), combinedVariables));
-    }
-
-    private Map<String, Object> combineVariables(Map<String, Object> inputVariables, Map<String, Object> outputVariables) {
-        var combined = new HashMap<>(inputVariables);
-        combined.putAll(outputVariables);
-        return combined;
+    @Override
+    public Class<CompleteActivityCommand> getCommandType() {
+        return CompleteActivityCommand.class;
     }
 
     private ActivityExecution getActivity(CompleteActivityCommand command) {

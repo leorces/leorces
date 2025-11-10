@@ -51,14 +51,15 @@ class TerminateAllActivitiesCommandHandlerTest {
     void setUp() {
         when(activity1.id()).thenReturn("act-1");
         when(activity1.type()).thenReturn(ActivityType.EXTERNAL_TASK);
+
         when(activity2.id()).thenReturn("act-2");
         when(activity2.type()).thenReturn(ActivityType.RECEIVE_TASK);
 
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
         when(behaviorResolver.resolveBehavior(ActivityType.RECEIVE_TASK)).thenReturn(activityBehavior);
 
-        when(taskExecutor.submit(any())).thenAnswer(inv -> {
-            Runnable runnable = inv.getArgument(0);
+        when(taskExecutor.submit(any())).thenAnswer(invocation -> {
+            Runnable runnable = invocation.getArgument(0);
             runnable.run();
             return CompletableFuture.completedFuture(null);
         });
@@ -72,25 +73,32 @@ class TerminateAllActivitiesCommandHandlerTest {
     }
 
     @Test
-    @DisplayName("Should terminate all activities asynchronously")
+    @DisplayName("Should terminate all activities asynchronously via TaskExecutorService")
     void shouldTerminateAllActivities() {
+        // Given
         var command = TerminateAllActivitiesCommand.of(List.of(activity1, activity2));
 
+        // When
         handler.handle(command);
 
+        // Then
         verify(taskExecutor, times(2)).submit(any());
-        verify(activityBehavior).terminate(activity1);
-        verify(activityBehavior).terminate(activity2);
+        verify(activityBehavior).terminate(activity1, true);
+        verify(activityBehavior).terminate(activity2, true);
     }
 
     @Test
-    @DisplayName("Should handle empty activities list")
+    @DisplayName("Should handle empty activities list gracefully")
     void shouldHandleEmptyActivities() {
+        // Given
         var command = TerminateAllActivitiesCommand.of(List.of());
 
+        // When
         handler.handle(command);
 
-        verifyNoInteractions(taskExecutor, behaviorResolver, activityBehavior);
+        // Then
+        verify(taskExecutor, never()).submit(any());
+        verifyNoInteractions(activityBehavior);
     }
 
 }

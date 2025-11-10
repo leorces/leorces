@@ -2,9 +2,7 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
-import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
-import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
 
     private final ActivityBehaviorResolver behaviorResolver;
     private final ActivityFactory activityFactory;
-    private final CommandDispatcher dispatcher;
 
     @Override
     public void handle(TerminateActivityCommand command) {
@@ -30,10 +27,7 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
         }
 
         log.debug("Terminate {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
-        var result = behaviorResolver.resolveBehavior(activity.type()).terminate(activity);
-        if (!command.withInterruption()) {
-            dispatcher.dispatch(HandleActivityCompletionCommand.of(result));
-        }
+        behaviorResolver.resolveBehavior(activity.type()).terminate(activity, command.withInterruption());
         log.debug("Activity {} with definitionId: {} and processId: {} terminated", activity.type(), activity.definitionId(), activity.processId());
     }
 
