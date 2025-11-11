@@ -18,6 +18,7 @@ public class ActivityExtractionHelper {
     private final BpmnFlowExtractor flowExtractor;
     private final BpmnParameterExtractor parameterExtractor;
     private final BpmnConditionExtractor conditionExtractor;
+    private final BpmnEscalationExtractor escalationExtractor;
 
     public <T> List<T> extractElements(Element processElement, String elementName, String parentId, String processId, BpmnElementExtractor.ElementCreator<T> creator) {
         return elementExtractor.extractElements(processElement, elementName, parentId, processId, creator);
@@ -25,6 +26,10 @@ public class ActivityExtractionHelper {
 
     public Element findMessageDefinition(Element element) {
         return messageExtractor.findMessageDefinition(element);
+    }
+
+    public Element findEscalationEventDefinition(Element element) {
+        return escalationExtractor.findEscalationDefinition(element);
     }
 
     public String getMessageName(Element messageDefinition) {
@@ -42,6 +47,10 @@ public class ActivityExtractionHelper {
 
     public String getErrorCode(Element errorDefinition) {
         return errorExtractor.getErrorCode(errorDefinition);
+    }
+
+    public String getEscalationCode(Element escalationDefinition) {
+        return escalationExtractor.getEscalationCode(escalationDefinition);
     }
 
     public List<String> extractIncoming(Element element) {

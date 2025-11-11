@@ -5,9 +5,9 @@ import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.correlation.command.CorrelateErrorCommand;
+import com.leorces.engine.correlation.service.ErrorHandlerResolver;
 import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.IncidentProcessCommand;
-import com.leorces.engine.service.ErrorHandlerResolver;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -110,7 +110,8 @@ public class CorrelateErrorCommandHandler implements CommandHandler<CorrelateErr
     }
 
     private ActivityExecution findCallActivity(String callActivityId) {
-        return activityPersistence.findById(callActivityId).orElseThrow();
+        return activityPersistence.findById(callActivityId)
+                .orElseThrow(() -> ActivityNotFoundException.activityNotFoundById(callActivityId));
     }
 
     private ActivityDefinition getActivityDefinition(String definitionId, Process process) {

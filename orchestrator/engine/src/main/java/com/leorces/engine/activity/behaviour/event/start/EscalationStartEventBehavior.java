@@ -6,16 +6,16 @@ import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ErrorStartEventBehavior extends AbstractTriggerableStartEventBehavior {
+public class EscalationStartEventBehavior extends AbstractTriggerableStartEventBehavior {
 
-    protected ErrorStartEventBehavior(ActivityPersistence activityPersistence,
-                                      CommandDispatcher dispatcher) {
+    protected EscalationStartEventBehavior(ActivityPersistence activityPersistence,
+                                           CommandDispatcher dispatcher) {
         super(activityPersistence, dispatcher);
     }
 
     @Override
     public ActivityType type() {
-        return ActivityType.ERROR_START_EVENT;
+        return ActivityType.ESCALATION_START_EVENT;
     }
 
 }

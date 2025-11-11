@@ -50,6 +50,9 @@ class FailActivityCommandHandlerTest {
     @Mock
     private ActivityExecution.ActivityExecutionBuilder builder;
 
+    @Mock
+    private com.leorces.model.runtime.process.Process process;
+
     @InjectMocks
     private FailActivityCommandHandler handler;
 
@@ -63,6 +66,9 @@ class FailActivityCommandHandlerTest {
         when(builder.failure(any())).thenReturn(builder);
         when(builder.build()).thenReturn(activityExecution);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
+        when(activityExecution.process()).thenReturn(process);
+        when(process.isInTerminalState()).thenReturn(false);
+        when(activityExecution.isAsync()).thenReturn(false);
     }
 
     @Test

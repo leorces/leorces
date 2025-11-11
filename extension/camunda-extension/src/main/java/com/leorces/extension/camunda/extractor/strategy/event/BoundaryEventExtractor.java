@@ -49,7 +49,7 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
             return createConditionalBoundaryEvent(element, parentId, conditionalDefinition);
         }
 
-        var escalationDefinition = findEscalationDefinition(element);
+        var escalationDefinition = helper.findEscalationEventDefinition(element);
         if (escalationDefinition != null) {
             return createEscalationBoundaryEvent(element, parentId, escalationDefinition);
         }
@@ -70,11 +70,6 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
     private Element findConditionalDefinition(Element element) {
         var conditionalDefinitions = element.getElementsByTagNameNS(BPMN_NAMESPACE, "conditionalEventDefinition");
         return conditionalDefinitions.getLength() > 0 ? (Element) conditionalDefinitions.item(0) : null;
-    }
-
-    private Element findEscalationDefinition(Element element) {
-        var escalationDefinitions = element.getElementsByTagNameNS(BPMN_NAMESPACE, "escalationEventDefinition");
-        return escalationDefinitions.getLength() > 0 ? (Element) escalationDefinitions.item(0) : null;
     }
 
     private TimerBoundaryEvent createTimerBoundaryEvent(Element element, String parentId, Element timerDefinition) {
@@ -161,7 +156,7 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .name(helper.getName(element))
                 .attachedToRef(element.getAttribute("attachedToRef"))
                 .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
-                .escalationCode(escalationDefinition.getAttribute("escalationRef"))
+                .escalationCode(helper.getEscalationCode(escalationDefinition))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))

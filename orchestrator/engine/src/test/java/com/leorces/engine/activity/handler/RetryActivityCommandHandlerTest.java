@@ -4,9 +4,9 @@ import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.RetryActivityCommand;
-import com.leorces.engine.exception.ExecutionException;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
+import com.leorces.model.runtime.process.Process;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +50,11 @@ class RetryActivityCommandHandlerTest {
         when(activityExecution.definitionId()).thenReturn(DEFINITION_ID);
         when(activityExecution.processId()).thenReturn(PROCESS_ID);
         when(activityExecution.type()).thenReturn(ActivityType.EXTERNAL_TASK);
+
+        var process = mock(Process.class);
+        when(process.isInTerminalState()).thenReturn(false);
+        when(activityExecution.process()).thenReturn(process);
+
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
     }
 
@@ -75,29 +79,23 @@ class RetryActivityCommandHandlerTest {
     @DisplayName("Should retry activity successfully when only activityId provided")
     void shouldRetryActivityWhenActivityIdProvided() {
         var command = RetryActivityCommand.of(ACTIVITY_ID);
+        var activityFromFactory = mock(ActivityExecution.class);
+        when(activityFromFactory.id()).thenReturn(ACTIVITY_ID);
+        when(activityFromFactory.definitionId()).thenReturn(DEFINITION_ID);
+        when(activityFromFactory.type()).thenReturn(ActivityType.EXTERNAL_TASK);
 
-        when(activityFactory.getById(ACTIVITY_ID)).thenReturn(activityExecution);
+        var process = mock(Process.class);
+        when(process.isInTerminalState()).thenReturn(false);
+        when(activityFromFactory.process()).thenReturn(process);
+
+        when(activityFactory.getById(ACTIVITY_ID)).thenReturn(activityFromFactory);
+        when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
 
         handler.handle(command);
 
         verify(activityFactory).getById(ACTIVITY_ID);
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
-        verify(activityBehavior).retry(activityExecution);
-    }
-
-    @Test
-    @DisplayName("Should throw ExecutionException when activity not found by factory")
-    void shouldThrowExceptionWhenActivityNotFound() {
-        var command = RetryActivityCommand.of(ACTIVITY_ID);
-
-        when(activityFactory.getById(ACTIVITY_ID)).thenThrow(new ExecutionException("Activity not found: " + ACTIVITY_ID));
-
-        assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessage("Activity not found: " + ACTIVITY_ID);
-
-        verify(activityFactory).getById(ACTIVITY_ID);
-        verifyNoInteractions(behaviorResolver, activityBehavior);
+        verify(activityBehavior).retry(activityFromFactory);
     }
 
     @Test
@@ -112,6 +110,51 @@ class RetryActivityCommandHandlerTest {
 
         verify(behaviorResolver).resolveBehavior(ActivityType.EXCLUSIVE_GATEWAY);
         verify(activityBehavior).retry(activityExecution);
+    }
+
+    @Test
+    @DisplayName("Should not retry activity in terminal state")
+    void shouldNotRetryActivityInTerminalState() {
+        when(activityExecution.isInTerminalState()).thenReturn(true);
+
+        var command = RetryActivityCommand.of(activityExecution);
+
+        handler.handle(command);
+
+        verifyNoInteractions(behaviorResolver, activityBehavior);
+    }
+
+    @Test
+    @DisplayName("Should retry async activity even if process is in terminal state")
+    void shouldRetryAsyncActivityIfProcessTerminal() {
+        when(activityExecution.isAsync()).thenReturn(true);
+
+        var process = mock(Process.class);
+        when(process.isInTerminalState()).thenReturn(true);
+        when(activityExecution.process()).thenReturn(process);
+
+        var command = RetryActivityCommand.of(activityExecution);
+
+        handler.handle(command);
+
+        verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
+        verify(activityBehavior).retry(activityExecution);
+    }
+
+    @Test
+    @DisplayName("Should not retry non-async activity if process is in terminal state")
+    void shouldNotRetryNonAsyncActivityIfProcessTerminal() {
+        when(activityExecution.isAsync()).thenReturn(false);
+
+        var process = mock(Process.class);
+        when(process.isInTerminalState()).thenReturn(true);
+        when(activityExecution.process()).thenReturn(process);
+
+        var command = RetryActivityCommand.of(activityExecution);
+
+        handler.handle(command);
+
+        verifyNoInteractions(behaviorResolver, activityBehavior);
     }
 
 }

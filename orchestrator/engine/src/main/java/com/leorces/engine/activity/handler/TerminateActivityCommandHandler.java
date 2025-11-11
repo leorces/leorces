@@ -49,7 +49,8 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
     }
 
     private boolean canHandle(ActivityExecution activity) {
-        return !activity.isInTerminalState() || !activity.process().isInTerminalState();
+        return !activity.isInTerminalState()
+                && (!activity.process().isInTerminalState() || activity.isAsync());
     }
 
 }

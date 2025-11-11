@@ -43,7 +43,8 @@ public class RetryActivityCommandHandler implements CommandHandler<RetryActivity
     }
 
     private boolean canHandle(ActivityExecution activity) {
-        return !activity.isInTerminalState() || !activity.process().isInTerminalState();
+        return !activity.isInTerminalState()
+                && (!activity.process().isInTerminalState() || activity.isAsync());
     }
 
 }

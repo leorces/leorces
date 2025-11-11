@@ -20,6 +20,9 @@ public enum ActivityType {
     ERROR_END_EVENT,
     ERROR_START_EVENT,
     TERMINATE_END_EVENT,
+    ESCALATION_END_EVENT,
+    ESCALATION_INTERMEDIATE_THROW_EVENT,
+    ESCALATION_START_EVENT,
 
     // Boundary Events
     TIMER_BOUNDARY_EVENT,
@@ -45,6 +48,11 @@ public enum ActivityType {
     public boolean isStartEvent() {
         return this == START_EVENT
                 || this == MESSAGE_START_EVENT
-                || this == ERROR_START_EVENT;
+                || this == ERROR_START_EVENT
+                || this == ESCALATION_START_EVENT;
+    }
+
+    public boolean isEscalationEndEvent() {
+        return this == ESCALATION_END_EVENT;
     }
 }

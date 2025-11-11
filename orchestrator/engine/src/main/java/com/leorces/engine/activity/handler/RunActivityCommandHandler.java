@@ -57,7 +57,7 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
     }
 
     private boolean canHandle(ActivityExecution activity) {
-        return !activity.process().isInTerminalState();
+        return !activity.process().isInTerminalState() || activity.isAsync();
     }
 
 }

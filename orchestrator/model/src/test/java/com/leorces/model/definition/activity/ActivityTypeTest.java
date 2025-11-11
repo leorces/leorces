@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Activity Type Tests")
 class ActivityTypeTest {
 
-    private static final int EXPECTED_ENUM_COUNT = 23;
+    private static final int EXPECTED_ENUM_COUNT = 26;
 
     @Test
     @DisplayName("Should contain all expected activity types")

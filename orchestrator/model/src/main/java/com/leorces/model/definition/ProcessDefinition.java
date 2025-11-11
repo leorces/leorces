@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityDefinitionDeserializer;
 import com.leorces.model.definition.activity.ActivityType;
-import com.leorces.model.definition.activity.event.start.StartEventActivityDefinition;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -37,15 +36,6 @@ public record ProcessDefinition(
     }
 
     @JsonIgnore
-    public Optional<StartEventActivityDefinition> getStartActivity(String definitionId) {
-        return activities().stream()
-                .filter(activityDefinition -> definitionId.equals(activityDefinition.parentId()))
-                .filter(activityDefinition -> activityDefinition.type().isStartEvent())
-                .map(StartEventActivityDefinition.class::cast)
-                .findFirst();
-    }
-
-    @JsonIgnore
     public Optional<ActivityDefinition> getActivityById(String definitionId) {
         return activities.stream()
                 .filter(activity -> activity.id().equals(definitionId))
@@ -68,6 +58,14 @@ public record ProcessDefinition(
         scopeActivities.add(id);
 
         return scopeActivities;
+    }
+
+    @JsonIgnore
+    public List<ActivityDefinition> findChildActivities(String parentDefinitionId) {
+        return activities.stream()
+                .filter(activity -> activity.parentId() != null)
+                .filter(activity -> activity.parentId().equals(parentDefinitionId))
+                .toList();
     }
 
     private List<ActivityDefinition> findParentActivities(ActivityDefinition activityDefinition) {

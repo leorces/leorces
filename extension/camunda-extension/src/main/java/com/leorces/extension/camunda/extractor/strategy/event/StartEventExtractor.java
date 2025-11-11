@@ -4,6 +4,7 @@ import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.event.start.ErrorStartEvent;
+import com.leorces.model.definition.activity.event.start.EscalationStartEvent;
 import com.leorces.model.definition.activity.event.start.MessageStartEvent;
 import com.leorces.model.definition.activity.event.start.StartEvent;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,11 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
             return createErrorStartEvent(element, parentId, errorDefinition);
         }
 
+        var escalationDefinition = helper.findEscalationEventDefinition(element);
+        if (escalationDefinition != null) {
+            return createEscalationStartEvent(element, parentId, escalationDefinition);
+        }
+
         return createBasicStartEvent(element, parentId);
     }
 
@@ -57,6 +63,18 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .errorCode(helper.getErrorCode(errorDefinition))
+                .build();
+    }
+
+    private EscalationStartEvent createEscalationStartEvent(Element element, String parentId, Element escalationDefinition) {
+        return EscalationStartEvent.builder()
+                .id(helper.getId(element))
+                .parentId(parentId)
+                .name(helper.getName(element))
+                .incoming(helper.extractIncoming(element))
+                .outgoing(helper.extractOutgoing(element))
+                .escalationCode(helper.getEscalationCode(escalationDefinition))
+                .isInterrupting(!"false".equals(element.getAttribute("isInterrupting")))
                 .build();
     }
 

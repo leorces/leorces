@@ -25,9 +25,10 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
     @Override
     public void complete(ActivityExecution activity, Map<String, Object> variables) {
         var completedTerminateEndEvent = activityPersistence.complete(activity);
+        var processId = completedTerminateEndEvent.processId();
 
         if (!activity.hasParent()) {
-            terminateProcess(completedTerminateEndEvent.processId());
+            terminateProcess(processId);
         } else {
             terminateParentActivity(completedTerminateEndEvent);
         }
@@ -54,16 +55,20 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
     }
 
     private void terminateEventSubprocess(ActivityExecution eventSubprocess) {
-        var process = eventSubprocess.process();
-        var startEvent = process.definition()
-                .getStartActivity(eventSubprocess.definitionId())
-                .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(eventSubprocess.id()));
-
         dispatcher.dispatch(TerminateActivityCommand.of(eventSubprocess, true));
 
-        if (startEvent.isInterrupting() && !eventSubprocess.hasParent()) {
+        var process = eventSubprocess.process();
+
+        if (!eventSubprocess.hasParent()) {
             terminateProcess(process.id());
+            return;
         }
+
+        dispatcher.dispatch(TerminateActivityCommand.of(
+                process.id(),
+                eventSubprocess.parentDefinitionId(),
+                false
+        ));
     }
 
     private void terminateProcess(String processId) {
@@ -71,13 +76,12 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
     }
 
     private ActivityExecution getParentActivity(ActivityExecution completedTerminateEndEvent) {
-        return activityPersistence
-                .findByDefinitionId(completedTerminateEndEvent.processId(), completedTerminateEndEvent.parentDefinitionId())
+        var processId = completedTerminateEndEvent.processId();
+        var parentDefinitionId = completedTerminateEndEvent.parentDefinitionId();
+
+        return activityPersistence.findByDefinitionId(processId, parentDefinitionId)
                 .orElseThrow(() ->
-                        ActivityNotFoundException.activityDefinitionNotFound(
-                                completedTerminateEndEvent.parentDefinitionId(),
-                                completedTerminateEndEvent.processId()
-                        )
+                        ActivityNotFoundException.activityDefinitionNotFound(parentDefinitionId, processId)
                 );
     }
 

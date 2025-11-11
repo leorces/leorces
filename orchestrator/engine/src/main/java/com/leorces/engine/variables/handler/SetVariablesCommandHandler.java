@@ -110,7 +110,7 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
     }
 
     private void correlate(Process process, List<Variable> variables) {
-        dispatcher.dispatchAsync(CorrelateVariablesCommand.of(process, variables));
+        dispatcher.dispatch(CorrelateVariablesCommand.of(process, variables));
     }
 
     private Map<String, Variable> toMapByKey(Collection<Variable> variables) {

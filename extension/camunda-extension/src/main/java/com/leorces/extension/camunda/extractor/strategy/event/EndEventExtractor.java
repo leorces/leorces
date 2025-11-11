@@ -5,6 +5,7 @@ import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrate
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.event.end.EndEvent;
 import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
+import com.leorces.model.definition.activity.event.end.EscalationEndEvent;
 import com.leorces.model.definition.activity.event.end.TerminateEndEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,6 +36,11 @@ public class EndEventExtractor implements ActivityExtractionStrategy {
             return createTerminateEndEvent(element, parentId);
         }
 
+        var escalationDefinition = helper.findEscalationEventDefinition(element);
+        if (escalationDefinition != null) {
+            return createEscalationEndEvent(element, parentId, escalationDefinition);
+        }
+
         return createBasicEndEvent(element, parentId);
     }
 
@@ -60,6 +66,17 @@ public class EndEventExtractor implements ActivityExtractionStrategy {
                 .name(helper.getName(element))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
+                .build();
+    }
+
+    private EscalationEndEvent createEscalationEndEvent(Element element, String parentId, Element escalationDefinition) {
+        return EscalationEndEvent.builder()
+                .id(helper.getId(element))
+                .parentId(parentId)
+                .name(helper.getName(element))
+                .incoming(helper.extractIncoming(element))
+                .outgoing(helper.extractOutgoing(element))
+                .escalationCode(helper.getEscalationCode(escalationDefinition))
                 .build();
     }
 

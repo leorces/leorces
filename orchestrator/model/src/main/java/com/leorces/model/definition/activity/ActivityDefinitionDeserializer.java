@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.model.definition.activity.event.boundary.*;
 import com.leorces.model.definition.activity.event.end.EndEvent;
 import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
+import com.leorces.model.definition.activity.event.end.EscalationEndEvent;
 import com.leorces.model.definition.activity.event.end.TerminateEndEvent;
+import com.leorces.model.definition.activity.event.intermediate.EscalationIntermediateThrowEvent;
 import com.leorces.model.definition.activity.event.intermediate.IntermediateCatchEvent;
 import com.leorces.model.definition.activity.event.intermediate.MessageIntermediateCatchEvent;
 import com.leorces.model.definition.activity.event.start.ErrorStartEvent;
+import com.leorces.model.definition.activity.event.start.EscalationStartEvent;
 import com.leorces.model.definition.activity.event.start.MessageStartEvent;
 import com.leorces.model.definition.activity.event.start.StartEvent;
 import com.leorces.model.definition.activity.gateway.EventBasedGateway;
@@ -58,6 +61,10 @@ public class ActivityDefinitionDeserializer extends JsonDeserializer<ActivityDef
             case MESSAGE_INTERMEDIATE_CATCH_EVENT -> mapper.treeToValue(node, MessageIntermediateCatchEvent.class);
             case EVENT_BASED_GATEWAY -> mapper.treeToValue(node, EventBasedGateway.class);
             case CALL_ACTIVITY -> mapper.treeToValue(node, CallActivity.class);
+            case ESCALATION_END_EVENT -> mapper.treeToValue(node, EscalationEndEvent.class);
+            case ESCALATION_INTERMEDIATE_THROW_EVENT ->
+                    mapper.treeToValue(node, EscalationIntermediateThrowEvent.class);
+            case ESCALATION_START_EVENT -> mapper.treeToValue(node, EscalationStartEvent.class);
             case TIMER_BOUNDARY_EVENT -> mapper.treeToValue(node, TimerBoundaryEvent.class);
             case MESSAGE_BOUNDARY_EVENT -> mapper.treeToValue(node, MessageBoundaryEvent.class);
             case ERROR_BOUNDARY_EVENT -> mapper.treeToValue(node, ErrorBoundaryEvent.class);

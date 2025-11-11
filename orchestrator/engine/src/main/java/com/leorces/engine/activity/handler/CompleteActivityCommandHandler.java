@@ -53,7 +53,8 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
     }
 
     private boolean canHandle(ActivityExecution activity) {
-        return activity.state() == null || !activity.isInTerminalState() || !activity.process().isInTerminalState();
+        return (activity.state() == null || !activity.isInTerminalState())
+                && (!activity.process().isInTerminalState() || activity.isAsync());
     }
 
 }

@@ -30,7 +30,7 @@ public class HandleActivityCompletionWithoutNextActivitiesCommandHandler
             return;
         }
 
-        completeSubprocess(activity);
+        completeParentActivity(activity);
     }
 
     @Override
@@ -42,15 +42,38 @@ public class HandleActivityCompletionWithoutNextActivitiesCommandHandler
         dispatcher.dispatch(CompleteProcessCommand.of(processId));
     }
 
-    private void completeSubprocess(ActivityExecution activity) {
-        var parentActivity = getParentActivity(activity);
-        dispatcher.dispatchAsync(CompleteActivityCommand.of(parentActivity));
+    private void completeParentActivity(ActivityExecution activity) {
+        var parent = getParentActivity(activity);
+
+        if (parent.type().isEventSubprocess()) {
+            completeEventSubprocess(parent);
+        } else {
+            dispatcher.dispatch(CompleteActivityCommand.of(parent));
+        }
+    }
+
+    private void completeEventSubprocess(ActivityExecution eventSubprocess) {
+        dispatcher.dispatch(CompleteActivityCommand.of(eventSubprocess));
+
+        var process = eventSubprocess.process();
+
+        if (!eventSubprocess.hasParent()) {
+            completeProcess(process.id());
+            return;
+        }
+
+        var parent = getParentActivity(eventSubprocess);
+        dispatcher.dispatch(CompleteActivityCommand.of(parent));
     }
 
     private ActivityExecution getParentActivity(ActivityExecution activity) {
-        return activityPersistence.findByDefinitionId(activity.processId(), activity.parentDefinitionId())
-                .orElseThrow(() -> ActivityNotFoundException.activityDefinitionNotFound(
-                        activity.parentDefinitionId(), activity.processId()));
+        var processId = activity.processId();
+        var parentDefinitionId = activity.parentDefinitionId();
+
+        return activityPersistence.findByDefinitionId(processId, parentDefinitionId)
+                .orElseThrow(() ->
+                        ActivityNotFoundException.activityDefinitionNotFound(parentDefinitionId, processId)
+                );
     }
 
 }
