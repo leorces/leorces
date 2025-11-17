@@ -1,5 +1,6 @@
 package com.leorces.engine.activity.behaviour.event.start;
 
+import com.leorces.engine.activity.behaviour.AbstractTriggerableStartEventBehavior;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.persistence.ActivityPersistence;

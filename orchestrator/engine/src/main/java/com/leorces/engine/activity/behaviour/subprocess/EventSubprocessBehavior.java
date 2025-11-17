@@ -19,18 +19,14 @@ public class EventSubprocessBehavior extends AbstractSubprocessBehavior {
     }
 
     @Override
-    public void complete(ActivityExecution activity, Map<String, Object> variables) {
-        var isAllChildActivitiesCompleted = activityPersistence.isAllCompleted(activity.processId(), getChildActivityIds(activity));
-
-        if (!isAllChildActivitiesCompleted) {
-            return;
+    public void complete(ActivityExecution eventSubprocess, Map<String, Object> variables) {
+        if (isAllChildActivitiesCompleted(eventSubprocess)) {
+            activityPersistence.complete(eventSubprocess);
         }
-
-        activityPersistence.complete(activity);
     }
 
     @Override
-    public List<ActivityDefinition> getNextActivities(ActivityExecution activity) {
+    public List<ActivityDefinition> getNextActivities(ActivityExecution eventSubprocess) {
         return List.of();
     }
 

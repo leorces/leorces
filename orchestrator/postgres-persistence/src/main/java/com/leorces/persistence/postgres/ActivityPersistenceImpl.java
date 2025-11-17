@@ -139,12 +139,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    public boolean isAllCompleted(String processId, String parentDefinitionId) {
-        log.debug("Checking if all activity completed for process: {} and parent definition id: {}", processId, parentDefinitionId);
-        return activityRepository.isAllCompleted(processId, parentDefinitionId);
-    }
-
-    @Override
     public boolean isAllCompleted(String processId) {
         log.debug("Checking if all activity completed for process: {}", processId);
         return activityRepository.isAllCompleted(processId);

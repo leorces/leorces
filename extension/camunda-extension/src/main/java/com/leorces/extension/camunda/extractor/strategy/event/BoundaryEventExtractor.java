@@ -1,5 +1,6 @@
 package com.leorces.extension.camunda.extractor.strategy.event;
 
+import com.leorces.extension.camunda.BpmnConstants;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -14,13 +15,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoundaryEventExtractor implements ActivityExtractionStrategy {
 
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
-
     private final ActivityExtractionHelper helper;
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "boundaryEvent", parentId, processId, this::createBoundaryEvent);
+        return helper.extractElements(
+                processElement,
+                BpmnConstants.BOUNDARY_EVENT,
+                parentId,
+                processId,
+                this::createBoundaryEvent
+        );
     }
 
     private ActivityDefinition createBoundaryEvent(Element element, String parentId, String processId) {
@@ -54,21 +59,34 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
             return createEscalationBoundaryEvent(element, parentId, escalationDefinition);
         }
 
-        throw new IllegalArgumentException("Unsupported boundary event type for element: " + element.getAttribute("id"));
+        throw new IllegalArgumentException(
+                "Unsupported boundary event type for element: %s".formatted(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_ID)
+                )
+        );
     }
 
     private Element findTimerDefinition(Element element) {
-        var timerDefinitions = element.getElementsByTagNameNS(BPMN_NAMESPACE, "timerEventDefinition");
+        var timerDefinitions = element.getElementsByTagNameNS(
+                BpmnConstants.BPMN_NAMESPACE,
+                BpmnConstants.TIMER_EVENT_DEFINITION
+        );
         return timerDefinitions.getLength() > 0 ? (Element) timerDefinitions.item(0) : null;
     }
 
     private Element findSignalDefinition(Element element) {
-        var signalDefinitions = element.getElementsByTagNameNS(BPMN_NAMESPACE, "signalEventDefinition");
+        var signalDefinitions = element.getElementsByTagNameNS(
+                BpmnConstants.BPMN_NAMESPACE,
+                BpmnConstants.SIGNAL_EVENT_DEFINITION
+        );
         return signalDefinitions.getLength() > 0 ? (Element) signalDefinitions.item(0) : null;
     }
 
     private Element findConditionalDefinition(Element element) {
-        var conditionalDefinitions = element.getElementsByTagNameNS(BPMN_NAMESPACE, "conditionalEventDefinition");
+        var conditionalDefinitions = element.getElementsByTagNameNS(
+                BpmnConstants.BPMN_NAMESPACE,
+                BpmnConstants.CONDITIONAL_EVENT_DEFINITION
+        );
         return conditionalDefinitions.getLength() > 0 ? (Element) conditionalDefinitions.item(0) : null;
     }
 
@@ -77,9 +95,10 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .attachedToRef(element.getAttribute("attachedToRef"))
-                .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
-                .timeDuration(getTimerAttribute(timerDefinition, "timeDuration"))
+                .attachedToRef(element.getAttribute(BpmnConstants.ATTRIBUTE_ATTACHED_TO_REF))
+                .cancelActivity(!BpmnConstants.FALSE_VALUE.equals(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_CANCEL_ACTIVITY)))
+                .timeDuration(getTimerAttribute(timerDefinition, BpmnConstants.CONDITION_EXPRESSION))
                 .timeDate(getTimerAttribute(timerDefinition, "timeDate"))
                 .timeCycle(getTimerAttribute(timerDefinition, "timeCycle"))
                 .incoming(helper.extractIncoming(element))
@@ -94,8 +113,9 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .attachedToRef(element.getAttribute("attachedToRef"))
-                .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
+                .attachedToRef(element.getAttribute(BpmnConstants.ATTRIBUTE_ATTACHED_TO_REF))
+                .cancelActivity(!BpmnConstants.FALSE_VALUE.equals(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_CANCEL_ACTIVITY)))
                 .messageReference(helper.getMessageName(messageDefinition))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
@@ -109,8 +129,9 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .attachedToRef(element.getAttribute("attachedToRef"))
-                .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
+                .attachedToRef(element.getAttribute(BpmnConstants.ATTRIBUTE_ATTACHED_TO_REF))
+                .cancelActivity(!BpmnConstants.FALSE_VALUE.equals(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_CANCEL_ACTIVITY)))
                 .errorCode(helper.getErrorCode(errorDefinition))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
@@ -124,9 +145,10 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .attachedToRef(element.getAttribute("attachedToRef"))
-                .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
-                .signalReference(signalDefinition.getAttribute("signalRef"))
+                .attachedToRef(element.getAttribute(BpmnConstants.ATTRIBUTE_ATTACHED_TO_REF))
+                .cancelActivity(!BpmnConstants.FALSE_VALUE.equals(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_CANCEL_ACTIVITY)))
+                .signalReference(signalDefinition.getAttribute(BpmnConstants.SIGNAL))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))
@@ -139,8 +161,9 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .attachedToRef(element.getAttribute("attachedToRef"))
-                .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
+                .attachedToRef(element.getAttribute(BpmnConstants.ATTRIBUTE_ATTACHED_TO_REF))
+                .cancelActivity(!BpmnConstants.FALSE_VALUE.equals(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_CANCEL_ACTIVITY)))
                 .condition(getConditionalExpression(conditionalDefinition))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
@@ -154,8 +177,9 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .attachedToRef(element.getAttribute("attachedToRef"))
-                .cancelActivity(!"false".equals(element.getAttribute("cancelActivity")))
+                .attachedToRef(element.getAttribute(BpmnConstants.ATTRIBUTE_ATTACHED_TO_REF))
+                .cancelActivity(!BpmnConstants.FALSE_VALUE.equals(
+                        element.getAttribute(BpmnConstants.ATTRIBUTE_CANCEL_ACTIVITY)))
                 .escalationCode(helper.getEscalationCode(escalationDefinition))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
@@ -165,19 +189,13 @@ public class BoundaryEventExtractor implements ActivityExtractionStrategy {
     }
 
     private String getTimerAttribute(Element timerDefinition, String attributeName) {
-        var elements = timerDefinition.getElementsByTagNameNS(BPMN_NAMESPACE, attributeName);
-        if (elements.getLength() > 0) {
-            return elements.item(0).getTextContent();
-        }
-        return null;
+        var elements = timerDefinition.getElementsByTagNameNS(BpmnConstants.BPMN_NAMESPACE, attributeName);
+        return elements.getLength() > 0 ? elements.item(0).getTextContent() : null;
     }
 
     private String getConditionalExpression(Element conditionalDefinition) {
-        var conditions = conditionalDefinition.getElementsByTagNameNS(BPMN_NAMESPACE, "condition");
-        if (conditions.getLength() > 0) {
-            return conditions.item(0).getTextContent();
-        }
-        return null;
+        var conditions = conditionalDefinition.getElementsByTagNameNS(BpmnConstants.BPMN_NAMESPACE, BpmnConstants.CONDITION);
+        return conditions.getLength() > 0 ? conditions.item(0).getTextContent() : null;
     }
 
 }

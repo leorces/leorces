@@ -26,6 +26,7 @@ import com.leorces.model.definition.activity.subprocess.EventSubprocess;
 import com.leorces.model.definition.activity.subprocess.Subprocess;
 import com.leorces.model.definition.activity.task.ExternalTask;
 import com.leorces.model.definition.activity.task.ReceiveTask;
+import com.leorces.model.definition.activity.task.SendTask;
 
 import java.io.IOException;
 
@@ -48,6 +49,7 @@ public class ActivityDefinitionDeserializer extends JsonDeserializer<ActivityDef
             case END_EVENT -> mapper.treeToValue(node, EndEvent.class);
             case MESSAGE_START_EVENT -> mapper.treeToValue(node, MessageStartEvent.class);
             case EXTERNAL_TASK -> mapper.treeToValue(node, ExternalTask.class);
+            case SEND_TASK -> mapper.treeToValue(node, SendTask.class);
             case RECEIVE_TASK -> mapper.treeToValue(node, ReceiveTask.class);
             case PARALLEL_GATEWAY -> mapper.treeToValue(node, ParallelGateway.class);
             case EXCLUSIVE_GATEWAY -> mapper.treeToValue(node, ExclusiveGateway.class);

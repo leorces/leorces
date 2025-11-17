@@ -1,12 +1,16 @@
 package com.leorces.extension.camunda.extractor.strategy;
 
 import com.leorces.extension.camunda.extractor.*;
+import com.leorces.extension.camunda.extractor.event.BpmnErrorExtractor;
+import com.leorces.extension.camunda.extractor.event.BpmnEscalationExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.leorces.extension.camunda.BpmnConstants.*;
 
 @Component
 @RequiredArgsConstructor
@@ -33,12 +37,8 @@ public class ActivityExtractionHelper {
     }
 
     public String getMessageName(Element messageDefinition) {
-        var messageRef = messageDefinition.getAttribute("messageRef");
-        return resolveMessageName(messageDefinition, messageRef);
-    }
-
-    public String resolveMessageName(Element element, String messageRef) {
-        return messageExtractor.resolveMessageName(element, messageRef);
+        var messageRef = messageDefinition.getAttribute(ATTRIBUTE_MESSAGE_REF);
+        return messageExtractor.resolveMessageName(messageDefinition, messageRef);
     }
 
     public Element findErrorDefinition(Element element) {
@@ -61,6 +61,10 @@ public class ActivityExtractionHelper {
         return flowExtractor.extractOutgoing(element);
     }
 
+    public List<Element> extractGatewayOutgoing(Element gateway) {
+        return flowExtractor.extractGatewayOutgoing(gateway);
+    }
+
     public Map<String, Object> extractInputParameters(Element element) {
         return parameterExtractor.extractInputParameters(element);
     }
@@ -74,11 +78,11 @@ public class ActivityExtractionHelper {
     }
 
     public String getId(Element element) {
-        return element.getAttribute("id");
+        return element.getAttribute(ATTRIBUTE_ID);
     }
 
     public String getName(Element element) {
-        return element.getAttribute("name");
+        return element.getAttribute(ATTRIBUTE_NAME);
     }
 
 }

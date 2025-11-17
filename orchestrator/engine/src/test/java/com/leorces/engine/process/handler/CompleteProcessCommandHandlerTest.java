@@ -3,8 +3,8 @@ package com.leorces.engine.process.handler;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.process.ProcessNotFoundException;
-import com.leorces.engine.process.ProcessMetrics;
 import com.leorces.engine.process.command.CompleteProcessCommand;
+import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ActivityPersistence;
@@ -106,7 +106,7 @@ class CompleteProcessCommandHandlerTest {
                 .id("process-1")
                 .businessKey("bk1")
                 .definition(null)
-                .state(ProcessState.COMPLETED) // неактивный процесс
+                .state(ProcessState.COMPLETED)
                 .variables(List.of())
                 .build();
 

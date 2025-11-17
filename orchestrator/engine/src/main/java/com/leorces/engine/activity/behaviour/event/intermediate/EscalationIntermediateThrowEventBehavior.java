@@ -1,28 +1,19 @@
 package com.leorces.engine.activity.behaviour.event.intermediate;
 
-import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.behaviour.AbstractThrowEscalationBehavior;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.correlation.command.CorrelateEscalationCommand;
+import com.leorces.engine.service.resolver.EscalationHandlerResolver;
 import com.leorces.model.definition.activity.ActivityType;
-import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
-public class EscalationIntermediateThrowEventBehavior extends AbstractActivityBehavior {
+public class EscalationIntermediateThrowEventBehavior extends AbstractThrowEscalationBehavior {
 
     protected EscalationIntermediateThrowEventBehavior(ActivityPersistence activityPersistence,
-                                                       CommandDispatcher dispatcher) {
-        super(activityPersistence, dispatcher);
-    }
-
-    @Override
-    public void complete(ActivityExecution activity, Map<String, Object> variables) {
-        var completedEscalationEndEvent = activityPersistence.complete(activity);
-        dispatcher.dispatch(CorrelateEscalationCommand.of(completedEscalationEndEvent));
-        postComplete(completedEscalationEndEvent, variables);
+                                                       CommandDispatcher dispatcher,
+                                                       EscalationHandlerResolver escalationHandlerResolver) {
+        super(activityPersistence, dispatcher, escalationHandlerResolver);
     }
 
     @Override

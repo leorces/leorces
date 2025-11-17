@@ -13,10 +13,10 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.*;
+
 @Component
 public class SubprocessExtractor implements ActivityExtractionStrategy {
-
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
     private final ActivityExtractionHelper helper;
     private final BpmnActivityParser activityParser;
@@ -30,10 +30,6 @@ public class SubprocessExtractor implements ActivityExtractionStrategy {
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return extractSubprocesses(processElement, parentId, processId);
-    }
-
-    public List<ActivityDefinition> extractSubprocesses(Element processElement, String parentId, String processId) {
         var result = new ArrayList<ActivityDefinition>();
 
         for (int i = 0; i < processElement.getChildNodes().getLength(); i++) {
@@ -43,12 +39,12 @@ public class SubprocessExtractor implements ActivityExtractionStrategy {
                 continue;
             }
 
-            if (!"subProcess".equals(child.getLocalName()) || !BPMN_NAMESPACE.equals(child.getNamespaceURI())) {
+            if (!SUB_PROCESS.equals(child.getLocalName()) || !BPMN_NAMESPACE.equals(child.getNamespaceURI())) {
                 continue;
             }
 
             result.add(createSubprocess(child, parentId));
-            result.addAll(activityParser.extractActivities(child, child.getAttribute("id"), processId));
+            result.addAll(activityParser.extractActivities(child, child.getAttribute(ATTRIBUTE_ID), processId));
         }
 
         return result;
@@ -61,8 +57,8 @@ public class SubprocessExtractor implements ActivityExtractionStrategy {
     }
 
     private boolean isEventSubprocess(Element element) {
-        var triggered = element.getAttribute("triggeredByEvent");
-        return "true".equalsIgnoreCase(triggered);
+        var triggered = element.getAttribute(ATTRIBUTE_TRIGGERED_BY_EVENT);
+        return TRUE_VALUE.equalsIgnoreCase(triggered);
     }
 
     private EventSubprocess createEventSubprocess(Element element, String parentId) {

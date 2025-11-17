@@ -1,8 +1,9 @@
 package com.leorces.engine.activity.behaviour.gateway;
 
+import com.leorces.engine.activity.behaviour.AbstractConditionalGatewayBehavior;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.activity.GatewayException;
-import com.leorces.engine.variables.VariablesService;
+import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class InclusiveGatewayBehavior extends AbstractGatewayBehavior {
+public class InclusiveGatewayBehavior extends AbstractConditionalGatewayBehavior {
 
     private final VariablesService variablesService;
 
@@ -28,23 +29,23 @@ public class InclusiveGatewayBehavior extends AbstractGatewayBehavior {
     }
 
     @Override
-    public void complete(ActivityExecution activity, Map<String, Object> variables) {
-        var nextActivities = getNextActivities(activity);
+    public void complete(ActivityExecution inclusiveGateway, Map<String, Object> variables) {
+        var nextActivities = getNextActivities(inclusiveGateway);
 
         if (nextActivities.isEmpty()) {
-            throw GatewayException.noValidPath(activity);
+            throw GatewayException.noValidPath(inclusiveGateway);
         }
 
-        var completedGateway = activityPersistence.complete(activity);
-        handleActivityCompletion(completedGateway, nextActivities);
+        var completedInclusiveGateway = activityPersistence.complete(inclusiveGateway);
+        handleActivityCompletion(completedInclusiveGateway, nextActivities);
     }
 
     @Override
-    public List<ActivityDefinition> getNextActivities(ActivityExecution activity) {
-        var variables = variablesService.getScopedVariables(activity);
-        var inclusiveGateway = (InclusiveGateway) activity.definition();
-        var nextActivityIds = evaluateInclusiveConditions(inclusiveGateway.condition(), variables);
-        return getNextActivities(activity.processDefinition(), nextActivityIds);
+    public List<ActivityDefinition> getNextActivities(ActivityExecution inclusiveGateway) {
+        var variables = variablesService.getScopedVariables(inclusiveGateway);
+        var condition = ((InclusiveGateway) inclusiveGateway.definition()).condition();
+        var nextActivityIds = evaluateInclusiveConditions(condition, variables);
+        return getNextActivities(inclusiveGateway.processDefinition(), nextActivityIds);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.leorces.model.definition.activity.task;
 
-import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
+import com.leorces.model.definition.activity.ExternalTaskDefinition;
 import lombok.Builder;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public record ExternalTask(
         List<String> outgoing,
         Map<String, Object> inputs,
         Map<String, Object> outputs
-) implements ActivityDefinition {
+) implements ExternalTaskDefinition {
 
     @Override
     public ActivityType type() {

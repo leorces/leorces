@@ -43,14 +43,10 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     @Query(IS_ANY_FAILED)
     boolean isAnyFailed(@Param("processId") String processId);
 
-    @Query(IS_ALL_COMPLETED_BY_DEFINITION_ID)
-    boolean isAllCompleted(@Param("processId") String processId,
-                           @Param("definitionId") String definitionId);
-
     @Query(IS_ALL_COMPLETED_BY_PROCESS_ID)
     boolean isAllCompleted(@Param("processId") String processId);
 
-    @Query(IS_ALL_COMPLETED)
+    @Query(IS_ALL_COMPLETED_BY_DEFINITION_IDS)
     boolean isAllCompleted(@Param("processId") String processId,
                            @Param("definitionIds") String[] definitionIds);
 

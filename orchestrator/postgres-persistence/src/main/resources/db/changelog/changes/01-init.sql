@@ -77,13 +77,17 @@ CREATE INDEX idx_activity_process_state_completed
     ON activity (process_id, activity_state, activity_completed_at);
 
 CREATE INDEX idx_activity_topic_scheduled
-    ON activity (activity_topic, process_definition_key, activity_state, activity_created_at)
+    ON activity (activity_topic, process_definition_key, activity_created_at)
     WHERE activity_state = 'SCHEDULED';
 
 CREATE INDEX idx_activity_timeout_active_scheduled
     ON activity (activity_timeout)
     WHERE activity_state IN ('ACTIVE', 'SCHEDULED')
         AND activity_timeout IS NOT NULL;
+
+CREATE INDEX idx_activity_process_def_state_completed
+    ON activity (process_id, activity_definition_id, activity_state, activity_completed_at)
+    WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
 
 -- Create the execution_variable table
 CREATE TABLE variable
@@ -102,7 +106,11 @@ CREATE TABLE variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX idx_variable_execution_id ON variable (execution_id);
+CREATE INDEX idx_variable_exec_proc
+    ON variable (execution_id, process_id);
+
+CREATE INDEX idx_variable_exec_execdef
+    ON variable (execution_id, execution_definition_id);
 
 CREATE INDEX idx_variable_execution_lookup
     ON variable (execution_id, variable_key, variable_value);

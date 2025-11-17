@@ -129,7 +129,7 @@ class EventBasedGatewayTest {
         assertNotNull(eventGateway);
         assertEquals(3, eventGateway.incoming().size());
         assertEquals(4, eventGateway.outgoing().size());
-        assertEquals("task1", eventGateway.incoming().get(0));
+        assertEquals("task1", eventGateway.incoming().getFirst());
         assertEquals("timeout-event", eventGateway.outgoing().get(3));
     }
 

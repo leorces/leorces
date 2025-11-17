@@ -1,9 +1,9 @@
 package com.leorces.engine.activity.handler;
 
-import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.RetryActivityCommand;
 import com.leorces.engine.core.CommandHandler;
+import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

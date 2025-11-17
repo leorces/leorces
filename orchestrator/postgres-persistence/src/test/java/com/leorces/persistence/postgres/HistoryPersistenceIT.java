@@ -9,7 +9,6 @@ import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.model.runtime.variable.Variable;
 import com.leorces.persistence.postgres.entity.HistoryEntity;
 import com.leorces.persistence.postgres.utils.ProcessDefinitionTestData;
-import com.leorces.persistence.postgres.utils.VariableTestData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -208,49 +207,6 @@ class HistoryPersistenceIT extends RepositoryIT {
         assertThat(result).isNotNull();
         assertThat(result.data()).isEmpty();
         assertThat(result.total()).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("Should save process execution with complex data structure")
-    void saveProcessExecutionWithComplexData() {
-        // Given
-        var process = createTestProcess();
-        var variables = List.of(
-                VariableTestData.createOrderVariable(),
-                VariableTestData.createClientVariable()
-        );
-        var activities = List.of(
-                createTestActivity("activity-1"),
-                createTestActivity("activity-2")
-        );
-        var processExecution = ProcessExecution.builder()
-                .id("complex-process-id")
-                .rootProcessId("complex-root-process-id")
-                .parentId("complex-parent-id")
-                .businessKey("complex-business-key")
-                .variables(variables)
-                .activities(activities)
-                .state(ProcessState.COMPLETED)
-                .definition(process.definition())
-                .createdAt(LocalDateTime.now().minusHours(2))
-                .updatedAt(LocalDateTime.now().minusHours(1))
-                .startedAt(LocalDateTime.now().minusMinutes(90))
-                .completedAt(LocalDateTime.now())
-                .build();
-
-        // When
-        historyPersistence.save(List.of(processExecution));
-
-        // Then
-        var historyEntities = StreamSupport.stream(historyRepository.findAll().spliterator(), false).toList();
-        assertThat(historyEntities).hasSize(1);
-
-        var historyEntity = historyEntities.getFirst();
-        assertThat(historyEntity.getProcessId()).isEqualTo("complex-process-id");
-        assertThat(historyEntity.getRootProcessId()).isEqualTo("complex-root-process-id");
-        assertThat(historyEntity.getParentProcessId()).isEqualTo("complex-parent-id");
-        assertThat(historyEntity.getBusinessKey()).isEqualTo("complex-business-key");
-        assertThat(historyEntity.getData()).isNotNull();
     }
 
     private Process createTestProcess() {

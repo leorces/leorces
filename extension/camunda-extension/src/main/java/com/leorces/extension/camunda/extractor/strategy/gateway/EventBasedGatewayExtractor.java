@@ -10,6 +10,8 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.EVENT_BASED_GATEWAY;
+
 @Component
 @RequiredArgsConstructor
 public class EventBasedGatewayExtractor implements ActivityExtractionStrategy {
@@ -18,7 +20,13 @@ public class EventBasedGatewayExtractor implements ActivityExtractionStrategy {
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "eventBasedGateway", parentId, processId, this::createEventBasedGateway);
+        return helper.extractElements(
+                processElement,
+                EVENT_BASED_GATEWAY,
+                parentId,
+                processId,
+                this::createEventBasedGateway
+        );
     }
 
     private EventBasedGateway createEventBasedGateway(Element element, String parentId, String processId) {

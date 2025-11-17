@@ -156,7 +156,7 @@ class BpmnParserTest {
                 .filter(activity -> "OrderFulfillmentNotification".equals(activity.id()))
                 .findFirst();
         assertThat(orderNotificationTask).isPresent();
-        assertThat(orderNotificationTask.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(orderNotificationTask.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(orderNotificationTask.get().name()).isEqualTo("Order fulfillment notification");
         assertThat(orderNotificationTask.get().parentId()).isNull();
         assertThat(orderNotificationTask.get().incoming()).containsExactly("OrderFulfillmentProcessStartEvent");
@@ -172,7 +172,7 @@ class BpmnParserTest {
                 .filter(activity -> "OrderFulfillmentNotificationFinishedNotification".equals(activity.id()))
                 .findFirst();
         assertThat(finishedNotificationTask).isPresent();
-        assertThat(finishedNotificationTask.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(finishedNotificationTask.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(finishedNotificationTask.get().name()).isEqualTo("Order fulfillment finished notification");
         assertThat(finishedNotificationTask.get().parentId()).isNull();
         assertThat(finishedNotificationTask.get().incoming()).containsExactly("WaitOrderFulfillment");
@@ -339,7 +339,7 @@ class BpmnParserTest {
                 .filter(activity -> "SellerNotificationOrderDelivered".equals(activity.id()))
                 .findFirst();
         assertThat(sellerNotificationDelivered).isPresent();
-        assertThat(sellerNotificationDelivered.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(sellerNotificationDelivered.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(sellerNotificationDelivered.get().name()).isEqualTo("Seller Notification (Order delivered)");
         assertThat(sellerNotificationDelivered.get().parentId()).isNull();
         assertThat(sellerNotificationDelivered.get().incoming()).containsExactly("Gateway_08m2xz9");
@@ -355,7 +355,7 @@ class BpmnParserTest {
                 .filter(activity -> "ClientNotificationOrderDelivered".equals(activity.id()))
                 .findFirst();
         assertThat(clientNotificationDelivered).isPresent();
-        assertThat(clientNotificationDelivered.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(clientNotificationDelivered.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(clientNotificationDelivered.get().name()).isEqualTo("Client Notification (Order delivered)");
         assertThat(clientNotificationDelivered.get().parentId()).isNull();
         assertThat(clientNotificationDelivered.get().incoming()).containsExactly("Gateway_08m2xz9");
@@ -371,7 +371,7 @@ class BpmnParserTest {
                 .filter(activity -> "SellerNotificationOrderRejected".equals(activity.id()))
                 .findFirst();
         assertThat(sellerNotificationRejected).isPresent();
-        assertThat(sellerNotificationRejected.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(sellerNotificationRejected.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(sellerNotificationRejected.get().name()).isEqualTo("Seller Notification (Order rejected)");
         assertThat(sellerNotificationRejected.get().parentId()).isNull();
         assertThat(sellerNotificationRejected.get().incoming()).containsExactly("Gateway_08m2xz9");
@@ -387,7 +387,7 @@ class BpmnParserTest {
                 .filter(activity -> "ClientNotificationOrderRejected".equals(activity.id()))
                 .findFirst();
         assertThat(clientNotificationRejected).isPresent();
-        assertThat(clientNotificationRejected.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(clientNotificationRejected.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(clientNotificationRejected.get().name()).isEqualTo("Client Notification (Order rejected)");
         assertThat(clientNotificationRejected.get().parentId()).isNull();
         assertThat(clientNotificationRejected.get().incoming()).containsExactly("Gateway_08m2xz9");
@@ -635,7 +635,7 @@ class BpmnParserTest {
                 .filter(activity -> "PaymentSuccessNotification".equals(activity.id()))
                 .findFirst();
         assertThat(paymentSuccessNotification).isPresent();
-        assertThat(paymentSuccessNotification.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(paymentSuccessNotification.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(paymentSuccessNotification.get().name()).isEqualTo("Payment success notification");
         assertThat(paymentSuccessNotification.get().parentId()).isNull();
         assertThat(paymentSuccessNotification.get().incoming()).containsExactly("ExclusiveGateway");
@@ -651,7 +651,7 @@ class BpmnParserTest {
                 .filter(activity -> "PaymentRejectedNotification".equals(activity.id()))
                 .findFirst();
         assertThat(paymentRejectedNotification).isPresent();
-        assertThat(paymentRejectedNotification.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(paymentRejectedNotification.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(paymentRejectedNotification.get().name()).isEqualTo("Payment rejected notification");
         assertThat(paymentRejectedNotification.get().parentId()).isNull();
         assertThat(paymentRejectedNotification.get().incoming()).containsExactly("PaymentRejectedEvent");
@@ -741,7 +741,7 @@ class BpmnParserTest {
                 .filter(activity -> "PaymentFailedNotification".equals(activity.id()))
                 .findFirst();
         assertThat(paymentFailedNotification).isPresent();
-        assertThat(paymentFailedNotification.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(paymentFailedNotification.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(paymentFailedNotification.get().name()).isEqualTo("Payment failed notification");
         assertThat(paymentFailedNotification.get().parentId()).isEqualTo("PaymentFailed");
         assertThat(paymentFailedNotification.get().incoming()).containsExactly("PaymentFailedErrorStartEvent");
@@ -829,7 +829,7 @@ class BpmnParserTest {
                 .filter(activity -> "NotificationToClient".equals(activity.id()))
                 .findFirst();
         assertThat(notificationToClient).isPresent();
-        assertThat(notificationToClient.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(notificationToClient.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(notificationToClient.get().name()).isEqualTo("Notification to client");
         assertThat(notificationToClient.get().parentId()).isNull();
         assertThat(notificationToClient.get().incoming()).containsExactly("Gateway_0t354xy");
@@ -845,7 +845,7 @@ class BpmnParserTest {
                 .filter(activity -> "NotificationToSeller".equals(activity.id()))
                 .findFirst();
         assertThat(notificationToSeller).isPresent();
-        assertThat(notificationToSeller.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(notificationToSeller.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(notificationToSeller.get().name()).isEqualTo("Notification to seller");
         assertThat(notificationToSeller.get().parentId()).isNull();
         assertThat(notificationToSeller.get().incoming()).containsExactly("Gateway_0t354xy");
@@ -1009,7 +1009,7 @@ class BpmnParserTest {
                 .filter(activity -> "PaymentCanceledNotification".equals(activity.id()))
                 .findFirst();
         assertThat(paymentCanceledNotification).isPresent();
-        assertThat(paymentCanceledNotification.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(paymentCanceledNotification.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(paymentCanceledNotification.get().name()).isEqualTo("Payment canceled notification");
         assertThat(paymentCanceledNotification.get().parentId()).isNull();
         assertThat(paymentCanceledNotification.get().incoming()).containsExactly("Event_1gm5bl0");
@@ -1025,7 +1025,7 @@ class BpmnParserTest {
                 .filter(activity -> "PaymentTimeoutNotification".equals(activity.id()))
                 .findFirst();
         assertThat(paymentTimeoutNotification).isPresent();
-        assertThat(paymentTimeoutNotification.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(paymentTimeoutNotification.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(paymentTimeoutNotification.get().name()).isEqualTo("Payment timeout notification");
         assertThat(paymentTimeoutNotification.get().parentId()).isNull();
         assertThat(paymentTimeoutNotification.get().incoming()).containsExactly("Event_0d1wliw");
@@ -1089,7 +1089,7 @@ class BpmnParserTest {
                 .filter(activity -> "PaymentRejectedNotification".equals(activity.id()))
                 .findFirst();
         assertThat(paymentRejectedNotification).isPresent();
-        assertThat(paymentRejectedNotification.get().type()).isEqualTo(ActivityType.EXTERNAL_TASK);
+        assertThat(paymentRejectedNotification.get().type()).isEqualTo(ActivityType.SEND_TASK);
         assertThat(paymentRejectedNotification.get().name()).isEqualTo("Payment rejected notification");
         assertThat(paymentRejectedNotification.get().parentId()).isEqualTo("PaymentFailed");
         assertThat(paymentRejectedNotification.get().incoming()).containsExactly("PaymentFailedErrorStartEvent");

@@ -34,7 +34,7 @@ public class TaskWorkerInitializer implements ApplicationListener<ApplicationRea
 
     private void validate(WorkerContext context) {
         var metadata = context.metadata();
-        var handlerClassName = context.handler().getClass().getSimpleName();
+        var handlerClassName = getHandlerClassName(context);
 
         if (metadata.topic().isBlank()) {
             throw new ClientConfigurationValidationException(
@@ -66,6 +66,10 @@ public class TaskWorkerInitializer implements ApplicationListener<ApplicationRea
                             "Please provide a value greater than or equal to 0.", handlerClassName, metadata.initialDelay(), metadata.timeUnit())
             );
         }
+    }
+
+    private String getHandlerClassName(WorkerContext context) {
+        return context.handler().getClass().getSimpleName();
     }
 
 }

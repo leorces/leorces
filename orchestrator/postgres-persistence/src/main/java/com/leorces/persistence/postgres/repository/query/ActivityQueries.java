@@ -24,16 +24,6 @@ public final class ActivityQueries {
             )
             """;
 
-    public static final String IS_ALL_COMPLETED_BY_DEFINITION_ID = """
-            SELECT NOT EXISTS (
-                SELECT 1 FROM activity
-                WHERE process_id = :processId
-                  AND activity_parent_definition_id = :definitionId
-                  AND activity_completed_at IS NULL
-                LIMIT 1
-            );
-            """;
-
     public static final String IS_ALL_COMPLETED_BY_PROCESS_ID = """
             SELECT NOT EXISTS (
                 SELECT 1 FROM activity
@@ -44,7 +34,7 @@ public final class ActivityQueries {
             );
             """;
 
-    public static final String IS_ALL_COMPLETED = """
+    public static final String IS_ALL_COMPLETED_BY_DEFINITION_IDS = """
             SELECT NOT EXISTS (
                 SELECT 1 FROM activity
                 WHERE process_id = :processId
@@ -57,39 +47,41 @@ public final class ActivityQueries {
     public static final String POLL = """
             WITH updated AS (
                 UPDATE activity
-                SET activity_state = 'ACTIVE',
-                    activity_started_at = NOW(),
-                    activity_updated_at = NOW()
-                WHERE activity_id IN (
-                    SELECT activity_id
-                    FROM activity
-                    WHERE activity_topic = :topic
-                      AND activity_state = 'SCHEDULED'
-                      AND process_definition_key = :processDefinitionKey
-                    ORDER BY activity_created_at ASC
-                    LIMIT :limit
-                    FOR UPDATE SKIP LOCKED
-                )
-                RETURNING *
-            ),
-            variables_data AS (
-                SELECT execution_id,
-                       json_agg(json_build_object(
-                           'id', variable_id,
-                           'process_id', process_id,
-                           'execution_id', execution_id,
-                           'execution_definition_id', execution_definition_id,
-                           'var_key', variable_key,
-                           'var_value', variable_value,
-                           'type', variable_type
-                       )) AS variables_json
-                FROM variable
-                WHERE execution_id IN (SELECT process_id FROM updated)
-                GROUP BY execution_id
+                    SET activity_state = 'ACTIVE',
+                        activity_started_at = NOW(),
+                        activity_updated_at = NOW()
+                    WHERE activity_id IN (
+                        SELECT activity_id
+                        FROM activity
+                        WHERE activity_topic = :topic
+                          AND activity_state = 'SCHEDULED'
+                          AND process_definition_key = :processDefinitionKey
+                        ORDER BY activity_created_at ASC
+                        LIMIT :limit
+                            FOR UPDATE SKIP LOCKED
+                    )
+                    RETURNING *
             )
-            SELECT updated.*, COALESCE(variables_data.variables_json, '[]'::json) AS variables_json
-            FROM updated
-            LEFT JOIN variables_data ON variables_data.execution_id = updated.process_id;
+            SELECT
+                u.*,
+                COALESCE(vars.variables_json, '[]'::json) AS variables_json
+            FROM updated u
+                     LEFT JOIN LATERAL (
+                SELECT json_agg(
+                               json_build_object(
+                                       'id', v.variable_id,
+                                       'process_id', v.process_id,
+                                       'execution_id', v.execution_id,
+                                       'execution_definition_id', v.execution_definition_id,
+                                       'var_key', v.variable_key,
+                                       'var_value', v.variable_value,
+                                       'type', v.variable_type
+                               )
+                       ) AS variables_json
+                FROM variable v
+                WHERE v.execution_id = u.process_id
+                   OR v.execution_id = u.activity_id
+                ) vars ON true;
             """;
 
     private static final String BASE_SELECT = """

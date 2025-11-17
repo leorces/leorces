@@ -2,7 +2,7 @@ package com.leorces.engine.variables.handler;
 
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.variables.VariablesService;
+import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import lombok.RequiredArgsConstructor;

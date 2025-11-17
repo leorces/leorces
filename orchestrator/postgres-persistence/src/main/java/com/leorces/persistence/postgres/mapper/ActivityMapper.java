@@ -3,7 +3,7 @@ package com.leorces.persistence.postgres.mapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leorces.model.definition.activity.task.ExternalTask;
+import com.leorces.model.definition.activity.ExternalTaskDefinition;
 import com.leorces.model.runtime.activity.Activity;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityFailure;
@@ -182,12 +182,9 @@ public class ActivityMapper {
     }
 
     private String getTopic(ActivityExecution activity) {
-        var definition = activity.definition();
-        if (definition instanceof ExternalTask) {
-            return ((ExternalTask) definition).topic();
-        } else {
-            return null;
-        }
+        return activity.definition() instanceof ExternalTaskDefinition externalTask
+                ? externalTask.topic()
+                : null;
     }
 
 }

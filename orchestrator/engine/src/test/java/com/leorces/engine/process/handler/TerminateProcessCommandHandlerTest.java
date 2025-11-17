@@ -1,8 +1,8 @@
 package com.leorces.engine.process.handler;
 
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.process.ProcessMetrics;
 import com.leorces.engine.process.command.TerminateProcessCommand;
+import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ActivityPersistence;
@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,7 +100,7 @@ class TerminateProcessCommandHandlerTest {
         when(processPersistence.findById(PROCESS_ID)).thenReturn(Optional.empty());
 
         // When & Then
-        org.junit.jupiter.api.Assertions.assertThrows(
+        assertThrows(
                 RuntimeException.class,
                 () -> handler.handle(command)
         );

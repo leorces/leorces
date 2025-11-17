@@ -11,6 +11,8 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.INTERMEDIATE_CATCH_EVENT;
+
 @Component
 @RequiredArgsConstructor
 public class IntermediateCatchEventExtractor implements ActivityExtractionStrategy {
@@ -19,7 +21,13 @@ public class IntermediateCatchEventExtractor implements ActivityExtractionStrate
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "intermediateCatchEvent", parentId, processId, this::createIntermediateCatchEvent);
+        return helper.extractElements(
+                processElement,
+                INTERMEDIATE_CATCH_EVENT,
+                parentId,
+                processId,
+                this::createIntermediateCatchEvent
+        );
     }
 
     private ActivityDefinition createIntermediateCatchEvent(Element element, String parentId, String processId) {

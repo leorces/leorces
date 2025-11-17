@@ -1,7 +1,6 @@
 package com.leorces.extension.camunda;
 
 import com.leorces.extension.camunda.exception.BpmnParseException;
-import com.leorces.extension.camunda.extractor.BpmnDocumentParser;
 import com.leorces.model.definition.ErrorItem;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.ProcessDefinitionMetadata;
@@ -16,6 +15,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.*;
+
 /**
  * Service for parsing BPMN files using DOM parser.
  */
@@ -25,7 +26,6 @@ import java.util.List;
 public class BpmnParser {
 
     private static final String CAMUNDA_ORIGIN = "Camunda";
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
     private final BpmnDocumentParser documentParser;
     private final BpmnActivityParser activityParser;
@@ -54,8 +54,8 @@ public class BpmnParser {
 
     private ProcessDefinition extractProcessDefinition(Document document, String filename, String bpmnContent) {
         var processElement = documentParser.findProcessElement(document);
-        var processId = processElement.getAttribute("id");
-        var processName = processElement.getAttribute("name");
+        var processId = processElement.getAttribute(ATTRIBUTE_ID);
+        var processName = processElement.getAttribute(ATTRIBUTE_NAME);
 
         // Activities directly in the main process should have null parentId (not subprocess)
         var activities = activityParser.extractActivities(processElement, null, processId);
@@ -78,23 +78,23 @@ public class BpmnParser {
     }
 
     private List<String> extractMessages(Document document) {
-        var nodes = document.getElementsByTagNameNS(BPMN_NAMESPACE, "message");
+        var nodes = document.getElementsByTagNameNS(BPMN_NAMESPACE, MESSAGE);
         var result = new ArrayList<String>();
         for (int i = 0; i < nodes.getLength(); i++) {
             var element = (Element) nodes.item(i);
-            result.add(element.getAttribute("name"));
+            result.add(element.getAttribute(ATTRIBUTE_NAME));
         }
         return result;
     }
 
     private List<ErrorItem> extractErrors(Document document) {
-        var nodes = document.getElementsByTagNameNS(BPMN_NAMESPACE, "error");
+        var nodes = document.getElementsByTagNameNS(BPMN_NAMESPACE, ERROR);
         var result = new ArrayList<ErrorItem>();
         for (int i = 0; i < nodes.getLength(); i++) {
             var element = (Element) nodes.item(i);
             var errorItem = ErrorItem.builder()
-                    .name(element.getAttribute("name"))
-                    .errorCode(element.getAttribute("errorCode"))
+                    .name(element.getAttribute(ATTRIBUTE_NAME))
+                    .errorCode(element.getAttribute(ATTRIBUTE_ERROR_CODE))
                     .message(element.getAttribute("camunda:errorMessage"))
                     .build();
             result.add(errorItem);

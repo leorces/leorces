@@ -5,13 +5,13 @@ import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.RunProcessCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.engine.service.CallActivityService;
-import com.leorces.engine.variables.command.SetVariablesCommand;
+import com.leorces.engine.service.activity.CallActivityService;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -27,32 +27,35 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public void run(ActivityExecution activity) {
-        var result = activityPersistence.run(activity);
-        dispatcher.dispatch(RunProcessCommand.of(result));
+    public void run(ActivityExecution callActivity) {
+        var newCallActivity = activityPersistence.run(callActivity);
+        dispatcher.dispatch(RunProcessCommand.of(newCallActivity));
     }
 
     @Override
     public void complete(ActivityExecution activity, Map<String, Object> variables) {
         var completedCallActivity = activityPersistence.complete(activity);
-        processOutputMappings(completedCallActivity);
-        postComplete(completedCallActivity, variables);
+        var outputVariables = combineVariables(
+                callActivityService.getOutputMappings(activity),
+                variables
+        );
+        postComplete(completedCallActivity, outputVariables);
     }
 
     @Override
-    public void retry(ActivityExecution activity) {
-        var failedActivities = activityPersistence.findFailed(activity.id());
+    public void retry(ActivityExecution callActivity) {
+        var failedActivities = activityPersistence.findFailed(callActivity.id());
         dispatcher.dispatchAsync(RetryAllActivitiesCommand.of(failedActivities));
     }
 
     @Override
-    public void terminate(ActivityExecution activity, boolean withInterruption) {
-        if (!activity.process().isInTerminalState()) {
-            dispatcher.dispatch(TerminateProcessCommand.of(activity.id(), false));
+    public void terminate(ActivityExecution callActivity, boolean withInterruption) {
+        if (!callActivity.process().isInTerminalState()) {
+            dispatcher.dispatch(TerminateProcessCommand.of(callActivity.id(), false));
         }
 
-        var terminatedActivity = activityPersistence.terminate(activity);
-        postTerminate(terminatedActivity, withInterruption);
+        var terminatedCallActivity = activityPersistence.terminate(callActivity);
+        postTerminate(terminatedCallActivity, withInterruption);
     }
 
     @Override
@@ -60,9 +63,10 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
         return ActivityType.CALL_ACTIVITY;
     }
 
-    private void processOutputMappings(ActivityExecution activity) {
-        var variables = callActivityService.getOutputMappings(activity);
-        dispatcher.dispatch(SetVariablesCommand.of(activity.process(), variables));
+    private Map<String, Object> combineVariables(Map<String, Object> inputVariables, Map<String, Object> outputVariables) {
+        var combined = new HashMap<>(inputVariables);
+        combined.putAll(outputVariables);
+        return combined;
     }
 
 }

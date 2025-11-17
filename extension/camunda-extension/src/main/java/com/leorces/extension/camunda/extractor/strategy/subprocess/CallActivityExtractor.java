@@ -12,50 +12,52 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.*;
+
 @Component
 @RequiredArgsConstructor
 public class CallActivityExtractor implements ActivityExtractionStrategy {
-
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
-    private static final String CAMUNDA_NAMESPACE = "http://camunda.org/schema/1.0/bpmn";
 
     private final ActivityExtractionHelper helper;
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "callActivity", parentId, processId, this::createCallActivity);
+        return helper.extractElements(
+                processElement,
+                CALL_ACTIVITY,
+                parentId,
+                processId,
+                this::createCallActivity
+        );
     }
 
     private CallActivity createCallActivity(Element element, String parentId, String processId) {
-        var inputMappings = extractInputMappings(element);
-        var outputMappings = extractOutputMappings(element);
-
         return CallActivity.builder()
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .calledElement(element.getAttribute("calledElement"))
+                .calledElement(element.getAttribute(ATTRIBUTE_CALLED_ELEMENT))
                 .calledElementVersion(getCalledElementVersion(element))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))
                 .outputs(helper.extractOutputParameters(element))
-                .inputMappings(inputMappings)
-                .outputMappings(outputMappings)
+                .inputMappings(extractInputMappings(element))
+                .outputMappings(extractOutputMappings(element))
                 .build();
     }
 
     private Integer getCalledElementVersion(Element element) {
-        var version = element.getAttributeNS(CAMUNDA_NAMESPACE, "calledElementVersion");
+        var version = element.getAttributeNS(CAMUNDA_NAMESPACE, ATTRIBUTE_CALLED_ELEMENT_VERSION);
         return !version.isBlank() ? Integer.parseInt(version) : null;
     }
 
     private List<VariableMapping> extractInputMappings(Element element) {
-        return extractVariableMappings(element, "in");
+        return extractVariableMappings(element, MAPPING_IN);
     }
 
     private List<VariableMapping> extractOutputMappings(Element element) {
-        return extractVariableMappings(element, "out");
+        return extractVariableMappings(element, MAPPING_OUT);
     }
 
     private List<VariableMapping> extractVariableMappings(Element element, String mappingType) {
@@ -76,16 +78,16 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
     }
 
     private Element getExtensionElement(Element element) {
-        var extensionElements = element.getElementsByTagNameNS(BPMN_NAMESPACE, "extensionElements");
+        var extensionElements = element.getElementsByTagNameNS(BPMN_NAMESPACE, EXTENSION_ELEMENTS);
         return extensionElements.getLength() > 0 ? (Element) extensionElements.item(0) : null;
     }
 
     private VariableMapping createVariableMapping(Element mapping) {
         return VariableMapping.builder()
-                .source(getStringOrNull(mapping.getAttribute("source")))
-                .target(getStringOrNull(mapping.getAttribute("target")))
-                .sourceExpression(getStringOrNull(mapping.getAttribute("sourceExpression")))
-                .variables(getStringOrNull(mapping.getAttribute("variables")))
+                .source(getStringOrNull(mapping.getAttribute(ATTRIBUTE_SOURCE)))
+                .target(getStringOrNull(mapping.getAttribute(ATTRIBUTE_TARGET)))
+                .sourceExpression(getStringOrNull(mapping.getAttribute(ATTRIBUTE_SOURCE_EXPRESSION)))
+                .variables(getStringOrNull(mapping.getAttribute(ATTRIBUTE_VARIABLES)))
                 .build();
     }
 

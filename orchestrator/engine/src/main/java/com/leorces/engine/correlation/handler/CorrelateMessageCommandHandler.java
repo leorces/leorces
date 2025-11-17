@@ -5,7 +5,7 @@ import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
 import com.leorces.engine.exception.correlation.MessageCorrelationException;
-import com.leorces.engine.variables.VariablesService;
+import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.definition.activity.MessageActivityDefinition;
 import com.leorces.model.runtime.process.Process;

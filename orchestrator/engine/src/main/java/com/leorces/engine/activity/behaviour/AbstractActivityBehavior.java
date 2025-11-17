@@ -1,19 +1,17 @@
 package com.leorces.engine.activity.behaviour;
 
 import com.leorces.engine.activity.command.CompleteActivityCommand;
-import com.leorces.engine.activity.command.HandleActivityCompletionWithNextActivitiesCommand;
-import com.leorces.engine.activity.command.HandleActivityCompletionWithoutNextActivitiesCommand;
+import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
+import com.leorces.engine.activity.command.RunAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public abstract class AbstractActivityBehavior implements ActivityBehavior {
 
@@ -59,15 +57,6 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
         return activity.nextActivities();
     }
 
-    protected void completeEventBasedGatewayActivities(ActivityExecution activity) {
-        var processId = activity.processId();
-        var eventBasedGatewayOpt = findEventBasedGateway(activity);
-        if (eventBasedGatewayOpt.isEmpty()) {
-            return;
-        }
-        activityPersistence.deleteAllActive(processId, eventBasedGatewayOpt.get().outgoing());
-    }
-
     protected void postComplete(ActivityExecution completedActivity, Map<String, Object> variables) {
         dispatcher.dispatch(SetActivityVariablesCommand.of(completedActivity, variables));
         handleActivityCompletion(completedActivity, getNextActivities(completedActivity));
@@ -81,20 +70,10 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
 
     protected void handleActivityCompletion(ActivityExecution activity, List<ActivityDefinition> nextActivities) {
         if (nextActivities.isEmpty()) {
-            dispatcher.dispatch(HandleActivityCompletionWithoutNextActivitiesCommand.of(activity));
+            dispatcher.dispatch(HandleActivityCompletionCommand.of(activity));
         } else {
-            dispatcher.dispatch(HandleActivityCompletionWithNextActivitiesCommand.of(activity.process(), nextActivities));
+            dispatcher.dispatch(RunAllActivitiesCommand.of(activity.process(), nextActivities));
         }
-    }
-
-    private Optional<ActivityDefinition> findEventBasedGateway(ActivityExecution activity) {
-        return activity.previousActivities().stream()
-                .filter(this::isEventBasedGateway)
-                .findFirst();
-    }
-
-    private boolean isEventBasedGateway(ActivityDefinition activityDefinition) {
-        return ActivityType.EVENT_BASED_GATEWAY.equals(activityDefinition.type());
     }
 
 }

@@ -10,7 +10,7 @@ testcontainers = "1.19.3"
 mapstruct = "1.6.3"
 
 # Documentation
-springdoc-openapi = "2.8.9"
+springdoc-openapi = "2.8.14"
 
 # Resilience4j
 resilience4j = "2.2.0"

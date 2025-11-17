@@ -1,9 +1,9 @@
 package com.leorces.engine.activity.handler;
 
-import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.RetryActivityCommand;
+import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;

@@ -13,17 +13,23 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.*;
+
 @Component
 @RequiredArgsConstructor
 public class EndEventExtractor implements ActivityExtractionStrategy {
-
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
     private final ActivityExtractionHelper helper;
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "endEvent", parentId, processId, this::createEndEvent);
+        return helper.extractElements(
+                processElement,
+                END_EVENT,
+                parentId,
+                processId,
+                this::createEndEvent
+        );
     }
 
     private ActivityDefinition createEndEvent(Element element, String parentId, String processId) {
@@ -32,20 +38,20 @@ public class EndEventExtractor implements ActivityExtractionStrategy {
             return createErrorEndEvent(element, parentId, errorDefinition);
         }
 
-        if (hasTerminateDefinition(element)) {
-            return createTerminateEndEvent(element, parentId);
-        }
-
         var escalationDefinition = helper.findEscalationEventDefinition(element);
         if (escalationDefinition != null) {
             return createEscalationEndEvent(element, parentId, escalationDefinition);
+        }
+
+        if (hasTerminateDefinition(element)) {
+            return createTerminateEndEvent(element, parentId);
         }
 
         return createBasicEndEvent(element, parentId);
     }
 
     private boolean hasTerminateDefinition(Element element) {
-        return element.getElementsByTagNameNS(BPMN_NAMESPACE, "terminateEventDefinition").getLength() > 0;
+        return element.getElementsByTagNameNS(BPMN_NAMESPACE, TERMINATE_EVENT_DEFINITION).getLength() > 0;
     }
 
     private ErrorEndEvent createErrorEndEvent(Element element, String parentId, Element errorDefinition) {

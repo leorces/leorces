@@ -19,14 +19,12 @@ public class SubprocessBehavior extends AbstractSubprocessBehavior {
     }
 
     @Override
-    public void complete(ActivityExecution activity, Map<String, Object> variables) {
-        var isAllChildActivitiesCompleted = activityPersistence.isAllCompleted(activity.processId(), getChildActivityIds(activity));
-
-        if (!isAllChildActivitiesCompleted) {
+    public void complete(ActivityExecution subprocess, Map<String, Object> variables) {
+        if (!isAllChildActivitiesCompleted(subprocess)) {
             return;
         }
 
-        var completedSubprocess = activityPersistence.complete(activity);
+        var completedSubprocess = activityPersistence.complete(subprocess);
         postComplete(completedSubprocess, variables);
     }
 

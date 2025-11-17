@@ -13,7 +13,7 @@ import java.io.IOException;
 
 
 /**
- * Auto-configuration for Orchestrator UI module.
+ * Autoconfiguration for the Orchestrator UI module.
  * Enables scanning of MVC controllers and related components.
  * Configures static resource serving for the browser application.
  */

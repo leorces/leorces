@@ -13,6 +13,8 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.*;
+
 @Component
 @RequiredArgsConstructor
 public class StartEventExtractor implements ActivityExtractionStrategy {
@@ -21,7 +23,13 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "startEvent", parentId, processId, this::createStartEvent);
+        return helper.extractElements(
+                processElement,
+                START_EVENT,
+                parentId,
+                processId,
+                this::createStartEvent
+        );
     }
 
     private ActivityDefinition createStartEvent(Element element, String parentId, String processId) {
@@ -51,7 +59,7 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .messageReference(helper.getMessageName(messageDefinition))
-                .isInterrupting(!"false".equals(element.getAttribute("isInterrupting")))
+                .isInterrupting(!FALSE_VALUE.equals(element.getAttribute(ATTRIBUTE_IS_INTERRUPTING)))
                 .build();
     }
 
@@ -74,7 +82,7 @@ public class StartEventExtractor implements ActivityExtractionStrategy {
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .escalationCode(helper.getEscalationCode(escalationDefinition))
-                .isInterrupting(!"false".equals(element.getAttribute("isInterrupting")))
+                .isInterrupting(!FALSE_VALUE.equals(element.getAttribute(ATTRIBUTE_IS_INTERRUPTING)))
                 .build();
     }
 

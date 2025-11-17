@@ -126,7 +126,7 @@ class ActivityUtilsTest {
         // Then
         assertNotNull(parentActivities);
         assertEquals(1, parentActivities.size());
-        assertEquals(CHILD_ACTIVITY_ID, parentActivities.get(0).id());
+        assertEquals(CHILD_ACTIVITY_ID, parentActivities.getFirst().id());
     }
 
     private ActivityDefinition createMockActivityDefinition(String id, String parentId, ActivityType type) {

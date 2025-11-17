@@ -31,55 +31,48 @@ leorces:
       OrderSubmittedProcess:
         workers:
           notification:
-            interval: 5
+            interval: 1
             time-unit: seconds
-            max-concurrent-tasks: 100
+            max-concurrent-tasks: 10
       OrderPaymentProcess:
         workers:
           debit:
-            interval: 500
-            time-unit: milliseconds
-            initial-delay: 250
-            max-concurrent-tasks: 100
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
           deposit:
-            interval: 500
-            time-unit: milliseconds
-            initial-delay: 500
-            max-concurrent-tasks: 100
-          payment-success-notification:
-            interval: 600
-            time-unit: milliseconds
-            initial-delay: 750
-            max-concurrent-tasks: 100
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
+          notification:
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
       OrderFulfillmentProcess:
         workers:
           notification:
-            interval: 800
-            time-unit: milliseconds
-            initial-delay: 1000
-            max-concurrent-tasks: 150
+            interval: 1
+            time-unit: seconds
+            initial-delay: 500
+            max-concurrent-tasks: 10
       OrderDeliveryProcess:
         workers:
           courier-delivery:
-            interval: 500
-            time-unit: milliseconds
-            initial-delay: 1000
-            max-concurrent-tasks: 75
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
           express-delivery:
-            interval: 500
-            time-unit: milliseconds
-            initial-delay: 1000
-            max-concurrent-tasks: 80
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
           postal-delivery:
-            interval: 500
-            time-unit: milliseconds
-            initial-delay: 1000
-            max-concurrent-tasks: 60
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
           notification:
-            interval: 1000
-            time-unit: milliseconds
-            initial-delay: 2000
-            max-concurrent-tasks: 120
+            interval: 1
+            time-unit: seconds
+            max-concurrent-tasks: 10
 logging:
   level:
     com.leorces.example: DEBUG

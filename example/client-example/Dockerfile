@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . .
 RUN gradle :example:client-example:bootJar --no-daemon
 
-FROM openjdk:21
+FROM openjdk:21-ea-23
 WORKDIR /app
 COPY --from=build /app/example/client-example/build/libs/client-example-*.jar app.jar
 EXPOSE 8080

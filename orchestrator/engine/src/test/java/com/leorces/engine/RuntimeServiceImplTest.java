@@ -2,8 +2,8 @@ package com.leorces.engine;
 
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
-import com.leorces.engine.process.ProcessRuntimeService;
 import com.leorces.engine.process.command.MoveExecutionCommand;
+import com.leorces.engine.service.process.ProcessRuntimeService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.process.Process;
 import org.junit.jupiter.api.DisplayName;

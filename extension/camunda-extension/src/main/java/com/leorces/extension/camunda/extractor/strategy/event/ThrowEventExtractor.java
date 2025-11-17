@@ -10,6 +10,9 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.ATTRIBUTE_ID;
+import static com.leorces.extension.camunda.BpmnConstants.INTERMEDIATE_THROW_EVENT;
+
 @Component
 @RequiredArgsConstructor
 public class ThrowEventExtractor implements ActivityExtractionStrategy {
@@ -18,7 +21,13 @@ public class ThrowEventExtractor implements ActivityExtractionStrategy {
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "intermediateThrowEvent", parentId, processId, this::createIntermediateThrowEvent);
+        return helper.extractElements(
+                processElement,
+                INTERMEDIATE_THROW_EVENT,
+                parentId,
+                processId,
+                this::createIntermediateThrowEvent
+        );
     }
 
     private ActivityDefinition createIntermediateThrowEvent(Element element, String parentId, String processId) {
@@ -27,7 +36,7 @@ public class ThrowEventExtractor implements ActivityExtractionStrategy {
             return createEscalationThrowEvent(element, parentId, escalationDefinition);
         }
 
-        return null;
+        throw new IllegalArgumentException("Unsupported throw event type for element: %s".formatted(element.getAttribute(ATTRIBUTE_ID)));
     }
 
     private ActivityDefinition createEscalationThrowEvent(Element element, String parentId, Element escalationDefinition) {

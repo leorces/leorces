@@ -1,11 +1,11 @@
 package com.leorces.engine.activity.handler;
 
-import com.leorces.engine.activity.ActivityFactory;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.variables.VariablesService;
+import com.leorces.engine.service.activity.ActivityFactory;
+import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

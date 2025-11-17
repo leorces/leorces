@@ -18,18 +18,18 @@ public class ParallelGatewayBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public void run(ActivityExecution activity) {
-        if (activity.definition().incoming().size() == 1) {
-            dispatcher.dispatchAsync(CompleteActivityCommand.of(activity));
+    public void run(ActivityExecution parallelGateway) {
+        if (parallelGateway.definition().incoming().size() == 1) {
+            dispatcher.dispatchAsync(CompleteActivityCommand.of(parallelGateway));
             return;
         }
 
-        var incomingActivityIds = activity.previousActivities().stream()
+        var incomingActivityIds = parallelGateway.previousActivities().stream()
                 .map(ActivityDefinition::id)
                 .toList();
 
-        if (activityPersistence.isAllCompleted(activity.processId(), incomingActivityIds)) {
-            dispatcher.dispatchAsync(CompleteActivityCommand.of(activity));
+        if (activityPersistence.isAllCompleted(parallelGateway.processId(), incomingActivityIds)) {
+            dispatcher.dispatchAsync(CompleteActivityCommand.of(parallelGateway));
         }
     }
 

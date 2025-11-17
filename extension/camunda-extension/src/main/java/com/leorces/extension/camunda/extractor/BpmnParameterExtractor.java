@@ -7,17 +7,14 @@ import org.w3c.dom.Element;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.leorces.extension.camunda.BpmnConstants.*;
+
 /**
  * Component responsible for extracting input and output parameters from BPMN elements.
  */
 @Slf4j
 @Component
 public class BpmnParameterExtractor {
-
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
-    private static final String CAMUNDA_NAMESPACE = "http://camunda.org/schema/1.0/bpmn";
-    private static final String INPUT_PARAMETER = "inputParameter";
-    private static final String OUTPUT_PARAMETER = "outputParameter";
 
     /**
      * Extracts input parameters from a BPMN element.
@@ -51,12 +48,12 @@ public class BpmnParameterExtractor {
     }
 
     private Element findExtensionElements(Element element) {
-        var extensionElements = element.getElementsByTagNameNS(BPMN_NAMESPACE, "extensionElements");
+        var extensionElements = element.getElementsByTagNameNS(BPMN_NAMESPACE, EXTENSION_ELEMENTS);
         return extensionElements.getLength() > 0 ? (Element) extensionElements.item(0) : null;
     }
 
     private void extractParametersFromExtension(Element extensionElement, Map<String, Object> parameters, String parameterType) {
-        var inputOutputs = extensionElement.getElementsByTagNameNS(CAMUNDA_NAMESPACE, "inputOutput");
+        var inputOutputs = extensionElement.getElementsByTagNameNS(CAMUNDA_NAMESPACE, INPUT_OUTPUT);
 
         if (inputOutputs.getLength() > 0) {
             var inputOutput = (Element) inputOutputs.item(0);
@@ -74,7 +71,7 @@ public class BpmnParameterExtractor {
     }
 
     private void addParameter(Element parameterElement, Map<String, Object> parameters) {
-        var name = parameterElement.getAttribute("name");
+        var name = parameterElement.getAttribute(ATTRIBUTE_NAME);
         var value = parameterElement.getTextContent();
         parameters.put(name, value);
     }

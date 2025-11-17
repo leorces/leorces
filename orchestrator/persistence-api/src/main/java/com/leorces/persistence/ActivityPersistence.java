@@ -54,7 +54,7 @@ public interface ActivityPersistence {
     ActivityExecution fail(ActivityExecution activity);
 
     /**
-     * Changes the state of a activity by its identifier.
+     * Changes the state of an activity by its identifier.
      *
      * @param activityId the activity identifier
      * @param state      the new activity state
@@ -104,7 +104,7 @@ public interface ActivityPersistence {
     List<ActivityExecution> findActive(String processId);
 
     /**
-     * Finds all failed activitys within a process.
+     * Finds all failed activities within a process.
      *
      * @param processId the process identifier
      * @return the list of failed activities
@@ -136,15 +136,6 @@ public interface ActivityPersistence {
      * @return true if any activity has failed, false otherwise
      */
     boolean isAnyFailed(String processId);
-
-    /**
-     * Checks if all activities under a parent definition are completed.
-     *
-     * @param processId          the process identifier
-     * @param parentDefinitionId the parent activity definition identifier
-     * @return true if all activities are completed, false otherwise
-     */
-    boolean isAllCompleted(String processId, String parentDefinitionId);
 
     /**
      * Checks if all activities within a process are completed.

@@ -10,6 +10,8 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.PARALLEL_GATEWAY;
+
 @Component
 @RequiredArgsConstructor
 public class ParallelGatewayExtractor implements ActivityExtractionStrategy {
@@ -18,7 +20,13 @@ public class ParallelGatewayExtractor implements ActivityExtractionStrategy {
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "parallelGateway", parentId, processId, this::createParallelGateway);
+        return helper.extractElements(
+                processElement,
+                PARALLEL_GATEWAY,
+                parentId,
+                processId,
+                this::createParallelGateway
+        );
     }
 
     private ParallelGateway createParallelGateway(Element element, String parentId, String processId) {

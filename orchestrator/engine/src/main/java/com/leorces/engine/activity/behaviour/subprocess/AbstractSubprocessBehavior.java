@@ -19,36 +19,42 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
     }
 
     @Override
-    public void run(ActivityExecution activity) {
-        var result = activityPersistence.run(activity);
-        dispatcher.dispatchAsync(RunActivityCommand.of(result.process(), getStartEvent(result)));
+    public void run(ActivityExecution subprocess) {
+        var newSubprocess = activityPersistence.run(subprocess);
+        dispatcher.dispatchAsync(RunActivityCommand.of(newSubprocess.process(), getStartEvent(newSubprocess)));
     }
 
     @Override
-    public void terminate(ActivityExecution activity, boolean withInterruption) {
-        terminateChildActivities(activity);
-        var terminatedActivity = activityPersistence.terminate(activity);
-        postTerminate(terminatedActivity, withInterruption);
+    public void terminate(ActivityExecution subprocess, boolean withInterruption) {
+        terminateChildActivities(subprocess);
+        var terminatedSubprocess = activityPersistence.terminate(subprocess);
+        postTerminate(terminatedSubprocess, withInterruption);
     }
 
-    protected List<String> getChildActivityIds(ActivityExecution activity) {
-        return activity.childActivities().stream()
+    protected boolean isAllChildActivitiesCompleted(ActivityExecution subprocess) {
+        return activityPersistence.isAllCompleted(
+                subprocess.processId(),
+                getChildActivityIds(subprocess)
+        );
+    }
+
+    protected List<String> getChildActivityIds(ActivityExecution subprocess) {
+        return subprocess.childActivities().stream()
                 .map(ActivityDefinition::id)
                 .toList();
     }
 
-    private ActivityDefinition getStartEvent(ActivityExecution activity) {
-        var definitionId = activity.definition().id();
-        return activity.processDefinition().activities().stream()
-                .filter(activityDefinition -> definitionId.equals(activityDefinition.parentId()))
-                .filter(activityDefinition -> activityDefinition.type().isStartEvent())
+    private ActivityDefinition getStartEvent(ActivityExecution subprocess) {
+        return subprocess.processDefinition().activities().stream()
+                .filter(activity -> subprocess.definitionId().equals(activity.parentId()))
+                .filter(activity -> activity.type().isStartEvent())
                 .findFirst()
-                .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(activity.definition().id()));
+                .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(subprocess.definitionId()));
     }
 
-    private void terminateChildActivities(ActivityExecution activity) {
-        var childActivityIds = getChildActivityIds(activity);
-        var childActivities = activityPersistence.findActive(activity.processId(), childActivityIds);
+    private void terminateChildActivities(ActivityExecution subprocess) {
+        var childActivityIds = getChildActivityIds(subprocess);
+        var childActivities = activityPersistence.findActive(subprocess.processId(), childActivityIds);
         dispatcher.dispatch(TerminateAllActivitiesCommand.of(childActivities));
     }
 

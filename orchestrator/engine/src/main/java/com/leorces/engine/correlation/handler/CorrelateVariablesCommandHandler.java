@@ -4,7 +4,7 @@ import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.correlation.command.CorrelateVariablesCommand;
-import com.leorces.engine.variables.VariablesService;
+import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ConditionalActivityDefinition;

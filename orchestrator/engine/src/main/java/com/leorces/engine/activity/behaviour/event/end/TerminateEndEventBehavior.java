@@ -23,11 +23,11 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
     }
 
     @Override
-    public void complete(ActivityExecution activity, Map<String, Object> variables) {
-        var completedTerminateEndEvent = activityPersistence.complete(activity);
+    public void complete(ActivityExecution terminateEndEvent, Map<String, Object> variables) {
+        var completedTerminateEndEvent = activityPersistence.complete(terminateEndEvent);
         var processId = completedTerminateEndEvent.processId();
 
-        if (!activity.hasParent()) {
+        if (!terminateEndEvent.hasParent()) {
             terminateProcess(processId);
         } else {
             terminateParentActivity(completedTerminateEndEvent);
@@ -44,8 +44,8 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
         return ActivityType.TERMINATE_END_EVENT;
     }
 
-    private void terminateParentActivity(ActivityExecution completedTerminateEndEvent) {
-        var parent = getParentActivity(completedTerminateEndEvent);
+    private void terminateParentActivity(ActivityExecution terminateEndEvent) {
+        var parent = getParentActivity(terminateEndEvent);
 
         if (parent.type().isEventSubprocess()) {
             terminateEventSubprocess(parent);
@@ -75,9 +75,9 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
         dispatcher.dispatch(TerminateProcessCommand.of(processId));
     }
 
-    private ActivityExecution getParentActivity(ActivityExecution completedTerminateEndEvent) {
-        var processId = completedTerminateEndEvent.processId();
-        var parentDefinitionId = completedTerminateEndEvent.parentDefinitionId();
+    private ActivityExecution getParentActivity(ActivityExecution terminateEndEvent) {
+        var processId = terminateEndEvent.processId();
+        var parentDefinitionId = terminateEndEvent.parentDefinitionId();
 
         return activityPersistence.findByDefinitionId(processId, parentDefinitionId)
                 .orElseThrow(() ->

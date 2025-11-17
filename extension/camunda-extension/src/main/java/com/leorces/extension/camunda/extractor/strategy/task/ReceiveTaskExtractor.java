@@ -10,6 +10,8 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.RECEIVE_TASK;
+
 @Component
 @RequiredArgsConstructor
 public class ReceiveTaskExtractor implements ActivityExtractionStrategy {
@@ -18,18 +20,21 @@ public class ReceiveTaskExtractor implements ActivityExtractionStrategy {
 
     @Override
     public List<ActivityDefinition> extract(Element processElement, String parentId, String processId) {
-        return helper.extractElements(processElement, "receiveTask", parentId, processId, this::createReceiveTask);
+        return helper.extractElements(
+                processElement,
+                RECEIVE_TASK,
+                parentId,
+                processId,
+                this::createReceiveTask
+        );
     }
 
     private ReceiveTask createReceiveTask(Element element, String parentId, String processId) {
-        var messageRef = element.getAttribute("messageRef");
-        var messageName = helper.resolveMessageName(element, messageRef);
-
         return ReceiveTask.builder()
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .messageReference(messageName)
+                .messageReference(helper.getMessageName(element))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))

@@ -24,9 +24,6 @@ class HostUtilsTest {
         // Given & When & Then
         var hostname = HostUtils.HOSTNAME;
         assertTrue(hostname != null && !hostname.isEmpty());
-
-        // Hostname should either be a valid hostname or the fallback "unknown-host"
-        assertTrue(hostname.equals("unknown-host") || hostname.length() > 0);
     }
 
 }

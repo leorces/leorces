@@ -1,9 +1,7 @@
 package com.leorces.persistence.postgres;
 
-import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.persistence.postgres.utils.ActivityTestData;
-import com.leorces.persistence.postgres.utils.VariableTestData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -161,26 +159,6 @@ class ActivityPersistenceIT extends RepositoryIT {
         // Then
         assertThat(result).isNotNull();
         assertThat(result).isEmpty();
-    }
-
-    @Test
-    @DisplayName("Should check if all activities are completed by process ID and parent definition ID")
-    void isAllCompleted() {
-        // Given
-        var process = runOrderSubmittedProcess();
-        var activity1 = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
-        var activity2 = activityPersistence.run(ActivityTestData.createNotificationToSellerActivityExecution(process));
-        activityPersistence.complete(activity1);
-        activityPersistence.complete(activity2);
-
-        var processId = activity1.processId();
-        var parentDefinitionId = "Gateway_0t354xy"; // From test data - parent gateway
-
-        // When
-        var result = activityPersistence.isAllCompleted(processId, parentDefinitionId);
-
-        // Then
-        assertThat(result).isTrue();
     }
 
     @Test
@@ -354,32 +332,6 @@ class ActivityPersistenceIT extends RepositoryIT {
         var allResults = activityPersistence.findTimedOut(10);
         assertThat(allResults).allSatisfy(activity -> assertThat(activity.timeout()).isBefore(LocalDateTime.now()));
         assertThat(allResults.size()).isLessThanOrEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("Should return false when not all children under parent are completed")
-    void isAllCompletedByParentWhenIncomplete() {
-        // Given
-        var process = runOrderFulfilledProcess();
-        var childActivity = ActivityExecution.builder()
-                .definitionId("ProcessOrderFulfillment")
-                .process(process)
-                .variables(List.of(VariableTestData.createOrderVariable(), VariableTestData.createClientVariable()))
-                .retries(3)
-                .build();
-        var runningChild = activityPersistence.run(childActivity);
-        var parentDefinitionId = "OrderFulfillment";
-
-        // When
-        var resultWhenIncomplete = activityPersistence.isAllCompleted(process.id(), parentDefinitionId);
-
-        // Then
-        assertThat(resultWhenIncomplete).isFalse();
-
-        // When & Then - complete the child and verify becomes true
-        activityPersistence.complete(runningChild);
-        var resultWhenComplete = activityPersistence.isAllCompleted(process.id(), parentDefinitionId);
-        assertThat(resultWhenComplete).isTrue();
     }
 
     @Test

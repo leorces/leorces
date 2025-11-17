@@ -3,6 +3,7 @@ package com.leorces.model.definition.activity;
 public enum ActivityType {
     // Task
     EXTERNAL_TASK,
+    SEND_TASK,
     RECEIVE_TASK,
 
     // Gateway
@@ -50,9 +51,5 @@ public enum ActivityType {
                 || this == MESSAGE_START_EVENT
                 || this == ERROR_START_EVENT
                 || this == ESCALATION_START_EVENT;
-    }
-
-    public boolean isEscalationEndEvent() {
-        return this == ESCALATION_END_EVENT;
     }
 }

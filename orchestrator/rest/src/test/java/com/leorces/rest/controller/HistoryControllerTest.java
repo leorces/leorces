@@ -166,6 +166,7 @@ class HistoryControllerTest {
         var result = subject.findAll(DEFAULT_OFFSET, DEFAULT_LIMIT).getBody();
 
         // Then
+        assertThat(result).isNotNull();
         assertThat(result).isEqualTo(emptyPageableData);
         assertThat(result.data()).isEmpty();
         assertThat(result.total()).isEqualTo(0L);
@@ -184,6 +185,7 @@ class HistoryControllerTest {
         var result = subject.findAll(DEFAULT_OFFSET, DEFAULT_LIMIT).getBody();
 
         // Then
+        assertThat(result).isNotNull();
         assertThat(result).isEqualTo(singleItemPageableData);
         assertThat(result.data()).hasSize(1);
         assertThat(result.data().getFirst()).isEqualTo(singleExecution);
@@ -207,6 +209,7 @@ class HistoryControllerTest {
         var result = subject.findAll(DEFAULT_OFFSET, DEFAULT_LIMIT).getBody();
 
         // Then
+        assertThat(result).isNotNull();
         assertThat(result).isEqualTo(multipleItemsPageableData);
         assertThat(result.data()).hasSize(2);
         assertThat(result.total()).isEqualTo(2L);

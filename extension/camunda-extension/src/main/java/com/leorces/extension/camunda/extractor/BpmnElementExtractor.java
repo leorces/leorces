@@ -8,14 +8,14 @@ import org.w3c.dom.Node;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.leorces.extension.camunda.BpmnConstants.BPMN_NAMESPACE;
+
 /**
  * Component responsible for extracting BPMN elements from XML.
  */
 @Slf4j
 @Component
 public class BpmnElementExtractor {
-
-    private static final String BPMN_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
 
     /**
      * Extracts elements of specified type from process element.

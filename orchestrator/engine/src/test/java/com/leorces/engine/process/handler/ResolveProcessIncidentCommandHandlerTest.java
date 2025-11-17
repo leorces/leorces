@@ -2,8 +2,8 @@ package com.leorces.engine.process.handler;
 
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.process.ProcessNotFoundException;
-import com.leorces.engine.process.ProcessMetrics;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
+import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
