@@ -4,9 +4,11 @@ plugins {
     jacoco
 }
 
+val springBootVersion = libs.versions.spring.boot.get()
+
 allprojects {
     group = "com.leorces"
-    version = "0.1.8"
+    version = "0.1.9"
 }
 
 subprojects {
@@ -25,7 +27,7 @@ subprojects {
 
     dependencyManagement {
         imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:3.5.4")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:$springBootVersion")
         }
     }
 

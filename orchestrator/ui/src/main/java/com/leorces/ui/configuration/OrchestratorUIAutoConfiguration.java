@@ -24,7 +24,7 @@ public class OrchestratorUIAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Assets
-        registry.addResourceHandler("/assets/**")
+        registry.addResourceHandler("assets/**")
                 .addResourceLocations("classpath:/static/assets/")
                 .setCachePeriod(3600)
                 .resourceChain(true)
