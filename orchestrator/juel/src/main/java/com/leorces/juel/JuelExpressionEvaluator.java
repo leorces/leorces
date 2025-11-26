@@ -11,6 +11,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
@@ -84,10 +85,7 @@ public class JuelExpressionEvaluator implements ExpressionEvaluator {
     public boolean evaluateBoolean(String expression, Map<String, Object> variables) {
         return executeWithExceptionHandling(expression, "evaluate boolean expression", () -> {
             var result = evaluate(expression, variables, Boolean.class);
-            if (result == null) {
-                throw new ExpressionEvaluationException("Failed to evaluate boolean expression '%s'".formatted(expression));
-            }
-            return result;
+            return Objects.requireNonNullElse(result, false);
         });
     }
 

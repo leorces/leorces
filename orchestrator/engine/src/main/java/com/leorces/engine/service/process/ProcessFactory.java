@@ -53,7 +53,6 @@ public class ProcessFactory {
                 ? activity.process().id()
                 : activity.process().rootProcessId();
 
-
         return Process.builder()
                 .id(activity.id())
                 .parentId(activity.process().id())
