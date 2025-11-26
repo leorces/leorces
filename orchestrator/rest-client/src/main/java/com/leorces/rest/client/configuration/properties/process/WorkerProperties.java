@@ -1,9 +1,11 @@
 package com.leorces.rest.client.configuration.properties.process;
 
+import org.springframework.boot.context.properties.bind.DefaultValue;
+
 import java.util.Map;
 
 public record WorkerProperties(
-        Map<String, WorkerConfigProperties> workers
+        @DefaultValue Map<String, WorkerConfigProperties> workers
 ) {
 
 }
