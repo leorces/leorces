@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -25,7 +26,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     @Override
     public boolean complete(ExternalTask externalTask, Map<String, Object> variables) {
         try {
-            var response = taskRestClient.complete(externalTask.id(), variables);
+            var response = taskRestClient.complete(externalTask.id(), Objects.requireNonNullElse(variables, Map.of()));
             var isSuccessful = response.getStatusCode().is2xxSuccessful();
             if (!isSuccessful) {
                 log.warn("ExternalTask completion failed with status: {} for taskId: {}",
@@ -56,7 +57,7 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     @Override
     public boolean fail(String taskId, ActivityFailure failure, Map<String, Object> variables) {
         try {
-            var response = taskRestClient.fail(taskId, failure, variables);
+            var response = taskRestClient.fail(taskId, failure, Objects.requireNonNullElse(variables, Map.of()));
             var isSuccessful = response.getStatusCode().is2xxSuccessful();
             if (!isSuccessful) {
                 log.warn("ExternalTask failure operation failed with status: {} for taskId: {}",
