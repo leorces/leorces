@@ -2,8 +2,8 @@ package com.leorces.rest.client.client;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -15,16 +15,19 @@ import static com.leorces.rest.client.constants.ApiConstants.REPOSITORY_COMPACTI
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class AdminClient {
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
+
+    public AdminClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "repository-compaction")
     @CircuitBreaker(name = "repository-compaction", fallbackMethod = "doCompactionFallback")
     public void doCompaction() {
         try {
-            restClient.post()
+            leorcesRestClient.post()
                     .uri(REPOSITORY_COMPACTION_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)

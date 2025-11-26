@@ -1,9 +1,9 @@
 package com.leorces.example.client.worker.submit;
 
-import com.leorces.rest.client.handler.TaskHandler;
-import com.leorces.rest.client.model.Task;
-import com.leorces.rest.client.service.TaskService;
-import com.leorces.rest.client.worker.TaskWorker;
+import com.leorces.rest.client.handler.ExternalTaskHandler;
+import com.leorces.rest.client.model.ExternalTask;
+import com.leorces.rest.client.service.ExternalTaskService;
+import com.leorces.rest.client.worker.ExternalTaskSubscription;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,19 +12,19 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Component
-@TaskWorker(
-        topic = "notification",
+@ExternalTaskSubscription(
+        topicName = "notification",
         processDefinitionKey = "OrderSubmittedProcess"
 )
-public class OrderSubmittedNotificationWorker implements TaskHandler {
+public class OrderSubmittedNotificationWorker implements ExternalTaskHandler {
 
     @Override
     @SneakyThrows
-    public void handle(Task task, TaskService taskService) {
-        var message = task.getVariable("message");
+    public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        var message = externalTask.getVariable("message");
         log.debug("Sending notification: {}", message);
         Thread.sleep(ThreadLocalRandom.current().nextLong(500, 2001));
-        taskService.complete(task);
+        externalTaskService.complete(externalTask);
     }
 
 }

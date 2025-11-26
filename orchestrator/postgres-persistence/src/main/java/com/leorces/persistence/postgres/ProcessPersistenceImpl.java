@@ -5,6 +5,7 @@ import com.leorces.model.pagination.PageableData;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessExecution;
 import com.leorces.model.runtime.process.ProcessState;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.persistence.ProcessPersistence;
 import com.leorces.persistence.VariablePersistence;
 import com.leorces.persistence.postgres.mapper.ProcessMapper;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,37 +78,20 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    public List<Process> findByBusinessKey(String businessKey) {
-        log.debug("Finding all processes by business key: {}", businessKey);
-        return processRepository.findAllByBusinessKey(businessKey).stream()
-                .map(processMapper::toProcess)
-                .toList();
-    }
-
-    @Override
-    public List<Process> findByVariables(Map<String, Object> variables) {
-        if (variables == null || variables.isEmpty()) {
-            return Collections.emptyList();
+    public List<Process> findAll(ProcessFilter filter) {
+        if (filter.isEmpty()) {
+            return List.of();
         }
 
-        log.debug("Finding all processes by variables: {}", variables);
-        var variableKeys = extractVariableKeys(variables);
-        var variableValues = extractVariableValues(variables);
-        return processRepository.findByVariables(variableKeys, variableValues, variables.size()).stream()
-                .map(processMapper::toProcess)
-                .toList();
-    }
-
-    @Override
-    public List<Process> findByBusinessKeyAndVariables(String businessKey, Map<String, Object> variables) {
-        if (variables == null || variables.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        log.debug("Finding all processes by business key: {} and variables: {}", businessKey, variables);
-        var variableKeys = extractVariableKeys(variables);
-        var variableValues = extractVariableValues(variables);
-        return processRepository.findByBusinessKeyAndVariables(businessKey, variableKeys, variableValues, variables.size()).stream()
+        var variables = filter.variables() == null ? Map.<String, Object>of() : filter.variables();
+        return processRepository.findAll(
+                        filter.processDefinitionKey(),
+                        filter.processDefinitionId(),
+                        filter.businessKey(),
+                        extractVariableKeys(variables),
+                        extractVariableValues(variables),
+                        variables.size()
+                ).stream()
                 .map(processMapper::toProcess)
                 .toList();
     }

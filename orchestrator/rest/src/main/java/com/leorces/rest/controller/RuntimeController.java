@@ -2,12 +2,15 @@ package com.leorces.rest.controller;
 
 import com.leorces.api.RuntimeService;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.rest.model.request.CorrelateMessageRequest;
 import com.leorces.rest.model.request.ProcessModificationRequest;
 import com.leorces.rest.model.request.StartProcessByIdRequest;
 import com.leorces.rest.model.request.StartProcessByKeyRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -209,6 +212,31 @@ public class RuntimeController {
     ) {
         runtimeService.setVariablesLocal(executionId, variables);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Get process by filter",
+            description = "Retrieve a specific process by filter"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = STATUS_200_OK,
+                    description = RESPONSE_200_OK,
+                    content = @Content(schema = @Schema(implementation = Process.class))
+            ),
+            @ApiResponse(responseCode = STATUS_404_NOT_FOUND, description = RESPONSE_404_NOT_FOUND),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PostMapping("/find/process")
+    public ResponseEntity<Process> findSingleProcess(
+            @Parameter(description = "Request containing search filters")
+            @Valid @RequestBody ProcessFilter request
+
+    ) {
+        var process = runtimeService.findProcess(request);
+        return process == null
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(process);
     }
 
     private boolean isNotNullOrEmpty(String value) {

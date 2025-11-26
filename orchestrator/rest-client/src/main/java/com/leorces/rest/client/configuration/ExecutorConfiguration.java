@@ -10,8 +10,8 @@ import java.util.concurrent.ScheduledExecutorService;
 @Configuration
 public class ExecutorConfiguration {
 
-    @Bean("taskExecutor")
-    public ExecutorService taskExecutor() {
+    @Bean("leorcesTaskExecutor")
+    public ExecutorService leorcesTaskExecutor() {
         return Executors.newCachedThreadPool(r -> {
             var thread = new Thread(r);
             thread.setName("task-worker-%d".formatted(thread.threadId()));

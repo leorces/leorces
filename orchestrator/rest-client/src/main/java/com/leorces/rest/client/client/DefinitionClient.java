@@ -5,8 +5,8 @@ import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,7 +24,6 @@ import static com.leorces.rest.client.constants.ApiConstants.DEFINITION_BY_ID_EN
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DefinitionClient {
 
     private static final ParameterizedTypeReference<PageableData<ProcessDefinition>> PAGEABLE_DEFINITION_TYPE_REF = new ParameterizedTypeReference<>() {
@@ -33,13 +32,17 @@ public class DefinitionClient {
     private static final ParameterizedTypeReference<List<ProcessDefinition>> DEFINITION_LIST_TYPE_REF = new ParameterizedTypeReference<>() {
     };
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
+
+    public DefinitionClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "definition-save")
     @CircuitBreaker(name = "definition-save", fallbackMethod = "saveFallback")
     public List<ProcessDefinition> save(List<ProcessDefinition> definitions) {
         try {
-            return restClient.post()
+            return leorcesRestClient.post()
                     .uri(DEFINITIONS_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -65,7 +68,7 @@ public class DefinitionClient {
     @CircuitBreaker(name = "definition-findall", fallbackMethod = "findAllFallback")
     public PageableData<ProcessDefinition> findAll(Pageable pageable) {
         try {
-            return restClient.get()
+            return leorcesRestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(DEFINITIONS_ENDPOINT)
                             .queryParam("page", pageable.offset() / pageable.limit())
@@ -96,7 +99,7 @@ public class DefinitionClient {
     @CircuitBreaker(name = "definition-findbyid", fallbackMethod = "findByIdFallback")
     public Optional<ProcessDefinition> findById(String definitionId) {
         try {
-            var processDefinition = restClient.get()
+            var processDefinition = leorcesRestClient.get()
                     .uri(DEFINITION_BY_ID_ENDPOINT.formatted(definitionId))
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()

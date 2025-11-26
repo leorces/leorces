@@ -1,7 +1,7 @@
 package com.leorces.rest.client.metrics;
 
 import com.leorces.common.service.MetricService;
-import com.leorces.rest.client.handler.TaskHandler;
+import com.leorces.rest.client.handler.ExternalTaskHandler;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
 import com.leorces.rest.client.worker.WorkerMetrics;
@@ -33,7 +33,7 @@ class WorkerMetricsTest {
     private MetricService metricService;
 
     @Mock
-    private TaskHandler taskHandler;
+    private ExternalTaskHandler externalTaskHandler;
 
     private WorkerMetrics workerMetrics;
 
@@ -186,7 +186,7 @@ class WorkerMetricsTest {
                 60L,
                 80.0
         );
-        return WorkerContext.create(taskHandler, metadata);
+        return WorkerContext.create(externalTaskHandler, metadata);
     }
 
 }

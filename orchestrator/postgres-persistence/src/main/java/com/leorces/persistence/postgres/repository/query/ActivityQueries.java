@@ -58,15 +58,18 @@ public final class ActivityQueries {
                           AND process_definition_key = :processDefinitionKey
                         ORDER BY activity_created_at ASC
                         LIMIT :limit
-                            FOR UPDATE SKIP LOCKED
+                        FOR UPDATE SKIP LOCKED
                     )
                     RETURNING *
             )
             SELECT
                 u.*,
+                p.process_business_key,
                 COALESCE(vars.variables_json, '[]'::json) AS variables_json
             FROM updated u
-                     LEFT JOIN LATERAL (
+            LEFT JOIN process p
+                   ON p.process_id = u.process_id
+            LEFT JOIN LATERAL (
                 SELECT json_agg(
                                json_build_object(
                                        'id', v.variable_id,
@@ -81,7 +84,7 @@ public final class ActivityQueries {
                 FROM variable v
                 WHERE v.execution_id = u.process_id
                    OR v.execution_id = u.activity_id
-                ) vars ON true;
+            ) vars ON TRUE;
             """;
 
     private static final String BASE_SELECT = """

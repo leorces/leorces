@@ -103,6 +103,8 @@ public class ActivityMapper {
         var failure = new ActivityFailure(entity.getFailureReason(), entity.getFailureTrace());
         return Activity.builder()
                 .id(entity.getId())
+                .processId(entity.getProcessId())
+                .processBusinessKey(entity.getProcessBusinessKey())
                 .definitionId(entity.getDefinitionId())
                 .variables(variables)
                 .state(ActivityState.valueOf(entity.getState()))

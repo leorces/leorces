@@ -95,6 +95,10 @@ public class ActivityEntity implements Persistable<String> {
     @JsonProperty("async")
     private Boolean async;
 
+    @ReadOnlyProperty
+    @JsonProperty("process_business_key")
+    private String processBusinessKey;
+
     @Transient
     @JsonIgnore
     private boolean isNew;

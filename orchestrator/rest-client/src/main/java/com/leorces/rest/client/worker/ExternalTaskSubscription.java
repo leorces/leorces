@@ -8,11 +8,13 @@ import java.util.concurrent.TimeUnit;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TaskWorker {
+public @interface ExternalTaskSubscription {
 
-    String topic();
+    String topicName();
 
-    String processDefinitionKey();
+    String processDefinitionKey() default "";
+
+    String[] processDefinitionKeyIn() default {};
 
     long interval() default 5;
 

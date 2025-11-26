@@ -1,11 +1,11 @@
 package com.leorces.rest.client.worker;
 
 import com.leorces.rest.client.exception.ClientConfigurationValidationException;
-import com.leorces.rest.client.handler.TaskHandler;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.handler.ExternalTaskHandler;
+import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
-import com.leorces.rest.client.service.TaskService;
+import com.leorces.rest.client.service.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TaskWorkerInitializer Tests")
-class TaskWorkerInitializerTest {
+class ExternalTaskSubscriptionInitializerTest {
 
     @Mock
     private WorkerScheduler workerScheduler;
@@ -46,31 +46,31 @@ class TaskWorkerInitializerTest {
     }
 
     @Test
-    @DisplayName("Should start worker when valid TaskHandler with TaskWorker annotation is found")
+    @DisplayName("Should start worker when valid ExternalTaskHandler with ExternalTaskSubscription annotation is found")
     void shouldStartWorkerWhenValidTaskHandlerWithTaskWorkerAnnotationIsFound() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var workerMetadata = createValidWorkerMetadata();
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(workerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(workerMetadata);
 
         //When
         taskWorkerInitializer.onApplicationEvent(applicationReadyEvent);
 
         //Then
-        verify(workerConfigResolver).resolveWorkerConfig(any(TaskWorker.class));
+        verify(workerConfigResolver).resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class));
         verify(workerScheduler).startWorker(any(WorkerContext.class));
     }
 
     @Test
-    @DisplayName("Should skip TaskHandler without TaskWorker annotation")
+    @DisplayName("Should skip ExternalTaskHandler without ExternalTaskSubscription annotation")
     void shouldSkipTaskHandlerWithoutTaskWorkerAnnotation() {
         //Given
-        var noAnnotationHandler = new NoAnnotationTaskHandler();
+        var noAnnotationHandler = new NoAnnotationExternalTaskHandler();
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("noAnnotationHandler", noAnnotationHandler));
 
         //When
@@ -82,10 +82,10 @@ class TaskWorkerInitializerTest {
     }
 
     @Test
-    @DisplayName("Should handle empty TaskHandler beans map")
+    @DisplayName("Should handle empty ExternalTaskHandler beans map")
     void shouldHandleEmptyTaskHandlerBeansMap() {
         //Given
-        when(applicationContext.getBeansOfType(TaskHandler.class)).thenReturn(Map.of());
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class)).thenReturn(Map.of());
 
         //When & Then
         assertDoesNotThrow(() -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
@@ -96,20 +96,20 @@ class TaskWorkerInitializerTest {
 
     @Test
     @DisplayName("Should throw exception when topic is blank")
-    void shouldThrowExceptionWhenTopicIsBlank() {
+    void shouldThrowExceptionWhenTopicNameIsBlank() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var invalidWorkerMetadata = createWorkerMetadata("", "validKey", 5, 0, 1);
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(invalidWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(invalidWorkerMetadata);
 
         //When & Then
         var exception = assertThrows(ClientConfigurationValidationException.class,
                 () -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
 
-        var expectedMessage = "Topic cannot be blank for TaskHandler";
+        var expectedMessage = "Topic cannot be blank for ExternalTaskHandler";
         assert exception.getMessage().contains(expectedMessage);
     }
 
@@ -117,18 +117,18 @@ class TaskWorkerInitializerTest {
     @DisplayName("Should throw exception when processDefinitionKey is blank")
     void shouldThrowExceptionWhenProcessDefinitionKeyIsBlank() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var invalidWorkerMetadata = createWorkerMetadata("validTopic", "", 5, 0, 1);
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(invalidWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(invalidWorkerMetadata);
 
         //When & Then
         var exception = assertThrows(ClientConfigurationValidationException.class,
                 () -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
 
-        var expectedMessage = "ProcessDefinitionKey cannot be blank for TaskHandler";
+        var expectedMessage = "ProcessDefinitionKey cannot be blank for ExternalTaskHandler";
         assert exception.getMessage().contains(expectedMessage);
     }
 
@@ -136,18 +136,18 @@ class TaskWorkerInitializerTest {
     @DisplayName("Should throw exception when interval is negative or zero")
     void shouldThrowExceptionWhenIntervalIsNegativeOrZero() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var invalidWorkerMetadata = createWorkerMetadata("validTopic", "validKey", -1, 0, 1);
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(invalidWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(invalidWorkerMetadata);
 
         //When & Then
         var exception = assertThrows(ClientConfigurationValidationException.class,
                 () -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
 
-        var expectedMessage = "Interval must be positive for TaskHandler";
+        var expectedMessage = "Interval must be positive for ExternalTaskHandler";
         assert exception.getMessage().contains(expectedMessage);
     }
 
@@ -155,18 +155,18 @@ class TaskWorkerInitializerTest {
     @DisplayName("Should throw exception when maxConcurrentTasks is negative or zero")
     void shouldThrowExceptionWhenMaxConcurrentTasksIsNegativeOrZero() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var invalidWorkerMetadata = createWorkerMetadata("validTopic", "validKey", 5, 0, -1);
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(invalidWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(invalidWorkerMetadata);
 
         //When & Then
         var exception = assertThrows(ClientConfigurationValidationException.class,
                 () -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
 
-        var expectedMessage = "MaxConcurrentTasks must be positive for TaskHandler";
+        var expectedMessage = "MaxConcurrentTasks must be positive for ExternalTaskHandler";
         assert exception.getMessage().contains(expectedMessage);
     }
 
@@ -174,18 +174,18 @@ class TaskWorkerInitializerTest {
     @DisplayName("Should throw exception when initialDelay is negative")
     void shouldThrowExceptionWhenInitialDelayIsNegative() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var invalidWorkerMetadata = createWorkerMetadata("validTopic", "validKey", 5, -1, 1);
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(invalidWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(invalidWorkerMetadata);
 
         //When & Then
         var exception = assertThrows(ClientConfigurationValidationException.class,
                 () -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
 
-        var expectedMessage = "InitialDelay must be non-negative for TaskHandler";
+        var expectedMessage = "InitialDelay must be non-negative for ExternalTaskHandler";
         assert exception.getMessage().contains(expectedMessage);
     }
 
@@ -193,12 +193,12 @@ class TaskWorkerInitializerTest {
     @DisplayName("Should accept zero initialDelay as valid")
     void shouldAcceptZeroInitialDelayAsValid() {
         //Given
-        var testHandler = new TestTaskHandler();
+        var testHandler = new TestExternalTaskHandler();
         var validWorkerMetadata = createWorkerMetadata("validTopic", "validKey", 5, 0, 1);
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of("testHandler", testHandler));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(validWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(validWorkerMetadata);
 
         //When & Then
         assertDoesNotThrow(() -> taskWorkerInitializer.onApplicationEvent(applicationReadyEvent));
@@ -210,24 +210,24 @@ class TaskWorkerInitializerTest {
     @DisplayName("Should process multiple TaskHandlers correctly")
     void shouldProcessMultipleTaskHandlersCorrectly() {
         //Given
-        var testHandler1 = new TestTaskHandler();
-        var testHandler2 = new TestTaskHandler();
-        var noAnnotationHandler = new NoAnnotationTaskHandler();
+        var testHandler1 = new TestExternalTaskHandler();
+        var testHandler2 = new TestExternalTaskHandler();
+        var noAnnotationHandler = new NoAnnotationExternalTaskHandler();
         var validWorkerMetadata = createValidWorkerMetadata();
 
-        when(applicationContext.getBeansOfType(TaskHandler.class))
+        when(applicationContext.getBeansOfType(ExternalTaskHandler.class))
                 .thenReturn(Map.of(
                         "testHandler1", testHandler1,
                         "testHandler2", testHandler2,
                         "noAnnotationHandler", noAnnotationHandler
                 ));
-        when(workerConfigResolver.resolveWorkerConfig(any(TaskWorker.class))).thenReturn(validWorkerMetadata);
+        when(workerConfigResolver.resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class))).thenReturn(validWorkerMetadata);
 
         //When
         taskWorkerInitializer.onApplicationEvent(applicationReadyEvent);
 
         //Then
-        verify(workerConfigResolver, times(2)).resolveWorkerConfig(any(TaskWorker.class));
+        verify(workerConfigResolver, times(2)).resolveWorkerConfig(anyString(), any(ExternalTaskSubscription.class));
         verify(workerScheduler, times(2)).startWorker(any(WorkerContext.class));
     }
 
@@ -243,20 +243,20 @@ class TaskWorkerInitializerTest {
         return new WorkerMetadata(topic, processDefinitionKey, interval, initialDelay, maxConcurrentTasks, TimeUnit.SECONDS);
     }
 
-    // Test implementation of TaskHandler with TaskWorker annotation
-    @TaskWorker(topic = "testTopic", processDefinitionKey = "testProcess")
-    static class TestTaskHandler implements TaskHandler {
+    // Test implementation of ExternalTaskHandler with ExternalTaskSubscription annotation
+    @ExternalTaskSubscription(topicName = "testTopic", processDefinitionKey = "testProcess")
+    static class TestExternalTaskHandler implements ExternalTaskHandler {
         @Override
-        public void handle(Task task, TaskService taskService) {
+        public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
             // Test implementation - do nothing
         }
 
     }
 
-    // Test implementation of TaskHandler without TaskWorker annotation
-    static class NoAnnotationTaskHandler implements TaskHandler {
+    // Test implementation of ExternalTaskHandler without ExternalTaskSubscription annotation
+    static class NoAnnotationExternalTaskHandler implements ExternalTaskHandler {
         @Override
-        public void handle(Task task, TaskService taskService) {
+        public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
             // Test implementation - do nothing
         }
 

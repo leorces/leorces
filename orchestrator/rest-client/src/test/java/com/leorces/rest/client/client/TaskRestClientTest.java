@@ -1,7 +1,7 @@
 package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.activity.ActivityFailure;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.request.FailActivityRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,9 +55,9 @@ class TaskRestClientTest {
 
     private TaskRestClient taskRestClient;
 
-    private static Task createTestTask(String id) {
-        // Using mock since Task might be complex
-        return mock(Task.class);
+    private static ExternalTask createTestTask(String id) {
+        // Using mock since ExternalTask might be complex
+        return mock(ExternalTask.class);
     }
 
     @BeforeEach

@@ -5,8 +5,8 @@ import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.model.request.FailActivityRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -23,19 +23,22 @@ import static com.leorces.rest.client.constants.ApiConstants.*;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ActivityClient {
 
     private static final ParameterizedTypeReference<List<Activity>> ACTIVITY_LIST_TYPE_REF = new ParameterizedTypeReference<>() {
     };
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
+
+    public ActivityClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "activity-run")
     @CircuitBreaker(name = "activity-run", fallbackMethod = "runFallback")
     public void run(String processId, String activityDefinitionId) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(RUN_ACTIVITY_ENDPOINT.formatted(processId, activityDefinitionId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -66,7 +69,7 @@ public class ActivityClient {
     @CircuitBreaker(name = "activity-complete", fallbackMethod = "completeFallback")
     public void complete(String activityId, Map<String, Object> variables) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(COMPLETE_ACTIVITY_ENDPOINT.formatted(activityId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -93,7 +96,7 @@ public class ActivityClient {
     @CircuitBreaker(name = "activity-fail", fallbackMethod = "failFallback")
     public void fail(String activityId, ActivityFailure failure, Map<String, Object> variables) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(FAIL_ACTIVITY_ENDPOINT.formatted(activityId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -120,7 +123,7 @@ public class ActivityClient {
     @CircuitBreaker(name = "activity-terminate", fallbackMethod = "terminateFallback")
     public void terminate(String activityId) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(TERMINATE_ACTIVITY_ENDPOINT.formatted(activityId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -146,7 +149,7 @@ public class ActivityClient {
     @CircuitBreaker(name = "activity-retry", fallbackMethod = "retryFallback")
     public void retry(String activityId) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(RETRY_ACTIVITY_ENDPOINT.formatted(activityId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -172,7 +175,7 @@ public class ActivityClient {
     @CircuitBreaker(name = "activity-poll", fallbackMethod = "pollFallback")
     public List<Activity> poll(String processDefinitionKey, String topic, int limit) {
         try {
-            return restClient.get()
+            return leorcesRestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(POLL_ACTIVITIES_ENDPOINT.formatted(processDefinitionKey, topic))
                             .queryParam(SIZE_PARAM, limit)

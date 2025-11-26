@@ -133,6 +133,27 @@ public final class ProcessQueries {
               )
             """;
 
+    public static final String FIND_BY_FIND_PROCESS_DATA = BASE_SELECT + """
+            WHERE (:processDefinitionKey IS NULL OR :processDefinitionKey = '' OR process.process_definition_key = :processDefinitionKey)
+              AND (:processDefinitionId IS NULL OR :processDefinitionId = '' OR process.process_definition_id = :processDefinitionId)
+              AND (:businessKey IS NULL OR :businessKey = '' OR process.process_business_key = :businessKey)
+              AND (
+                    :variableKeys IS NULL OR :variableValues IS NULL OR :variableCount = 0
+                    OR process.process_id IN (
+                        SELECT variable.execution_id
+                        FROM variable
+                        WHERE variable.execution_id = process.process_id
+                        GROUP BY variable.execution_id
+                        HAVING COUNT(DISTINCT CASE
+                                 WHEN variable.variable_key = ANY(:variableKeys)
+                                  AND variable.variable_value::text = ANY(:variableValues)
+                                 THEN variable.variable_key
+                                 END) = :variableCount
+                    )
+                  )
+              LIMIT 100;
+            """;
+
     public static final String CHANGE_STATE = """
             UPDATE process
             SET process_state = :state,

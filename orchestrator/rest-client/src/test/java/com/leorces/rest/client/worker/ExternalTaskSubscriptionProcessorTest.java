@@ -3,11 +3,11 @@ package com.leorces.rest.client.worker;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.rest.client.client.TaskRestClient;
-import com.leorces.rest.client.handler.TaskHandler;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.handler.ExternalTaskHandler;
+import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
-import com.leorces.rest.client.service.TaskService;
+import com.leorces.rest.client.service.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("WorkerProcessor Tests")
-class WorkerProcessorTest {
+@DisplayName("ExternalTaskSubscriptionProcessor Tests")
+class ExternalTaskSubscriptionProcessorTest {
 
     private static final String TOPIC = "test-topic";
     private static final String PROCESS_DEFINITION_KEY = "test-process";
@@ -34,7 +34,7 @@ class WorkerProcessorTest {
     private TaskRestClient client;
 
     @Mock
-    private TaskService service;
+    private ExternalTaskService service;
 
     @Mock
     private VariablesMapper variablesMapper;
@@ -49,17 +49,17 @@ class WorkerProcessorTest {
     private WorkerMetrics workerMetrics;
 
     @Mock
-    private TaskHandler taskHandler;
+    private ExternalTaskHandler externalTaskHandler;
 
-    private WorkerProcessor processor;
+    private ExternalTaskSubscriptionProcessor processor;
     private WorkerContext context;
 
     @BeforeEach
     void setUp() {
-        processor = new WorkerProcessor(client, service, variablesMapper, objectMapper, workerMetrics, executor);
+        processor = new ExternalTaskSubscriptionProcessor(client, service, variablesMapper, objectMapper, workerMetrics, executor);
 
         var metadata = createWorkerMetadata();
-        context = WorkerContext.create(taskHandler, metadata);
+        context = WorkerContext.create(externalTaskHandler, metadata);
     }
 
     @Test
@@ -76,8 +76,8 @@ class WorkerProcessorTest {
     @DisplayName("Should record successful poll metrics when tasks are polled")
     void shouldRecordSuccessfulPollMetricsWhenTasksArePolled() {
         // Given
-        var task1 = mock(Task.class);
-        var task2 = mock(Task.class);
+        var task1 = mock(ExternalTask.class);
+        var task2 = mock(ExternalTask.class);
         var tasks = List.of(task1, task2);
         var response = new ResponseEntity<>(tasks, HttpStatus.OK);
         when(client.poll(TOPIC, PROCESS_DEFINITION_KEY, 1)).thenReturn(response);
@@ -94,7 +94,7 @@ class WorkerProcessorTest {
     @DisplayName("Should record failed poll metrics when polling returns error status")
     void shouldRecordFailedPollMetricsWhenPollingReturnsErrorStatus() {
         // Given
-        var response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).<List<Task>>build();
+        var response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).<List<ExternalTask>>build();
         when(client.poll(TOPIC, PROCESS_DEFINITION_KEY, 1)).thenReturn(response);
 
         // When
@@ -123,12 +123,12 @@ class WorkerProcessorTest {
     @DisplayName("Should record task completed metrics when task executes successfully")
     void shouldRecordTaskCompletedMetricsWhenTaskExecutesSuccessfully() {
         // Given
-        var task = createTask("task-1");
+        var task = createTask();
         var tasks = List.of(task);
         var response = new ResponseEntity<>(tasks, HttpStatus.OK);
         when(client.poll(TOPIC, PROCESS_DEFINITION_KEY, 1)).thenReturn(response);
 
-        var taskBuilder = mock(Task.TaskBuilder.class);
+        var taskBuilder = mock(ExternalTask.ExternalTaskBuilder.class);
         when(task.toBuilder()).thenReturn(taskBuilder);
         when(taskBuilder.objectMapper(objectMapper)).thenReturn(taskBuilder);
         when(taskBuilder.variablesMapper(variablesMapper)).thenReturn(taskBuilder);
@@ -153,18 +153,18 @@ class WorkerProcessorTest {
     @DisplayName("Should record task failed metrics when task execution throws exception")
     void shouldRecordTaskFailedMetricsWhenTaskExecutionThrowsException() {
         // Given
-        var task = createTask("task-1");
+        var task = createTask();
         var tasks = List.of(task);
         var response = new ResponseEntity<>(tasks, HttpStatus.OK);
         when(client.poll(TOPIC, PROCESS_DEFINITION_KEY, 1)).thenReturn(response);
 
-        var taskBuilder = mock(Task.TaskBuilder.class);
+        var taskBuilder = mock(ExternalTask.ExternalTaskBuilder.class);
         when(task.toBuilder()).thenReturn(taskBuilder);
         when(taskBuilder.objectMapper(objectMapper)).thenReturn(taskBuilder);
         when(taskBuilder.variablesMapper(variablesMapper)).thenReturn(taskBuilder);
         when(taskBuilder.build()).thenReturn(task);
 
-        doThrow(new RuntimeException("Task execution failed")).when(taskHandler).handle(any(Task.class), eq(service));
+        doThrow(new RuntimeException("ExternalTask execution failed")).when(externalTaskHandler).doExecute(any(ExternalTask.class), eq(service));
         when(service.fail("task-1")).thenReturn(true);
 
         doAnswer(invocation -> {
@@ -196,9 +196,9 @@ class WorkerProcessorTest {
         );
     }
 
-    private Task createTask(String id) {
-        var task = mock(Task.class);
-        when(task.id()).thenReturn(id);
+    private ExternalTask createTask() {
+        var task = mock(ExternalTask.class);
+        when(task.id()).thenReturn("task-1");
         return task;
     }
 

@@ -5,8 +5,8 @@ import com.leorces.model.pagination.PageableData;
 import com.leorces.model.runtime.process.ProcessExecution;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -21,19 +21,22 @@ import static com.leorces.rest.client.constants.ApiConstants.HISTORY_ENDPOINT;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class HistoryClient {
 
     private static final ParameterizedTypeReference<PageableData<ProcessExecution>> PAGEABLE_PROCESS_EXECUTION_TYPE_REF = new ParameterizedTypeReference<>() {
     };
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
+
+    public HistoryClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "history-findall")
     @CircuitBreaker(name = "history-findall", fallbackMethod = "findAllFallback")
     public PageableData<ProcessExecution> findAll(Pageable pageable) {
         try {
-            return restClient.get()
+            return leorcesRestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(HISTORY_ENDPOINT)
                             .queryParam("page", pageable.offset() / pageable.limit())

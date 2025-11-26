@@ -10,6 +10,8 @@ import java.util.List;
 public record Activity(
         String id,
         String definitionId,
+        String processId,
+        String processBusinessKey,
         List<Variable> variables,
         ActivityState state,
         int retries,

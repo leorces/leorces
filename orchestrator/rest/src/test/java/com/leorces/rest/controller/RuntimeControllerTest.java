@@ -2,6 +2,7 @@ package com.leorces.rest.controller;
 
 import com.leorces.api.RuntimeService;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.rest.model.request.CorrelateMessageRequest;
 import com.leorces.rest.model.request.ProcessModificationRequest;
 import com.leorces.rest.model.request.StartProcessByIdRequest;
@@ -313,6 +314,33 @@ class RuntimeControllerTest {
 
         // Then
         verify(runtimeService).setVariablesLocal(TEST_EXECUTION_ID, emptyVariables);
+    }
+
+    @Test
+    @DisplayName("Should find process")
+    void shouldFindProcess() {
+        var filter = ProcessFilter.builder().businessKey(TEST_BUSINESS_KEY).build();
+        var expected = createTestProcess();
+
+        when(runtimeService.findProcess(filter)).thenReturn(expected);
+
+        var res = subject.findSingleProcess(filter);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(res.getBody()).isEqualTo(expected);
+        verify(runtimeService).findProcess(filter);
+    }
+
+    @Test
+    @DisplayName("Should return 404 if process not found")
+    void shouldReturn404IfNotFound() {
+        var filter = ProcessFilter.builder().businessKey("none").build();
+
+        when(runtimeService.findProcess(filter)).thenReturn(null);
+
+        var res = subject.findSingleProcess(filter);
+
+        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     private Process createTestProcess() {

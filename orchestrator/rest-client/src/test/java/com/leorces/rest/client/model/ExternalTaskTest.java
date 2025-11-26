@@ -14,8 +14,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Task Model Tests")
-class TaskTest {
+@DisplayName("ExternalTask Model Tests")
+class ExternalTaskTest {
 
     private static final String STRING_TYPE = "string";
     private static final String INTEGER_TYPE = "integer";
@@ -357,11 +357,10 @@ class TaskTest {
                 .build();
     }
 
-    private Task createTaskWithVariables(List<Variable> variables) {
-        return Task.builder()
+    private ExternalTask createTaskWithVariables(List<Variable> variables) {
+        return ExternalTask.builder()
                 .id(TASK_ID)
                 .businessKey(BUSINESS_KEY)
-                .definitionId(DEFINITION_ID)
                 .state(ProcessState.ACTIVE)
                 .retries(0)
                 .variables(variables)

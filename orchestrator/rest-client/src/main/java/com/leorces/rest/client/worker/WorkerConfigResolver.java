@@ -11,14 +11,13 @@ public class WorkerConfigResolver {
 
     private final ProcessConfigurationProperties processConfigurationProperties;
 
-    public WorkerMetadata resolveWorkerConfig(TaskWorker annotation) {
-        var processDefinitionKey = annotation.processDefinitionKey();
+    public WorkerMetadata resolveWorkerConfig(String processDefinitionKey, ExternalTaskSubscription annotation) {
         var processConfig = processConfigurationProperties.configuration().get(processDefinitionKey);
 
         if (processConfig == null) {
             return new WorkerMetadata(
-                    annotation.topic(),
-                    annotation.processDefinitionKey(),
+                    annotation.topicName(),
+                    processDefinitionKey,
                     annotation.interval(),
                     annotation.initialDelay(),
                     annotation.maxConcurrentTasks(),
@@ -26,10 +25,10 @@ public class WorkerConfigResolver {
             );
         }
 
-        var workerConfig = processConfig.workers().get(annotation.topic());
+        var workerConfig = processConfig.workers().get(annotation.topicName());
         return new WorkerMetadata(
-                annotation.topic(),
-                annotation.processDefinitionKey(),
+                annotation.topicName(),
+                processDefinitionKey,
                 workerConfig != null ? workerConfig.interval() : annotation.interval(),
                 workerConfig != null ? workerConfig.initialDelay() : annotation.initialDelay(),
                 workerConfig != null ? workerConfig.maxConcurrentTasks() : annotation.maxConcurrentTasks(),

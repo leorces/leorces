@@ -24,7 +24,7 @@ class WorkerConfigResolverTest {
     private ProcessConfigurationProperties processConfigurationProperties;
 
     @Mock
-    private TaskWorker taskWorkerAnnotation;
+    private ExternalTaskSubscription externalTaskSubscriptionAnnotation;
 
     private WorkerConfigResolver workerConfigResolver;
 
@@ -44,16 +44,15 @@ class WorkerConfigResolverTest {
         var maxConcurrentTasks = 3;
         var timeUnit = TimeUnit.MINUTES;
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
-        when(taskWorkerAnnotation.interval()).thenReturn(interval);
-        when(taskWorkerAnnotation.initialDelay()).thenReturn(initialDelay);
-        when(taskWorkerAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
-        when(taskWorkerAnnotation.timeUnit()).thenReturn(timeUnit);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
+        when(externalTaskSubscriptionAnnotation.interval()).thenReturn(interval);
+        when(externalTaskSubscriptionAnnotation.initialDelay()).thenReturn(initialDelay);
+        when(externalTaskSubscriptionAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
+        when(externalTaskSubscriptionAnnotation.timeUnit()).thenReturn(timeUnit);
         when(processConfigurationProperties.configuration()).thenReturn(Map.of());
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result).isNotNull();
@@ -79,16 +78,15 @@ class WorkerConfigResolverTest {
         var workerProperties = new WorkerProperties(Map.of());
         var configurationMap = Map.of(processDefinitionKey, workerProperties);
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
-        when(taskWorkerAnnotation.interval()).thenReturn(interval);
-        when(taskWorkerAnnotation.initialDelay()).thenReturn(initialDelay);
-        when(taskWorkerAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
-        when(taskWorkerAnnotation.timeUnit()).thenReturn(timeUnit);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
+        when(externalTaskSubscriptionAnnotation.interval()).thenReturn(interval);
+        when(externalTaskSubscriptionAnnotation.initialDelay()).thenReturn(initialDelay);
+        when(externalTaskSubscriptionAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
+        when(externalTaskSubscriptionAnnotation.timeUnit()).thenReturn(timeUnit);
         when(processConfigurationProperties.configuration()).thenReturn(configurationMap);
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result).isNotNull();
@@ -119,12 +117,11 @@ class WorkerConfigResolverTest {
         var workerProperties = new WorkerProperties(Map.of(topic, workerConfig));
         var configurationMap = Map.of(processDefinitionKey, workerProperties);
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
         when(processConfigurationProperties.configuration()).thenReturn(configurationMap);
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result).isNotNull();
@@ -152,16 +149,15 @@ class WorkerConfigResolverTest {
         var workerProperties = new WorkerProperties(Map.of(differentTopic, workerConfig));
         var configurationMap = Map.of(processDefinitionKey, workerProperties);
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
-        when(taskWorkerAnnotation.interval()).thenReturn(interval);
-        when(taskWorkerAnnotation.initialDelay()).thenReturn(initialDelay);
-        when(taskWorkerAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
-        when(taskWorkerAnnotation.timeUnit()).thenReturn(timeUnit);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
+        when(externalTaskSubscriptionAnnotation.interval()).thenReturn(interval);
+        when(externalTaskSubscriptionAnnotation.initialDelay()).thenReturn(initialDelay);
+        when(externalTaskSubscriptionAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
+        when(externalTaskSubscriptionAnnotation.timeUnit()).thenReturn(timeUnit);
         when(processConfigurationProperties.configuration()).thenReturn(configurationMap);
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result).isNotNull();
@@ -189,16 +185,15 @@ class WorkerConfigResolverTest {
         var workerProperties = new WorkerProperties(workerMap);
         var configurationMap = Map.of(processDefinitionKey, workerProperties);
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
-        when(taskWorkerAnnotation.interval()).thenReturn(interval);
-        when(taskWorkerAnnotation.initialDelay()).thenReturn(initialDelay);
-        when(taskWorkerAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
-        when(taskWorkerAnnotation.timeUnit()).thenReturn(timeUnit);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
+        when(externalTaskSubscriptionAnnotation.interval()).thenReturn(interval);
+        when(externalTaskSubscriptionAnnotation.initialDelay()).thenReturn(initialDelay);
+        when(externalTaskSubscriptionAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
+        when(externalTaskSubscriptionAnnotation.timeUnit()).thenReturn(timeUnit);
         when(processConfigurationProperties.configuration()).thenReturn(configurationMap);
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result).isNotNull();
@@ -221,12 +216,11 @@ class WorkerConfigResolverTest {
         var workerProperties = new WorkerProperties(Map.of(topic, workerConfig));
         var configurationMap = Map.of(processDefinitionKey, workerProperties);
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
         when(processConfigurationProperties.configuration()).thenReturn(configurationMap);
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result.topic()).isEqualTo(topic);
@@ -249,16 +243,15 @@ class WorkerConfigResolverTest {
         var workerProperties = new WorkerProperties(Map.of(topic, workerConfig));
         var configurationMap = Map.of("differentProcessKey", workerProperties);
 
-        when(taskWorkerAnnotation.topic()).thenReturn(topic);
-        when(taskWorkerAnnotation.processDefinitionKey()).thenReturn(processDefinitionKey);
-        when(taskWorkerAnnotation.interval()).thenReturn(interval);
-        when(taskWorkerAnnotation.initialDelay()).thenReturn(initialDelay);
-        when(taskWorkerAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
-        when(taskWorkerAnnotation.timeUnit()).thenReturn(timeUnit);
+        when(externalTaskSubscriptionAnnotation.topicName()).thenReturn(topic);
+        when(externalTaskSubscriptionAnnotation.interval()).thenReturn(interval);
+        when(externalTaskSubscriptionAnnotation.initialDelay()).thenReturn(initialDelay);
+        when(externalTaskSubscriptionAnnotation.maxConcurrentTasks()).thenReturn(maxConcurrentTasks);
+        when(externalTaskSubscriptionAnnotation.timeUnit()).thenReturn(timeUnit);
         when(processConfigurationProperties.configuration()).thenReturn(configurationMap);
 
         //When
-        var result = workerConfigResolver.resolveWorkerConfig(taskWorkerAnnotation);
+        var result = workerConfigResolver.resolveWorkerConfig(processDefinitionKey, externalTaskSubscriptionAnnotation);
 
         //Then
         assertThat(result).isNotNull();

@@ -1,10 +1,10 @@
 package com.leorces.rest.client.worker;
 
-import com.leorces.rest.client.handler.TaskHandler;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.handler.ExternalTaskHandler;
+import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
-import com.leorces.rest.client.service.TaskService;
+import com.leorces.rest.client.service.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 class WorkerSchedulerTest {
 
     @Mock
-    private WorkerProcessor workerProcessor;
+    private ExternalTaskSubscriptionProcessor externalTaskSubscriptionProcessor;
 
     @Mock
     private ScheduledExecutorService scheduledExecutorService;
@@ -33,14 +33,14 @@ class WorkerSchedulerTest {
 
     @BeforeEach
     void setUp() {
-        workerScheduler = new WorkerScheduler(workerProcessor, scheduledExecutorService);
+        workerScheduler = new WorkerScheduler(externalTaskSubscriptionProcessor, scheduledExecutorService);
     }
 
     @Test
     @DisplayName("Should schedule worker with correct initial delay and interval")
     void shouldScheduleWorkerWithCorrectInitialDelayAndInterval() {
         //Given
-        var handler = new TestTaskHandler();
+        var handler = new TestExternalTaskHandler();
         var metadata = new WorkerMetadata("testTopic", "testProcess", 10L, 5L, 2, TimeUnit.SECONDS);
         var context = WorkerContext.create(handler, metadata);
 
@@ -63,7 +63,7 @@ class WorkerSchedulerTest {
     @DisplayName("Should schedule worker with different time units correctly")
     void shouldScheduleWorkerWithDifferentTimeUnitsCorrectly() {
         //Given
-        var handler = new TestTaskHandler();
+        var handler = new TestExternalTaskHandler();
         var metadata = new WorkerMetadata("testTopic", "testProcess", 2L, 1L, 1, TimeUnit.MINUTES);
         var context = WorkerContext.create(handler, metadata);
 
@@ -86,7 +86,7 @@ class WorkerSchedulerTest {
     @DisplayName("Should handle zero initial delay correctly")
     void shouldHandleZeroInitialDelayCorrectly() {
         //Given
-        var handler = new TestTaskHandler();
+        var handler = new TestExternalTaskHandler();
         var metadata = new WorkerMetadata("testTopic", "testProcess", 15L, 0L, 3, TimeUnit.SECONDS);
         var context = WorkerContext.create(handler, metadata);
 
@@ -109,7 +109,7 @@ class WorkerSchedulerTest {
     @DisplayName("Should execute processor when scheduled task runs and not shutting down")
     void shouldExecuteProcessorWhenScheduledTaskRunsAndNotShuttingDown() {
         //Given
-        var handler = new TestTaskHandler();
+        var handler = new TestExternalTaskHandler();
         var metadata = new WorkerMetadata("testTopic", "testProcess", 5L, 0L, 1, TimeUnit.SECONDS);
         var context = WorkerContext.create(handler, metadata);
 
@@ -127,14 +127,14 @@ class WorkerSchedulerTest {
         var capturedRunnable = runnableCaptor.getValue();
         capturedRunnable.run();
 
-        verify(workerProcessor).process(context);
+        verify(externalTaskSubscriptionProcessor).process(context);
     }
 
     @Test
     @DisplayName("Should not execute processor when shutting down")
     void shouldNotExecuteProcessorWhenShuttingDown() {
         //Given
-        var handler = new TestTaskHandler();
+        var handler = new TestExternalTaskHandler();
         var metadata = new WorkerMetadata("testTopic", "testProcess", 5L, 0L, 1, TimeUnit.SECONDS);
         var context = WorkerContext.create(handler, metadata);
 
@@ -153,7 +153,7 @@ class WorkerSchedulerTest {
         var capturedRunnable = runnableCaptor.getValue();
         capturedRunnable.run();
 
-        verifyNoInteractions(workerProcessor);
+        verifyNoInteractions(externalTaskSubscriptionProcessor);
     }
 
     @Test
@@ -224,11 +224,11 @@ class WorkerSchedulerTest {
     @DisplayName("Should schedule multiple workers independently")
     void shouldScheduleMultipleWorkersIndependently() {
         //Given
-        var handler1 = new TestTaskHandler();
+        var handler1 = new TestExternalTaskHandler();
         var metadata1 = new WorkerMetadata("topic1", "process1", 5L, 1L, 1, TimeUnit.SECONDS);
         var context1 = WorkerContext.create(handler1, metadata1);
 
-        var handler2 = new TestTaskHandler();
+        var handler2 = new TestExternalTaskHandler();
         var metadata2 = new WorkerMetadata("topic2", "process2", 10L, 2L, 2, TimeUnit.MINUTES);
         var context2 = WorkerContext.create(handler2, metadata2);
 
@@ -256,7 +256,7 @@ class WorkerSchedulerTest {
     @DisplayName("Should convert time units to milliseconds correctly")
     void shouldConvertTimeUnitsToMillisecondsCorrectly() {
         //Given
-        var handler = new TestTaskHandler();
+        var handler = new TestExternalTaskHandler();
         var metadata = new WorkerMetadata("testTopic", "testProcess", 1L, 30L, 1, TimeUnit.HOURS);
         var context = WorkerContext.create(handler, metadata);
 
@@ -275,10 +275,10 @@ class WorkerSchedulerTest {
         );
     }
 
-    // Test implementation of TaskHandler
-    static class TestTaskHandler implements TaskHandler {
+    // Test implementation of ExternalTaskHandler
+    static class TestExternalTaskHandler implements ExternalTaskHandler {
         @Override
-        public void handle(Task task, TaskService taskService) {
+        public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
             // Test implementation - do nothing
         }
 

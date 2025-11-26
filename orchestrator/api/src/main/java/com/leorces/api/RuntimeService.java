@@ -1,6 +1,7 @@
 package com.leorces.api;
 
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 
 import java.util.Map;
 
@@ -88,6 +89,14 @@ public interface RuntimeService {
      * @param processId the unique identifier of the process
      */
     void terminateProcess(String processId);
+
+    /**
+     * Finds process by filter.
+     *
+     * @param filter contains process data to search for
+     * @return process
+     */
+    Process findProcess(ProcessFilter filter);
 
     /**
      * Moves an execution within a process instance from one activity to another.

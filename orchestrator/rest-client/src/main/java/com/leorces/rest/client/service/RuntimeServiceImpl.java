@@ -2,6 +2,7 @@ package com.leorces.rest.client.service;
 
 import com.leorces.api.RuntimeService;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.rest.client.client.RuntimeClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,11 @@ public class RuntimeServiceImpl implements RuntimeService {
     @Override
     public void terminateProcess(String processId) {
         runtimeClient.terminateProcess(processId);
+    }
+
+    @Override
+    public Process findProcess(ProcessFilter filter) {
+        return runtimeClient.findProcess(filter);
     }
 
     @Override

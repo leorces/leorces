@@ -17,6 +17,7 @@ public final class ApiConstants {
     public static final String CORRELATE_MESSAGE_ENDPOINT = RUNTIME_ENDPOINT + "/correlate";
     public static final String SET_VARIABLES_ENDPOINT = RUNTIME_ENDPOINT + "/%s/variables";
     public static final String SET_VARIABLES_LOCAL_ENDPOINT = RUNTIME_ENDPOINT + "/%s/variables/local";
+    public static final String FIND_PROCESS = RUNTIME_ENDPOINT + "/find/process";
     // =====================
     // Activities endpoints
     // =====================

@@ -1,6 +1,7 @@
 package com.leorces.rest.client.service;
 
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.rest.client.client.RuntimeClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -273,6 +274,29 @@ class RuntimeServiceImplTest {
 
         //Then
         verify(runtimeClient).correlateMessage(MESSAGE_NAME, BUSINESS_KEY, VARIABLES, CORRELATION_KEYS);
+    }
+
+    @Test
+    @DisplayName("Should find process using filter")
+    void shouldFindProcess() {
+        // Given
+        var filter = ProcessFilter.builder()
+                .processDefinitionKey("defKey")
+                .businessKey("bizKey")
+                .variables(Map.of("v1", "x"))
+                .build();
+
+        var expectedProcess = createProcess("process-found");
+
+        when(runtimeClient.findProcess(filter))
+                .thenReturn(expectedProcess);
+
+        // When
+        var result = runtimeService.findProcess(filter);
+
+        // Then
+        verify(runtimeClient).findProcess(filter);
+        assertThat(result).isEqualTo(expectedProcess);
     }
 
     private Process createProcess(String id) {

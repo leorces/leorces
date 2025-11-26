@@ -24,10 +24,4 @@ public class MessageCorrelationException extends RuntimeException {
         );
     }
 
-    public static MessageCorrelationException missingBusinessKeyAndCorrelationKeys() {
-        return new MessageCorrelationException(
-                "Neither businessKey nor correlationKeys provided for message correlation"
-        );
-    }
-
 }

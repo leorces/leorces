@@ -5,9 +5,9 @@ import com.leorces.model.pagination.PageableData;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessExecution;
 import com.leorces.model.runtime.process.ProcessState;
+import com.leorces.model.search.ProcessFilter;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -70,29 +70,20 @@ public interface ProcessPersistence {
     Optional<ProcessExecution> findExecutionById(String processId);
 
     /**
-     * Finds all processes by their business key.
+     * Finds all processes.
      *
-     * @param businessKey the business key to search for
-     * @return the list of processes matching the business key
+     * @param filter contains process data to search for
+     * @return the list of processes
      */
-    List<Process> findByBusinessKey(String businessKey);
+    List<Process> findAll(ProcessFilter filter);
 
     /**
-     * Finds all processes by their variables.
+     * Finds all processes with pagination support.
      *
-     * @param variables the map of variables to search for
-     * @return the list of processes matching the variables
+     * @param pageable the pagination parameters
+     * @return pageable data containing processes and total count
      */
-    List<Process> findByVariables(Map<String, Object> variables);
-
-    /**
-     * Finds all processes by both business key and variables.
-     *
-     * @param businessKey the business key to search for
-     * @param variables   the map of variables to search for
-     * @return the list of processes matching both business key and variables
-     */
-    List<Process> findByBusinessKeyAndVariables(String businessKey, Map<String, Object> variables);
+    PageableData<Process> findAll(Pageable pageable);
 
     /**
      * Finds all fully completed processes with a limit.
@@ -101,13 +92,5 @@ public interface ProcessPersistence {
      * @return the list of fully completed processes
      */
     List<ProcessExecution> findAllFullyCompleted(int limit);
-
-    /**
-     * Retrieves all processes with pagination support.
-     *
-     * @param pageable the pagination parameters
-     * @return pageable data containing processes and total count
-     */
-    PageableData<Process> findAll(Pageable pageable);
 
 }

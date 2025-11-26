@@ -8,6 +8,7 @@ import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.engine.service.process.ProcessRuntimeService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,12 @@ public class RuntimeServiceImpl implements RuntimeService {
     public void terminateProcess(String processId) {
         log.debug("Terminate process by process id: {}", processId);
         dispatcher.dispatch(TerminateProcessCommand.of(processId));
+    }
+
+    @Override
+    public Process findProcess(ProcessFilter filter) {
+        log.debug("Find process by filter: {}", filter);
+        return processRuntimeService.find(filter);
     }
 
     @Override

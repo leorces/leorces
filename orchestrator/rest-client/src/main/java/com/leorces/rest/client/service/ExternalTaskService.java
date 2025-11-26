@@ -1,15 +1,15 @@
 package com.leorces.rest.client.service;
 
 import com.leorces.model.runtime.activity.ActivityFailure;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.ExternalTask;
 
 import java.util.Map;
 
-public interface TaskService {
+public interface ExternalTaskService {
 
-    boolean complete(Task task);
+    boolean complete(ExternalTask externalTask);
 
-    boolean complete(Task task, Map<String, Object> variables);
+    boolean complete(ExternalTask externalTask, Map<String, Object> variables);
 
     boolean fail(String taskId);
 

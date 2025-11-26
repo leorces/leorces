@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Component
 public class WorkerScheduler {
 
-    private final WorkerProcessor processor;
+    private final ExternalTaskSubscriptionProcessor processor;
     private final ScheduledExecutorService scheduler;
     private final AtomicBoolean isShuttingDown = new AtomicBoolean(false);
 
-    public WorkerScheduler(WorkerProcessor processor,
+    public WorkerScheduler(ExternalTaskSubscriptionProcessor processor,
                            @Qualifier("scheduledExecutorService") ScheduledExecutorService scheduler) {
         this.processor = processor;
         this.scheduler = scheduler;

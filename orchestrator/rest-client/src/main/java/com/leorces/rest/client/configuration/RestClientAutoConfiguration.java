@@ -12,6 +12,7 @@ import com.leorces.rest.client.configuration.properties.process.ProcessConfigura
 import com.leorces.rest.client.configuration.properties.resilence.ResilenceConfigurationProperties;
 import com.leorces.rest.client.configuration.properties.rest.RestClientProperties;
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,8 +32,8 @@ import org.springframework.web.client.RestClient;
 })
 public class RestClientAutoConfiguration {
 
-    @Bean
-    public ObjectMapper restClientObjectMapper() {
+    @Bean("leorcesRestClientObjectMapper")
+    public ObjectMapper leorcesRestClientObjectMapper() {
         var mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -40,10 +41,10 @@ public class RestClientAutoConfiguration {
         return mapper;
     }
 
-    @Bean
-    public RestClient restClient(RestClientProperties properties,
-                                 ObjectMapper restClientObjectMapper) {
-        var messageConverter = new MappingJackson2HttpMessageConverter(restClientObjectMapper);
+    @Bean("leorcesRestClient")
+    public RestClient leorcesRestClient(RestClientProperties properties,
+                                        @Qualifier("leorcesRestClientObjectMapper") ObjectMapper leorcesRestClientObjectMapper) {
+        var messageConverter = new MappingJackson2HttpMessageConverter(leorcesRestClientObjectMapper);
         var requestFactory = createRequestFactory(properties);
 
         return RestClient.builder()

@@ -1,12 +1,12 @@
 package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.activity.ActivityFailure;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.request.FailActivityRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,20 +24,22 @@ import static com.leorces.rest.client.constants.ApiConstants.*;
 
 @Slf4j
 @Component
-@AllArgsConstructor
 public class TaskRestClient {
 
-    private static final ParameterizedTypeReference<List<Task>> TASK_LIST_TYPE_REF = new ParameterizedTypeReference<>() {
+    private static final ParameterizedTypeReference<List<ExternalTask>> TASK_LIST_TYPE_REF = new ParameterizedTypeReference<>() {
     };
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
 
+    public TaskRestClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "task-update")
     @CircuitBreaker(name = "task-update", fallbackMethod = "updateFallback")
     public ResponseEntity<Void> complete(String taskId, Map<String, Object> variables) {
         try {
-            return restClient.put()
+            return leorcesRestClient.put()
                     .uri(COMPLETE_ACTIVITY_ENDPOINT.formatted(taskId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -48,10 +50,10 @@ public class TaskRestClient {
             log.warn("Bad request for task completion: taskId={}, error={}", taskId, e.getMessage());
             return ResponseEntity.badRequest().build();
         } catch (HttpClientErrorException.NotFound e) {
-            log.warn("Task not found for completion: taskId={}", taskId);
+            log.warn("ExternalTask not found for completion: taskId={}", taskId);
             return ResponseEntity.notFound().build();
         } catch (HttpClientErrorException.Conflict e) {
-            log.warn("Task conflict for completion: taskId={}, error={}", taskId, e.getMessage());
+            log.warn("ExternalTask conflict for completion: taskId={}, error={}", taskId, e.getMessage());
             return ResponseEntity.status(409).build();
         } catch (HttpServerErrorException.InternalServerError e) {
             log.error("Server error during task completion: taskId={}, error={}", taskId, e.getMessage());
@@ -65,12 +67,11 @@ public class TaskRestClient {
         }
     }
 
-
     @Retry(name = "task-update")
     @CircuitBreaker(name = "task-update", fallbackMethod = "updateFallback")
     public ResponseEntity<Void> fail(String taskId, ActivityFailure failure, Map<String, Object> variables) {
         try {
-            return restClient.put()
+            return leorcesRestClient.put()
                     .uri(FAIL_ACTIVITY_ENDPOINT.formatted(taskId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -81,10 +82,10 @@ public class TaskRestClient {
             log.warn("Bad request for task failure: taskId={}, error={}", taskId, e.getMessage());
             return ResponseEntity.badRequest().build();
         } catch (HttpClientErrorException.NotFound e) {
-            log.warn("Task not found for failure: taskId={}", taskId);
+            log.warn("ExternalTask not found for failure: taskId={}", taskId);
             return ResponseEntity.notFound().build();
         } catch (HttpClientErrorException.Conflict e) {
-            log.warn("Task conflict for failure: taskId={}, error={}", taskId, e.getMessage());
+            log.warn("ExternalTask conflict for failure: taskId={}, error={}", taskId, e.getMessage());
             return ResponseEntity.status(409).build();
         } catch (HttpServerErrorException.InternalServerError e) {
             log.error("Server error during task failure: taskId={}, error={}", taskId, e.getMessage());
@@ -99,9 +100,9 @@ public class TaskRestClient {
     }
 
     @CircuitBreaker(name = "task-poll", fallbackMethod = "pollFallback")
-    public ResponseEntity<List<Task>> poll(String topic, String processDefinitionKey, int size) {
+    public ResponseEntity<List<ExternalTask>> poll(String topic, String processDefinitionKey, int size) {
         try {
-            return restClient.get()
+            return leorcesRestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(POLL_ACTIVITIES_ENDPOINT.formatted(processDefinitionKey, topic))
                             .queryParam(SIZE_PARAM, size)
@@ -127,7 +128,7 @@ public class TaskRestClient {
         }
     }
 
-    private ResponseEntity<List<Task>> pollFallback(String topic, String processDefinitionKey, int size, Exception e) {
+    private ResponseEntity<List<ExternalTask>> pollFallback(String topic, String processDefinitionKey, int size, Exception e) {
         log.warn("Failed to poll tasks for topic: {}, processDefinitionKey: {}, limit:{}. Fallback response", topic, processDefinitionKey, size, e);
         return ResponseEntity.ok(Collections.emptyList());
     }

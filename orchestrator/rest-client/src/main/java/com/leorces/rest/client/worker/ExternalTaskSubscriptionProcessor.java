@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.TaskRestClient;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.worker.WorkerContext;
-import com.leorces.rest.client.service.TaskService;
+import com.leorces.rest.client.service.ExternalTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -16,21 +16,21 @@ import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Component
-public class WorkerProcessor {
+public class ExternalTaskSubscriptionProcessor {
 
     private final TaskRestClient client;
-    private final TaskService service;
+    private final ExternalTaskService service;
     private final VariablesMapper variablesMapper;
     private final ObjectMapper objectMapper;
     private final ExecutorService executor;
     private final WorkerMetrics workerMetrics;
 
-    public WorkerProcessor(TaskRestClient client,
-                           TaskService service,
-                           VariablesMapper variablesMapper,
-                           ObjectMapper objectMapper,
-                           WorkerMetrics workerMetrics,
-                           @Qualifier("taskExecutor") ExecutorService executor) {
+    public ExternalTaskSubscriptionProcessor(TaskRestClient client,
+                                             ExternalTaskService service,
+                                             VariablesMapper variablesMapper,
+                                             ObjectMapper objectMapper,
+                                             WorkerMetrics workerMetrics,
+                                             @Qualifier("leorcesTaskExecutor") ExecutorService executor) {
         this.client = client;
         this.service = service;
         this.variablesMapper = variablesMapper;
@@ -100,30 +100,30 @@ public class WorkerProcessor {
         }
     }
 
-    private void executeTask(WorkerContext context, Task task) {
+    private void executeTask(WorkerContext context, ExternalTask externalTask) {
         var handler = context.handler();
         var state = context.state();
         var topic = context.metadata().topic();
 
         try {
-            var taskToHandle = task.toBuilder()
+            var taskToHandle = externalTask.toBuilder()
                     .objectMapper(objectMapper)
                     .variablesMapper(variablesMapper)
                     .build();
-            handler.handle(taskToHandle, service);
+            handler.doExecute(taskToHandle, service);
             workerMetrics.recordTaskCompletedMetrics(context);
-            log.debug("Task '{}' completed successfully for topic '{}'", task.id(), topic);
+            log.debug("ExternalTask '{}' completed successfully for topic '{}'", externalTask.id(), topic);
         } catch (Exception e) {
-            log.error("Task '{}' failed for topic '{}'", task.id(), topic, e);
+            log.error("ExternalTask '{}' failed for topic '{}'", externalTask.id(), topic, e);
             workerMetrics.recordTaskFailedMetrics(context);
-            boolean failedSuccessfully = service.fail(task.id(), ActivityFailure.of(e));
+            boolean failedSuccessfully = service.fail(externalTask.id(), ActivityFailure.of(e));
             if (!failedSuccessfully) {
-                log.error("Failed to mark task '{}' as failed for topic '{}'. Task may be in inconsistent state.",
-                        task.id(), topic);
+                log.error("Failed to mark externalTask '{}' as failed for topic '{}'. ExternalTask may be in inconsistent state.",
+                        externalTask.id(), topic);
             }
         } finally {
             int remaining = state.activeTasks.decrementAndGet();
-            log.debug("Task '{}' finished. Worker '{}' remaining activeTasks={}/{}", task.id(), topic, remaining, state.maxCapacity);
+            log.debug("ExternalTask '{}' finished. Worker '{}' remaining activeTasks={}/{}", externalTask.id(), topic, remaining, state.maxCapacity);
         }
     }
 

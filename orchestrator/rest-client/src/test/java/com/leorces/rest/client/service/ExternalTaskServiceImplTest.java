@@ -2,7 +2,7 @@ package com.leorces.rest.client.service;
 
 import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.TaskRestClient;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.ExternalTask;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,8 +20,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Task Service Implementation Tests")
-class TaskServiceImplTest {
+@DisplayName("ExternalTask Service Implementation Tests")
+class ExternalTaskServiceImplTest {
 
     private static final String TASK_ID = "test-task-123";
     private static final Map<String, Object> VARIABLES = Map.of("key1", "value1", "key2", 42);
@@ -31,7 +31,7 @@ class TaskServiceImplTest {
     private TaskRestClient taskRestClient;
 
     @InjectMocks
-    private TaskServiceImpl taskService;
+    private ExternalTaskServiceImpl taskService;
 
     @Test
     @DisplayName("Should complete task without variables and return true on success")
@@ -158,9 +158,9 @@ class TaskServiceImplTest {
         assertThat(result).isFalse();
     }
 
-    private Task createTask() {
-        return Task.builder()
-                .id(TaskServiceImplTest.TASK_ID)
+    private ExternalTask createTask() {
+        return ExternalTask.builder()
+                .id(ExternalTaskServiceImplTest.TASK_ID)
                 .build();
     }
 

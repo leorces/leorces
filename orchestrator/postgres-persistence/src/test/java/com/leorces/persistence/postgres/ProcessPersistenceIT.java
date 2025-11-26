@@ -3,6 +3,7 @@ package com.leorces.persistence.postgres;
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
+import com.leorces.model.search.ProcessFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -146,9 +147,10 @@ class ProcessPersistenceIT extends RepositoryIT {
         // Given
         var process1 = processPersistence.run(createOrderSubmittedProcess());
         var process2 = processPersistence.run(createOrderSubmittedProcess());
+        var processFilter = ProcessFilter.builder().businessKey(process1.businessKey()).build();
 
         // When
-        var result = processPersistence.findByBusinessKey(process1.businessKey());
+        var result = processPersistence.findAll(processFilter);
 
         // Then
         assertThat(result).isNotEmpty();
@@ -156,7 +158,8 @@ class ProcessPersistenceIT extends RepositoryIT {
         assertThat(result.getFirst().businessKey()).isEqualTo(process1.businessKey());
 
         // When & Then - non-existent business key
-        var nonExistentResult = processPersistence.findByBusinessKey("non-existent-key");
+        var processFilter2 = ProcessFilter.builder().businessKey("non-existent-key").build();
+        var nonExistentResult = processPersistence.findAll(processFilter2);
         assertThat(nonExistentResult).isEmpty();
     }
 
@@ -169,9 +172,10 @@ class ProcessPersistenceIT extends RepositoryIT {
                 "order", "{\"number\":1234}",
                 "client", "{\"firstName\":\"Json\",\"lastName\":\"Statement\"}"
         );
+        var processFilter = ProcessFilter.builder().variables(variables).build();
 
         // When
-        var result = processPersistence.findByVariables(variables);
+        var result = processPersistence.findAll(processFilter);
 
         // Then
         assertThat(result).isNotEmpty();
@@ -180,11 +184,13 @@ class ProcessPersistenceIT extends RepositoryIT {
 
         // When & Then - non-matching variables
         var nonMatchingVariables = Map.<String, Object>of("nonExistent", "value");
-        var nonMatchingResult = processPersistence.findByVariables(nonMatchingVariables);
+        var processFilter2 = ProcessFilter.builder().variables(nonMatchingVariables).build();
+        var nonMatchingResult = processPersistence.findAll(processFilter2);
         assertThat(nonMatchingResult).isEmpty();
 
         // When & Then - empty variables map
-        var emptyResult = processPersistence.findByVariables(Map.of());
+        var processFilter3 = ProcessFilter.builder().variables(Map.of()).build();
+        var emptyResult = processPersistence.findAll(processFilter3);
         assertThat(emptyResult).isEmpty();
     }
 
@@ -197,9 +203,13 @@ class ProcessPersistenceIT extends RepositoryIT {
                 "order", "{\"number\":1234}",
                 "client", "{\"firstName\":\"Json\",\"lastName\":\"Statement\"}"
         );
+        var processFilter = ProcessFilter.builder()
+                .businessKey(process.businessKey())
+                .variables(variables)
+                .build();
 
         // When
-        var result = processPersistence.findByBusinessKeyAndVariables(process.businessKey(), variables);
+        var result = processPersistence.findAll(processFilter);
 
         // Then
         assertThat(result).isNotEmpty();
@@ -208,12 +218,41 @@ class ProcessPersistenceIT extends RepositoryIT {
         assertThat(result.getFirst().businessKey()).isEqualTo(process.businessKey());
 
         // When & Then - non-matching business key
-        var nonMatchingResult = processPersistence.findByBusinessKeyAndVariables("non-existent-key", variables);
+        var processFilter2 = ProcessFilter.builder()
+                .businessKey("non-existent-key")
+                .variables(variables)
+                .build();
+        var nonMatchingResult = processPersistence.findAll(processFilter2);
         assertThat(nonMatchingResult).isEmpty();
 
         // When & Then - empty variables map
-        var emptyVariablesResult = processPersistence.findByBusinessKeyAndVariables(process.businessKey(), Map.of());
-        assertThat(emptyVariablesResult).isEmpty();
+        var processFilter3 = ProcessFilter.builder()
+                .businessKey(process.businessKey())
+                .variables(Map.of())
+                .build();
+        var emptyVariablesResult = processPersistence.findAll(processFilter3);
+        assertThat(emptyVariablesResult).isNotEmpty();
+        assertThat(emptyVariablesResult).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Should find processes by business key and variables combination")
+    void findByBusinessKeyAndDefinitionKey() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+        var processFilter = ProcessFilter.builder()
+                .businessKey(process.businessKey())
+                .processDefinitionKey(process.definitionKey())
+                .build();
+
+        // When
+        var result = processPersistence.findAll(processFilter);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id()).isEqualTo(process.id());
+        assertThat(result.getFirst().businessKey()).isEqualTo(process.businessKey());
     }
 
     @Test

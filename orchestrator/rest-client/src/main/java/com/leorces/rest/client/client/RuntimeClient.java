@@ -1,14 +1,15 @@
 package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.rest.client.model.request.CorrelateMessageRequest;
 import com.leorces.rest.client.model.request.ProcessModificationRequest;
 import com.leorces.rest.client.model.request.StartProcessByIdRequest;
 import com.leorces.rest.client.model.request.StartProcessByKeyRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,16 +23,19 @@ import static com.leorces.rest.client.constants.ApiConstants.*;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RuntimeClient {
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
+
+    public RuntimeClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "start-process")
     @CircuitBreaker(name = "start-process", fallbackMethod = "startProcessFallback")
     public Process startProcessByKey(String definitionKey, String businessKey, Map<String, Object> variables) {
         try {
-            return restClient.post()
+            return leorcesRestClient.post()
                     .uri(START_PROCESS_BY_KEY_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -60,7 +64,7 @@ public class RuntimeClient {
     @CircuitBreaker(name = "start-process", fallbackMethod = "startProcessFallback")
     public Process startProcessById(String definitionId, String businessKey, Map<String, Object> variables) {
         try {
-            return restClient.post()
+            return leorcesRestClient.post()
                     .uri(START_PROCESS_BY_ID_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -89,7 +93,7 @@ public class RuntimeClient {
     @CircuitBreaker(name = "terminate-process", fallbackMethod = "terminateProcessFallback")
     public void terminateProcess(String processId) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(TERMINATE_PROCESS_BY_ID_ENDPOINT.formatted(processId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -115,7 +119,7 @@ public class RuntimeClient {
     @CircuitBreaker(name = "move-execution", fallbackMethod = "moveExecutionFallback")
     public void moveExecution(String processId, String activityId, String targetDefinitionId) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(MODIFY_PROCESS_BY_ID_ENDPOINT.formatted(processId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -142,7 +146,7 @@ public class RuntimeClient {
     @CircuitBreaker(name = "runtime-correlate", fallbackMethod = "correlateMessageFallback")
     public void correlateMessage(String message, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(CORRELATE_MESSAGE_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -167,7 +171,7 @@ public class RuntimeClient {
     @CircuitBreaker(name = "runtime-variables", fallbackMethod = "setVariablesFallback")
     public void setVariables(String executionId, Map<String, Object> variables) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(SET_VARIABLES_ENDPOINT.formatted(executionId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -194,7 +198,7 @@ public class RuntimeClient {
     @CircuitBreaker(name = "runtime-variables", fallbackMethod = "setVariablesFallback")
     public void setVariablesLocal(String executionId, Map<String, Object> variables) {
         try {
-            restClient.put()
+            leorcesRestClient.put()
                     .uri(SET_VARIABLES_LOCAL_ENDPOINT.formatted(executionId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -213,6 +217,35 @@ public class RuntimeClient {
             throw e;
         } catch (ResourceAccessException e) {
             log.error("Connection error during set local variables: executionId={}, error={}", executionId, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Retry(name = "find-process")
+    @CircuitBreaker(name = "find-process", fallbackMethod = "findProcessFallback")
+    public Process findProcess(ProcessFilter filter) {
+        try {
+            return leorcesRestClient.post()
+                    .uri(FIND_PROCESS)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(filter)
+                    .retrieve()
+                    .body(Process.class);
+        } catch (HttpClientErrorException.BadRequest e) {
+            log.warn("Bad request for find process by filter={}, error={}", filter, e.getMessage());
+            throw e;
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("Process not found by filter={}", filter);
+            return null;
+        } catch (HttpServerErrorException.InternalServerError e) {
+            log.error("Server error during finding process by filter={}, error={}", filter, e.getMessage());
+            throw e;
+        } catch (HttpServerErrorException.ServiceUnavailable e) {
+            log.error("Service unavailable during finding process by filter={}, error={}", filter, e.getMessage());
+            throw e;
+        } catch (ResourceAccessException e) {
+            log.error("Connection error during finding process by filter={}, error={}", filter, e.getMessage());
             throw e;
         }
     }
@@ -268,6 +301,17 @@ public class RuntimeClient {
                     executionId, clientError.getStatusCode(), e.getMessage());
         } else {
             log.error("Unexpected error for set variables: executionId={}, variables: {}", executionId, variables, e);
+        }
+    }
+
+    private void findProcessFallback(ProcessFilter filter, Exception e) {
+        if (e instanceof HttpServerErrorException || e instanceof ResourceAccessException) {
+            log.error("Service unavailable for finding process by filter={}, error={}", filter, e.getMessage());
+        } else if (e instanceof HttpClientErrorException clientError) {
+            log.warn("Client error for finding process by filter={}, status={}, error={}",
+                    filter, clientError.getStatusCode(), e.getMessage());
+        } else {
+            log.error("Unexpected error for finding process by filter={}, variables={}", filter, e.getMessage());
         }
     }
 

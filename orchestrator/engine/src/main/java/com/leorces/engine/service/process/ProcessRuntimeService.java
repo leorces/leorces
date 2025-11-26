@@ -3,7 +3,9 @@ package com.leorces.engine.service.process;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.exception.activity.ActivityNotFoundException;
+import com.leorces.engine.exception.process.ProcessException;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,14 @@ public class ProcessRuntimeService {
         processMetrics.recordProcessStartedMetric(process);
         startInitialActivity(newProcess);
         return newProcess;
+    }
+
+    public Process find(ProcessFilter filter) {
+        var processes = processPersistence.findAll(filter);
+        if (processes.size() > 1) {
+            throw ProcessException.moreThenOneProcessesFound(filter);
+        }
+        return !processes.isEmpty() ? processes.getFirst() : null;
     }
 
     private void startInitialActivity(Process process) {

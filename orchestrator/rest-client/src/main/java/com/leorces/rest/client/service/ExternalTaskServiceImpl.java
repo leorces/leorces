@@ -2,7 +2,7 @@ package com.leorces.rest.client.service;
 
 import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.rest.client.client.TaskRestClient;
-import com.leorces.rest.client.model.Task;
+import com.leorces.rest.client.model.ExternalTask;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,27 +13,27 @@ import java.util.Map;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class TaskServiceImpl implements TaskService {
+public class ExternalTaskServiceImpl implements ExternalTaskService {
 
     private final TaskRestClient taskRestClient;
 
     @Override
-    public boolean complete(Task task) {
-        return complete(task, Collections.emptyMap());
+    public boolean complete(ExternalTask externalTask) {
+        return complete(externalTask, Collections.emptyMap());
     }
 
     @Override
-    public boolean complete(Task task, Map<String, Object> variables) {
+    public boolean complete(ExternalTask externalTask, Map<String, Object> variables) {
         try {
-            var response = taskRestClient.complete(task.id(), variables);
+            var response = taskRestClient.complete(externalTask.id(), variables);
             var isSuccessful = response.getStatusCode().is2xxSuccessful();
             if (!isSuccessful) {
-                log.warn("Task completion failed with status: {} for taskId: {}",
-                        response.getStatusCode(), task.id());
+                log.warn("ExternalTask completion failed with status: {} for taskId: {}",
+                        response.getStatusCode(), externalTask.id());
             }
             return isSuccessful;
         } catch (Exception e) {
-            log.error("Exception during task completion for taskId: {}", task.id(), e);
+            log.error("Exception during externalTask completion for taskId: {}", externalTask.id(), e);
             return false;
         }
     }
@@ -59,7 +59,7 @@ public class TaskServiceImpl implements TaskService {
             var response = taskRestClient.fail(taskId, failure, variables);
             var isSuccessful = response.getStatusCode().is2xxSuccessful();
             if (!isSuccessful) {
-                log.warn("Task failure operation failed with status: {} for taskId: {}",
+                log.warn("ExternalTask failure operation failed with status: {} for taskId: {}",
                         response.getStatusCode(), taskId);
             }
             return isSuccessful;

@@ -6,8 +6,8 @@ import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessExecution;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -24,19 +24,22 @@ import static com.leorces.rest.client.constants.ApiConstants.PROCESS_BY_ID_ENDPO
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ProcessClient {
 
     private static final ParameterizedTypeReference<PageableData<Process>> PAGEABLE_PROCESS_TYPE_REF = new ParameterizedTypeReference<>() {
     };
 
-    private final RestClient restClient;
+    private final RestClient leorcesRestClient;
+
+    public ProcessClient(@Qualifier("leorcesRestClient") RestClient leorcesRestClient) {
+        this.leorcesRestClient = leorcesRestClient;
+    }
 
     @Retry(name = "process-findall")
     @CircuitBreaker(name = "process-findall", fallbackMethod = "findAllFallback")
     public PageableData<Process> findAll(Pageable pageable) {
         try {
-            return restClient.get()
+            return leorcesRestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(PROCESSES_ENDPOINT)
                             .queryParam("page", pageable.offset() / pageable.limit())
@@ -68,7 +71,7 @@ public class ProcessClient {
     @CircuitBreaker(name = "process-findbyid", fallbackMethod = "findByIdFallback")
     public Optional<ProcessExecution> findById(String processId) {
         try {
-            var processExecution = restClient.get()
+            var processExecution = leorcesRestClient.get()
                     .uri(PROCESS_BY_ID_ENDPOINT.formatted(processId))
                     .accept(MediaType.APPLICATION_JSON)
                     .retrieve()

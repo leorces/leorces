@@ -1,6 +1,7 @@
 package com.leorces.rest.client.client;
 
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.rest.client.model.request.CorrelateMessageRequest;
 import com.leorces.rest.client.model.request.ProcessModificationRequest;
 import com.leorces.rest.client.model.request.StartProcessByIdRequest;
@@ -402,6 +403,42 @@ class RuntimeClientTest {
         // When & Then
         assertThrows(ResourceAccessException.class,
                 () -> runtimeClient.startProcessByKey(TEST_DEFINITION_KEY, TEST_BUSINESS_KEY, TEST_VARIABLES));
+    }
+
+    @Test
+    @DisplayName("Should find process successfully")
+    void shouldFindProcessSuccessfully() {
+        var expected = createTestProcess("p-find");
+
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(ProcessFilter.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(Process.class)).thenReturn(expected);
+
+        var result = runtimeClient.findProcess(ProcessFilter.builder().build());
+
+        assertNotNull(result);
+        assertEquals("p-find", result.id());
+    }
+
+    @Test
+    @DisplayName("Should return null when findProcess returns NotFound")
+    void shouldReturnNullWhenFindProcessNotFound() {
+        when(restClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(any())).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(ProcessFilter.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(Process.class))
+                .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", null, null, null));
+
+        var result = runtimeClient.findProcess(ProcessFilter.builder().build());
+
+        assertNull(result);
     }
 
 }

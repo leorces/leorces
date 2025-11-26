@@ -16,7 +16,7 @@ public final class MetricConstants {
     public static final String WORKER_POLL_FAILED = "worker.poll.failed";
     public static final String WORKER_TASKS_POLLED = "worker.tasks.polled";
     // =====================
-    //  Task execution metrics
+    //  ExternalTask execution metrics
     // =====================
     public static final String WORKER_TASKS_COMPLETED = "worker.tasks.completed";
     public static final String WORKER_TASKS_FAILED = "worker.tasks.failed";

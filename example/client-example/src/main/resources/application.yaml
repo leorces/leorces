@@ -53,7 +53,6 @@ leorces:
           notification:
             interval: 1
             time-unit: seconds
-            initial-delay: 500
             max-concurrent-tasks: 10
       OrderDeliveryProcess:
         workers:

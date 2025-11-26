@@ -5,14 +5,13 @@ import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
 import com.leorces.engine.exception.correlation.MessageCorrelationException;
-import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.definition.activity.MessageActivityDefinition;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateMessageCommand> {
 
-    private final VariablesService variablesService;
     private final ProcessPersistence processPersistence;
     private final CommandDispatcher dispatcher;
 
@@ -49,34 +47,29 @@ public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateM
         return CorrelateMessageCommand.class;
     }
 
-    private List<com.leorces.model.runtime.process.Process> findCorrelatedProcesses(String messageName,
-                                                                                    String businessKey,
-                                                                                    Map<String, Object> correlationKeys) {
+    private List<Process> findCorrelatedProcesses(String messageName,
+                                                  String businessKey,
+                                                  Map<String, Object> correlationKeys) {
         return findProcesses(businessKey, correlationKeys).stream()
                 .filter(process -> isCorrelated(messageName, process))
                 .toList();
     }
 
-    private List<com.leorces.model.runtime.process.Process> findProcesses(String businessKey, Map<String, Object> correlationKeys) {
-        if (StringUtils.isNotBlank(businessKey) && !correlationKeys.isEmpty()) {
-            return processPersistence.findByBusinessKeyAndVariables(businessKey, correlationKeys);
-        }
-        if (StringUtils.isNotBlank(businessKey)) {
-            return processPersistence.findByBusinessKey(businessKey);
-        }
-        if (!correlationKeys.isEmpty()) {
-            return processPersistence.findByVariables(correlationKeys);
-        }
-
-        throw MessageCorrelationException.missingBusinessKeyAndCorrelationKeys();
+    private List<Process> findProcesses(String businessKey, Map<String, Object> correlationKeys) {
+        return processPersistence.findAll(
+                ProcessFilter.builder()
+                        .businessKey(businessKey)
+                        .variables(correlationKeys)
+                        .build()
+        );
     }
 
-    private boolean isCorrelated(String messageName, com.leorces.model.runtime.process.Process process) {
+    private boolean isCorrelated(String messageName, Process process) {
         return process.definition().messages().stream()
                 .anyMatch(messageName::equals);
     }
 
-    private void validateCorrelatedProcesses(String messageName, List<com.leorces.model.runtime.process.Process> processes) {
+    private void validateCorrelatedProcesses(String messageName, List<Process> processes) {
         if (processes.isEmpty()) {
             log.warn("No process correlated with message: {}", messageName);
             throw MessageCorrelationException.noProcessesCorrelated(messageName);
@@ -94,7 +87,7 @@ public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateM
         }
     }
 
-    private List<MessageActivityDefinition> correlateActivities(String messageName, com.leorces.model.runtime.process.Process process) {
+    private List<MessageActivityDefinition> correlateActivities(String messageName, Process process) {
         return process.definition().activities().stream()
                 .filter(MessageActivityDefinition.class::isInstance)
                 .map(MessageActivityDefinition.class::cast)

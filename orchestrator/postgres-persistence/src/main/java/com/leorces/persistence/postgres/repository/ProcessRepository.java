@@ -43,6 +43,14 @@ public interface ProcessRepository extends CrudRepository<ProcessEntity, String>
                                                       @Param("variableValues") String[] variableValues,
                                                       @Param("variableCount") int variableCount);
 
+    @Query(FIND_BY_FIND_PROCESS_DATA)
+    List<ProcessEntity> findAll(@Param("processDefinitionKey") String processDefinitionKey,
+                                @Param("processDefinitionId") String processDefinitionId,
+                                @Param("businessKey") String businessKey,
+                                @Param("variableKeys") String[] variableKeys,
+                                @Param("variableValues") String[] variableValues,
+                                @Param("variableCount") int variableCount);
+
     @Query(FIND_BY_ID_WITH_ACTIVITIES)
     Optional<ProcessExecutionEntity> findByIdWithActivities(@Param("processId") String processId);
 

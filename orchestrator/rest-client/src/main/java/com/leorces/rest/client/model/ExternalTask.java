@@ -1,6 +1,5 @@
 package com.leorces.rest.client.model;
 
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,10 +15,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Builder(toBuilder = true)
-public record Task(
+public record ExternalTask(
         @JsonProperty("id") String id,
-        @JsonProperty("businessKey") String businessKey,
-        @JsonProperty("definitionId") String definitionId,
+        @JsonProperty("processId") String processId,
+        @JsonProperty("processBusinessKey") String businessKey,
         @JsonProperty("state") ProcessState state,
         @JsonProperty("retries") int retries,
         @JsonProperty("variables") List<Variable> variables,
@@ -32,10 +31,10 @@ public record Task(
 ) {
 
     @JsonCreator
-    public static Task create(
+    public static ExternalTask create(
             @JsonProperty("id") String id,
-            @JsonProperty("businessKey") String businessKey,
-            @JsonProperty("definitionId") String definitionId,
+            @JsonProperty("processId") String processId,
+            @JsonProperty("processBusinessKey") String businessKey,
             @JsonProperty("state") ProcessState state,
             @JsonProperty("retries") int retries,
             @JsonProperty("variables") List<Variable> variables,
@@ -43,10 +42,10 @@ public record Task(
             @JsonProperty("updatedAt") LocalDateTime updatedAt,
             @JsonProperty("startedAt") LocalDateTime startedAt,
             @JsonProperty("completedAt") LocalDateTime completedAt) {
-        return Task.builder()
+        return ExternalTask.builder()
                 .id(id)
+                .processId(processId)
                 .businessKey(businessKey)
-                .definitionId(definitionId)
                 .state(state)
                 .retries(retries)
                 .variables(variables)
@@ -57,20 +56,17 @@ public record Task(
                 .build();
     }
 
-
     public <T> T getVariable(String name) {
         return (T) findVariableByName(name)
                 .map(this::convertVariableToValue)
                 .orElse(null);
     }
 
-
     public <T> T getVariable(String name, Class<T> clazz) {
         return findVariableByName(name)
                 .map(variable -> convertVariableToCustomObject(variable, clazz))
                 .orElse(null);
     }
-
 
     private Optional<Variable> findVariableByName(String name) {
         if (variables == null || variables.isEmpty()) {
@@ -81,11 +77,9 @@ public record Task(
                 .findFirst();
     }
 
-
     private Object convertVariableToValue(Variable variable) {
         return variablesMapper.convertStringToValue(variable.varValue(), variable.type());
     }
-
 
     private <T> T convertVariableToCustomObject(Variable variable, Class<T> clazz) {
         if (variable.varValue() == null) {
