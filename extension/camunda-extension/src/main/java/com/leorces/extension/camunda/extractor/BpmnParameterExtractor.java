@@ -4,7 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.leorces.extension.camunda.BpmnConstants.*;
@@ -72,8 +74,31 @@ public class BpmnParameterExtractor {
 
     private void addParameter(Element parameterElement, Map<String, Object> parameters) {
         var name = parameterElement.getAttribute(ATTRIBUTE_NAME);
-        var value = parameterElement.getTextContent();
+        var value = parseParameterValue(parameterElement);
         parameters.put(name, value);
+    }
+
+    private Object parseParameterValue(Element parameterElement) {
+        var lists = parameterElement.getElementsByTagNameNS(CAMUNDA_NAMESPACE, LIST);
+        if (lists.getLength() > 0) {
+            Element listEl = (Element) lists.item(0);
+            return parseCamundaList(listEl);
+        }
+
+        var text = parameterElement.getTextContent();
+        return text != null ? text.trim() : null;
+    }
+
+    private List<String> parseCamundaList(Element listElement) {
+        var values = new ArrayList<String>();
+        var valueNodes = listElement.getElementsByTagNameNS(CAMUNDA_NAMESPACE, VALUE);
+        for (int i = 0; i < valueNodes.getLength(); i++) {
+            var v = valueNodes.item(i).getTextContent();
+            if (v != null) {
+                values.add(v.trim());
+            }
+        }
+        return values;
     }
 
 }

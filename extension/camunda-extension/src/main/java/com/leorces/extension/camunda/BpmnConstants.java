@@ -92,6 +92,8 @@ public final class BpmnConstants {
     public static final String TRUE_VALUE = "true";
     public static final String FALSE_VALUE = "false";
     public static final String EMPTY_STRING = "";
+    public static final String VALUE = "value";
+    public static final String LIST = "list";
 
     private BpmnConstants() {
         // prevent instantiation
