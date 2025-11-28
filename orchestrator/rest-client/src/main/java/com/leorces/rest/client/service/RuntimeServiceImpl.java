@@ -104,22 +104,22 @@ public class RuntimeServiceImpl implements RuntimeService {
 
     @Override
     public void correlateMessage(String messageName, Map<String, Object> correlationKeys) {
-        correlateMessage(messageName, null, Map.of(), correlationKeys);
+        correlateMessage(messageName, null, correlationKeys, Map.of());
     }
 
     @Override
     public void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables) {
-        correlateMessage(messageName, businessKey, processVariables, Map.of());
+        correlateMessage(messageName, businessKey, Map.of(), processVariables);
     }
 
     @Override
     public void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
-        correlateMessage(messageName, null, processVariables, correlationKeys);
+        correlateMessage(messageName, null, correlationKeys, processVariables);
     }
 
     @Override
-    public void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables, Map<String, Object> correlationKeys) {
-        runtimeClient.correlateMessage(messageName, businessKey, processVariables, correlationKeys);
+    public void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
+        runtimeClient.correlateMessage(messageName, businessKey, correlationKeys, processVariables);
     }
 
 }

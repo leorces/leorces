@@ -196,9 +196,9 @@ public interface RuntimeService {
      *
      * @param messageName      the name of the message to correlate
      * @param businessKey      the business key for message correlation
-     * @param processVariables the variables to set in the target process
      * @param correlationKeys  the correlation keys for message matching
+     * @param processVariables the variables to set in the target process
      */
-    void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables, Map<String, Object> correlationKeys);
+    void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 
 }

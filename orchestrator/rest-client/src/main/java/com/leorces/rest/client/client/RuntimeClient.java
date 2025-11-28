@@ -100,17 +100,23 @@ public class RuntimeClient {
         }
     }
 
-    public void correlateMessage(String message, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
+    public void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
+        var request = CorrelateMessageRequest.builder()
+                .message(messageName)
+                .businessKey(businessKey)
+                .correlationKeys(correlationKeys)
+                .processVariables(processVariables)
+                .build();
         try {
             leorcesRestClient.put()
                     .uri(CORRELATE_MESSAGE_ENDPOINT)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .body(new CorrelateMessageRequest(message, businessKey, correlationKeys, processVariables))
+                    .body(request)
                     .retrieve()
                     .toBodilessEntity();
         } catch (Exception e) {
-            log.warn("Can't correlate message: message={}, error={}", message, e.getMessage());
+            log.warn("Can't correlate message: message={}, error={}", messageName, e.getMessage());
             throw e;
         }
     }

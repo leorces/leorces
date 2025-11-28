@@ -253,7 +253,7 @@ class RuntimeServiceImplTest {
         runtimeService.correlateMessage(MESSAGE_NAME, CORRELATION_KEYS);
 
         //Then
-        verify(runtimeClient).correlateMessage(MESSAGE_NAME, null, EMPTY_MAP, CORRELATION_KEYS);
+        verify(runtimeClient).correlateMessage(MESSAGE_NAME, null, CORRELATION_KEYS, EMPTY_MAP);
     }
 
     @Test
@@ -263,7 +263,7 @@ class RuntimeServiceImplTest {
         runtimeService.correlateMessage(MESSAGE_NAME, BUSINESS_KEY, VARIABLES);
 
         //Then
-        verify(runtimeClient).correlateMessage(MESSAGE_NAME, BUSINESS_KEY, VARIABLES, EMPTY_MAP);
+        verify(runtimeClient).correlateMessage(MESSAGE_NAME, BUSINESS_KEY, EMPTY_MAP, VARIABLES);
     }
 
     @Test
@@ -273,7 +273,7 @@ class RuntimeServiceImplTest {
         runtimeService.correlateMessage(MESSAGE_NAME, CORRELATION_KEYS, VARIABLES);
 
         //Then
-        verify(runtimeClient).correlateMessage(MESSAGE_NAME, null, VARIABLES, CORRELATION_KEYS);
+        verify(runtimeClient).correlateMessage(MESSAGE_NAME, null, CORRELATION_KEYS, VARIABLES);
     }
 
     @Test
