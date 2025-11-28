@@ -105,6 +105,7 @@ public class ActivityMapper {
                 .id(entity.getId())
                 .processId(entity.getProcessId())
                 .processBusinessKey(entity.getProcessBusinessKey())
+                .topic(entity.getTopic())
                 .definitionId(entity.getDefinitionId())
                 .variables(variables)
                 .state(ActivityState.valueOf(entity.getState()))

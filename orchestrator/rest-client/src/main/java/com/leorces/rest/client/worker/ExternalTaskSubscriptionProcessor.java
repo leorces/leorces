@@ -110,7 +110,7 @@ public class ExternalTaskSubscriptionProcessor {
                     .objectMapper(objectMapper)
                     .variablesMapper(variablesMapper)
                     .build();
-            handler.doExecute(taskToHandle, service);
+            handler.execute(taskToHandle, service);
             workerMetrics.recordTaskCompletedMetrics(context);
             log.debug("ExternalTask '{}' completed successfully for topic '{}'", externalTask.id(), topic);
         } catch (Exception e) {

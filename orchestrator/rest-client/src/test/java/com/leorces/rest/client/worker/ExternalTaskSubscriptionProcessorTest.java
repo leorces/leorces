@@ -164,7 +164,7 @@ class ExternalTaskSubscriptionProcessorTest {
         when(taskBuilder.variablesMapper(variablesMapper)).thenReturn(taskBuilder);
         when(taskBuilder.build()).thenReturn(task);
 
-        doThrow(new RuntimeException("ExternalTask execution failed")).when(externalTaskHandler).doExecute(any(ExternalTask.class), eq(service));
+        doThrow(new RuntimeException("ExternalTask execution failed")).when(externalTaskHandler).execute(any(ExternalTask.class), eq(service));
         when(service.fail("task-1")).thenReturn(true);
 
         doAnswer(invocation -> {

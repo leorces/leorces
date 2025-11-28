@@ -278,7 +278,7 @@ class WorkerSchedulerTest {
     // Test implementation of ExternalTaskHandler
     static class TestExternalTaskHandler implements ExternalTaskHandler {
         @Override
-        public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
             // Test implementation - do nothing
         }
 

@@ -19,6 +19,7 @@ public record ExternalTask(
         @JsonProperty("id") String id,
         @JsonProperty("processId") String processId,
         @JsonProperty("processBusinessKey") String businessKey,
+        @JsonProperty("topic") String topicName,
         @JsonProperty("state") ProcessState state,
         @JsonProperty("retries") int retries,
         @JsonProperty("variables") List<Variable> variables,
@@ -35,6 +36,7 @@ public record ExternalTask(
             @JsonProperty("id") String id,
             @JsonProperty("processId") String processId,
             @JsonProperty("processBusinessKey") String businessKey,
+            @JsonProperty("topic") String topicName,
             @JsonProperty("state") ProcessState state,
             @JsonProperty("retries") int retries,
             @JsonProperty("variables") List<Variable> variables,
@@ -46,6 +48,7 @@ public record ExternalTask(
                 .id(id)
                 .processId(processId)
                 .businessKey(businessKey)
+                .topicName(topicName)
                 .state(state)
                 .retries(retries)
                 .variables(variables)

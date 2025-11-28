@@ -12,6 +12,7 @@ public record Activity(
         String definitionId,
         String processId,
         String processBusinessKey,
+        String topic,
         List<Variable> variables,
         ActivityState state,
         int retries,

@@ -5,6 +5,6 @@ import com.leorces.rest.client.service.ExternalTaskService;
 
 public interface ExternalTaskHandler {
 
-    void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService);
+    void execute(ExternalTask externalTask, ExternalTaskService externalTaskService);
 
 }

@@ -247,7 +247,7 @@ class ExternalTaskSubscriptionInitializerTest {
     @ExternalTaskSubscription(topicName = "testTopic", processDefinitionKey = "testProcess")
     static class TestExternalTaskHandler implements ExternalTaskHandler {
         @Override
-        public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
             // Test implementation - do nothing
         }
 
@@ -256,7 +256,7 @@ class ExternalTaskSubscriptionInitializerTest {
     // Test implementation of ExternalTaskHandler without ExternalTaskSubscription annotation
     static class NoAnnotationExternalTaskHandler implements ExternalTaskHandler {
         @Override
-        public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+        public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
             // Test implementation - do nothing
         }
 

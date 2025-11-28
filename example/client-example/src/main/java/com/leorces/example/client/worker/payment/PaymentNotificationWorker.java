@@ -20,7 +20,7 @@ public class PaymentNotificationWorker implements ExternalTaskHandler {
 
     @Override
     @SneakyThrows
-    public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         var message = externalTask.getVariable("message");
         log.debug("Sending notification: {}", message);
         Thread.sleep(ThreadLocalRandom.current().nextLong(500, 2001));

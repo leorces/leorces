@@ -20,7 +20,7 @@ public class PostalDeliveryWorker implements ExternalTaskHandler {
 
     @Override
     @SneakyThrows
-    public void doExecute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+    public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
         log.debug("Postal delivery selected");
         Thread.sleep(ThreadLocalRandom.current().nextLong(500, 2001));
         externalTaskService.complete(externalTask);
