@@ -92,27 +92,6 @@ class ProcessClientTest {
     }
 
     @Test
-    @DisplayName("Should return empty pageable data when finding all processes with bad request")
-    void shouldReturnEmptyPageableDataWhenFindingAllProcessesWithBadRequest() {
-        // Given
-        var pageable = createTestPageable();
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(any(ParameterizedTypeReference.class)))
-                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
-
-        // When
-        var result = processClient.findAll(pageable);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(0L, result.total());
-        assertTrue(result.data().isEmpty());
-    }
-
-    @Test
     @DisplayName("Should throw server error when finding all processes and server error occurs")
     void shouldThrowServerErrorWhenFindingAllProcessesAndServerErrorOccurs() {
         // Given
@@ -159,24 +138,6 @@ class ProcessClientTest {
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(ProcessExecution.class))
                 .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", null, null, null));
-
-        // When
-        var result = processClient.findById(TEST_PROCESS_ID);
-
-        // Then
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Should return empty optional when finding process by id with bad request")
-    void shouldReturnEmptyOptionalWhenFindingProcessByIdWithBadRequest() {
-        // Given
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(ProcessExecution.class))
-                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When
         var result = processClient.findById(TEST_PROCESS_ID);

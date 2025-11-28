@@ -27,13 +27,14 @@ public class RestControllerExceptionAdvice {
             errors.put(fieldName, errorMessage);
         });
 
-        var errorResponse = new ErrorResponse(
-                "Validation failed",
-                "One or more fields have invalid values",
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                errors
-        );
+        var errorResponse = ErrorResponse.builder()
+                .error("Validation failed")
+                .message("One or more fields have invalid values")
+                .detailedMessage(exception.getMessage())
+                .validationErrors(errors)
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(LocalDateTime.now())
+                .build();
 
         return ResponseEntity.badRequest().body(errorResponse);
     }
@@ -41,14 +42,13 @@ public class RestControllerExceptionAdvice {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException exception) {
         log.warn("Illegal argument error: {}", exception.getMessage());
-
-        var errorResponse = new ErrorResponse(
-                "Invalid argument",
-                exception.getMessage(),
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                null
-        );
+        var errorResponse = ErrorResponse.builder()
+                .error("Invalid argument")
+                .message(exception.getMessage())
+                .detailedMessage(exception.getMessage())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .timestamp(LocalDateTime.now())
+                .build();
 
         return ResponseEntity.badRequest().body(errorResponse);
     }
@@ -56,14 +56,13 @@ public class RestControllerExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception exception) {
         log.error("Unexpected error occurred", exception);
-
-        var errorResponse = new ErrorResponse(
-                "Internal server error",
-                "An unexpected error occurred. Please try again later.",
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now(),
-                null
-        );
+        var errorResponse = ErrorResponse.builder()
+                .error("Internal server error")
+                .message("An unexpected error occurred. Please try again later.")
+                .detailedMessage(exception.getMessage())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .timestamp(LocalDateTime.now())
+                .build();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }

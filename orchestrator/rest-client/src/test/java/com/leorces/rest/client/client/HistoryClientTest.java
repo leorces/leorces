@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -80,27 +79,6 @@ class HistoryClientTest {
         assertEquals(2L, result.total());
         assertEquals(TEST_PROCESS_EXECUTIONS.size(), result.data().size());
         verify(restClient).get();
-    }
-
-    @Test
-    @DisplayName("Should return empty pageable data when finding all process executions with bad request")
-    void shouldReturnEmptyPageableDataWhenFindingAllProcessExecutionsWithBadRequest() {
-        // Given
-        var pageable = createTestPageable();
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(any(ParameterizedTypeReference.class)))
-                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
-
-        // When
-        var result = historyClient.findAll(pageable);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(0L, result.total());
-        assertTrue(result.data().isEmpty());
     }
 
     @Test

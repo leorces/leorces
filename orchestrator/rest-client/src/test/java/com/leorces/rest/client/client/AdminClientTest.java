@@ -73,7 +73,7 @@ class AdminClientTest {
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When & Then
-        assertDoesNotThrow(() -> adminClient.doCompaction());
+        assertThrows(HttpClientErrorException.class, () -> adminClient.doCompaction());
     }
 
     @Test

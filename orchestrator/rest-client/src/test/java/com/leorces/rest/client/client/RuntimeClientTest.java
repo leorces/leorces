@@ -140,7 +140,7 @@ class RuntimeClientTest {
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When & Then
-        assertDoesNotThrow(() -> runtimeClient.terminateProcess(TEST_EXECUTION_ID));
+        assertThrows(HttpClientErrorException.class, () -> runtimeClient.terminateProcess(TEST_EXECUTION_ID));
     }
 
     @Test
@@ -212,8 +212,7 @@ class RuntimeClientTest {
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When & Then
-        assertDoesNotThrow(() ->
-                runtimeClient.moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456"));
+        assertThrows(HttpClientErrorException.class, () -> runtimeClient.moveExecution(TEST_EXECUTION_ID, "activity-123", "target-def-456"));
     }
 
     @Test
@@ -326,11 +325,9 @@ class RuntimeClientTest {
         when(responseSpec.body(Process.class))
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
-        // When
-        var result = runtimeClient.startProcessByKey(TEST_DEFINITION_KEY, TEST_BUSINESS_KEY, TEST_VARIABLES);
-
-        // Then
-        assertNull(result);
+        // When & Then
+        assertThrows(HttpClientErrorException.class,
+                () -> runtimeClient.startProcessByKey(TEST_DEFINITION_KEY, TEST_BUSINESS_KEY, TEST_VARIABLES));
     }
 
     @Test
@@ -365,8 +362,7 @@ class RuntimeClientTest {
                 .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When & Then
-        assertDoesNotThrow(() -> runtimeClient.correlateMessage(
-                TEST_MESSAGE, TEST_BUSINESS_KEY, TEST_CORRELATION_KEYS, TEST_VARIABLES));
+        assertThrows(HttpClientErrorException.class, () -> runtimeClient.correlateMessage(TEST_MESSAGE, TEST_BUSINESS_KEY, TEST_CORRELATION_KEYS, TEST_VARIABLES));
     }
 
     @Test
@@ -436,9 +432,8 @@ class RuntimeClientTest {
         when(responseSpec.body(Process.class))
                 .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", null, null, null));
 
-        var result = runtimeClient.findProcess(ProcessFilter.builder().build());
-
-        assertNull(result);
+        assertThrows(HttpClientErrorException.class,
+                () -> runtimeClient.findProcess(ProcessFilter.builder().build()));
     }
 
 }

@@ -98,7 +98,7 @@ class ActivityClientTest {
         when(responseSpec.toBodilessEntity()).thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When & Then
-        assertDoesNotThrow(() -> activityClient.run(TEST_PROCESS_ID, TEST_ACTIVITY_DEFINITION_ID));
+        assertThrows(HttpClientErrorException.class, () -> activityClient.run(TEST_PROCESS_ID, TEST_ACTIVITY_DEFINITION_ID));
     }
 
     @Test

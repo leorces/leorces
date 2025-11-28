@@ -87,27 +87,6 @@ class DefinitionClientTest {
     }
 
     @Test
-    @DisplayName("Should return empty list when saving definitions with bad request")
-    void shouldReturnEmptyListWhenSavingDefinitionsWithBadRequest() {
-        // Given
-        when(restClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(TEST_DEFINITIONS)).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(any(ParameterizedTypeReference.class)))
-                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
-
-        // When
-        var result = definitionClient.save(TEST_DEFINITIONS);
-
-        // Then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
     @DisplayName("Should throw server error when saving definitions and server error occurs")
     void shouldThrowServerErrorWhenSavingDefinitionsAndServerErrorOccurs() {
         // Given
@@ -148,27 +127,6 @@ class DefinitionClientTest {
     }
 
     @Test
-    @DisplayName("Should return empty pageable data when finding all definitions with bad request")
-    void shouldReturnEmptyPageableDataWhenFindingAllDefinitionsWithBadRequest() {
-        // Given
-        var pageable = createTestPageable();
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(any(ParameterizedTypeReference.class)))
-                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
-
-        // When
-        var result = definitionClient.findAll(pageable);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(0L, result.total());
-        assertTrue(result.data().isEmpty());
-    }
-
-    @Test
     @DisplayName("Should find definition by id successfully when valid id is provided")
     void shouldFindDefinitionByIdSuccessfullyWhenValidIdIsProvided() {
         // Given
@@ -198,24 +156,6 @@ class DefinitionClientTest {
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(ProcessDefinition.class))
                 .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", null, null, null));
-
-        // When
-        var result = definitionClient.findById(TEST_DEFINITION_ID);
-
-        // Then
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    @DisplayName("Should return empty optional when finding definition by id with bad request")
-    void shouldReturnEmptyOptionalWhenFindingDefinitionByIdWithBadRequest() {
-        // Given
-        when(restClient.get()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(ProcessDefinition.class))
-                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
 
         // When
         var result = definitionClient.findById(TEST_DEFINITION_ID);
