@@ -29,22 +29,9 @@ public interface ProcessRepository extends CrudRepository<ProcessEntity, String>
                                               @Param("filter") String filter,
                                               @Param("state") String state);
 
-    @Query(FIND_ALL_BY_BUSINESS_KEY)
-    List<ProcessEntity> findAllByBusinessKey(@Param("businessKey") String businessKey);
-
-    @Query(FIND_BY_VARIABLES)
-    List<ProcessEntity> findByVariables(@Param("variableKeys") String[] variableKeys,
-                                        @Param("variableValues") String[] variableValues,
-                                        @Param("variableCount") int variableCount);
-
-    @Query(FIND_BY_BUSINESS_KEY_AND_VARIABLES)
-    List<ProcessEntity> findByBusinessKeyAndVariables(@Param("businessKey") String businessKey,
-                                                      @Param("variableKeys") String[] variableKeys,
-                                                      @Param("variableValues") String[] variableValues,
-                                                      @Param("variableCount") int variableCount);
-
-    @Query(FIND_BY_FIND_PROCESS_DATA)
-    List<ProcessEntity> findAll(@Param("processDefinitionKey") String processDefinitionKey,
+    @Query(FIND_ALL_BY_FILTERS)
+    List<ProcessEntity> findAll(@Param("processId") String processId,
+                                @Param("processDefinitionKey") String processDefinitionKey,
                                 @Param("processDefinitionId") String processDefinitionId,
                                 @Param("businessKey") String businessKey,
                                 @Param("variableKeys") String[] variableKeys,

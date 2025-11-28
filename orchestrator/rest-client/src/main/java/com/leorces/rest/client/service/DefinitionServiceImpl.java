@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service("leorcesDefinitionService")
 public class DefinitionServiceImpl implements DefinitionService {
 
     private final DefinitionClient definitionClient;

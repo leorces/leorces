@@ -91,6 +91,13 @@ public interface RuntimeService {
     void terminateProcess(String processId);
 
     /**
+     * Resolve incidents for process execution.
+     *
+     * @param processId the unique identifier of the process
+     */
+    void resolveIncident(String processId);
+
+    /**
      * Finds process by filter.
      *
      * @param filter contains process data to search for

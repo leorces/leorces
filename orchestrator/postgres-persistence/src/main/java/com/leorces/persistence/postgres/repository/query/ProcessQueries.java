@@ -92,10 +92,6 @@ public final class ProcessQueries {
             LIMIT :limit;
             """;
 
-    public static final String FIND_ALL_BY_BUSINESS_KEY = BASE_SELECT + """
-            WHERE process.process_business_key = :businessKey
-            """;
-
     public static final String COUNT_ALL_WITH_FILTERS = """
             SELECT COUNT(*)
             FROM process
@@ -108,35 +104,11 @@ public final class ProcessQueries {
               AND (:state IS NULL OR :state = '' OR :state = 'all' OR process.process_state = :state)
             """;
 
-    public static final String FIND_BY_VARIABLES = BASE_SELECT + """
-            WHERE process.process_id IN (
-                SELECT DISTINCT variable.execution_id
-                FROM variable
-                WHERE variable.execution_id = process.process_id
-                GROUP BY variable.execution_id
-                HAVING COUNT(DISTINCT CASE WHEN variable.variable_key = ANY(:variableKeys)
-                                            AND variable.variable_value::text = ANY(:variableValues)
-                                            THEN variable.variable_key END) = :variableCount
-            )
-            """;
-
-    public static final String FIND_BY_BUSINESS_KEY_AND_VARIABLES = BASE_SELECT + """
-            WHERE process.process_business_key = :businessKey
-              AND process.process_id IN (
-                SELECT DISTINCT variable.execution_id
-                FROM variable
-                WHERE variable.execution_id = process.process_id
-                GROUP BY variable.execution_id
-                HAVING COUNT(DISTINCT CASE WHEN variable.variable_key = ANY(:variableKeys)
-                                            AND variable.variable_value::text = ANY(:variableValues)
-                                            THEN variable.variable_key END) = :variableCount
-              )
-            """;
-
-    public static final String FIND_BY_FIND_PROCESS_DATA = BASE_SELECT + """
+    public static final String FIND_ALL_BY_FILTERS = BASE_SELECT + """
             WHERE (:processDefinitionKey IS NULL OR :processDefinitionKey = '' OR process.process_definition_key = :processDefinitionKey)
               AND (:processDefinitionId IS NULL OR :processDefinitionId = '' OR process.process_definition_id = :processDefinitionId)
               AND (:businessKey IS NULL OR :businessKey = '' OR process.process_business_key = :businessKey)
+              AND (:processId IS NULL OR :processId = '' OR process.process_id = :processId)
               AND (
                     :variableKeys IS NULL OR :variableValues IS NULL OR :variableCount = 0
                     OR process.process_id IN (

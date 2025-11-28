@@ -176,6 +176,16 @@ class RuntimeServiceImplTest {
     }
 
     @Test
+    @DisplayName("Should retry all failed activities in process by ID")
+    void shouldResolveIncident() {
+        //When
+        runtimeService.resolveIncident(EXECUTION_ID);
+
+        //Then
+        verify(runtimeClient).resolveIncident(EXECUTION_ID);
+    }
+
+    @Test
     @DisplayName("Should move execution by delegating to RuntimeClient")
     void shouldMoveExecution() {
         // When

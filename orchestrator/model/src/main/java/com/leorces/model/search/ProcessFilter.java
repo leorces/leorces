@@ -7,6 +7,7 @@ import java.util.Map;
 
 @Builder
 public record ProcessFilter(
+        String processId,
         String processDefinitionKey,
         String processDefinitionId,
         String businessKey,
@@ -15,7 +16,8 @@ public record ProcessFilter(
 
     @JsonIgnore
     public boolean isEmpty() {
-        return (processDefinitionKey == null || processDefinitionKey.isBlank()) &&
+        return (processId == null || processId.isEmpty()) &&
+                (processDefinitionKey == null || processDefinitionKey.isBlank()) &&
                 (processDefinitionId == null || processDefinitionId.isBlank()) &&
                 (businessKey == null || businessKey.isBlank()) &&
                 (variables == null || variables.isEmpty());

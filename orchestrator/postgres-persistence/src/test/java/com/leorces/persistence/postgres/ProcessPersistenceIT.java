@@ -256,6 +256,25 @@ class ProcessPersistenceIT extends RepositoryIT {
     }
 
     @Test
+    @DisplayName("Should find processes by business key and variables combination")
+    void findByProcessId() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+        var processFilter = ProcessFilter.builder()
+                .processId(process.id())
+                .build();
+
+        // When
+        var result = processPersistence.findAll(processFilter);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id()).isEqualTo(process.id());
+        assertThat(result.getFirst().businessKey()).isEqualTo(process.businessKey());
+    }
+
+    @Test
     @DisplayName("Should find all fully completed processes with limit and verify completion state")
     void findAllFullyCompleted() {
         // Given

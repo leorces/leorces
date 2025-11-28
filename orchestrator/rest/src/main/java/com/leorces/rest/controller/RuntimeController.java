@@ -101,6 +101,25 @@ public class RuntimeController {
     }
 
     @Operation(
+            summary = "Resolve incident by process ID",
+            description = "Resolve incidents in process by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_404_NOT_FOUND, description = RESPONSE_404_NOT_FOUND),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/{processId}/resolve-incident")
+    public ResponseEntity<Void> resolveIncident(
+            @Parameter(description = "The ID of the process to resolve incidents in", required = true)
+            @PathVariable("processId") String processId
+    ) {
+        runtimeService.resolveIncident(processId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
             summary = "Modify process by ID",
             description = "Process modification by its ID"
     )

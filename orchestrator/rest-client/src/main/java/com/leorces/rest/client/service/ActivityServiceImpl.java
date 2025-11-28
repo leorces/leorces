@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service("leorcesActivityService")
 public class ActivityServiceImpl implements ActivityService {
 
     private final ActivityClient activityClient;

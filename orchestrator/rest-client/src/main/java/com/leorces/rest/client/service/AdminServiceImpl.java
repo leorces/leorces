@@ -5,8 +5,8 @@ import com.leorces.rest.client.client.AdminClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
+@Service("leorcesAdminService")
 public class AdminServiceImpl implements AdminService {
 
     private final AdminClient adminClient;

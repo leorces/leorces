@@ -113,6 +113,18 @@ class RuntimeControllerTest {
     }
 
     @Test
+    @DisplayName("Should resolve incidents in process successfully")
+    void shouldResolveIncidentsInProcessSuccessfully() {
+        // When
+        var response = subject.resolveIncident(TEST_EXECUTION_ID);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+        verify(runtimeService).resolveIncident(TEST_EXECUTION_ID);
+    }
+
+    @Test
     @DisplayName("Should modify process successfully")
     void shouldModifyProcessSuccessfully() {
         // Given

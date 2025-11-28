@@ -1,6 +1,7 @@
 package com.leorces.engine;
 
 import com.leorces.api.RuntimeService;
+import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
 import com.leorces.engine.process.command.MoveExecutionCommand;
@@ -17,8 +18,8 @@ import java.util.Collections;
 import java.util.Map;
 
 @Slf4j
-@Service
 @AllArgsConstructor
+@Service("leorcesRuntimeService")
 public class RuntimeServiceImpl implements RuntimeService {
 
     private final ProcessRuntimeService processRuntimeService;
@@ -78,6 +79,12 @@ public class RuntimeServiceImpl implements RuntimeService {
     public void terminateProcess(String processId) {
         log.debug("Terminate process by process id: {}", processId);
         dispatcher.dispatch(TerminateProcessCommand.of(processId));
+    }
+
+    @Override
+    public void resolveIncident(String processId) {
+        log.debug("Resolve incident by process id: {}", processId);
+        dispatcher.dispatch(RetryAllActivitiesCommand.of(processId));
     }
 
     @Override

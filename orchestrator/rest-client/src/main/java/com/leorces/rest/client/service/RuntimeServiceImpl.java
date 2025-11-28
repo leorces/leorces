@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service("leorcesRuntimeService")
 public class RuntimeServiceImpl implements RuntimeService {
 
     private final RuntimeClient runtimeClient;
@@ -60,6 +60,11 @@ public class RuntimeServiceImpl implements RuntimeService {
     @Override
     public void terminateProcess(String processId) {
         runtimeClient.terminateProcess(processId);
+    }
+
+    @Override
+    public void resolveIncident(String processId) {
+        runtimeClient.resolveIncident(processId);
     }
 
     @Override

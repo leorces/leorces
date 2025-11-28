@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Slf4j
-@Service
 @AllArgsConstructor
+@Service("leorcesProcessService")
 public class ProcessServiceImpl implements ProcessService {
 
     private final ProcessPersistence processPersistence;

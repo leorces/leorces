@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
-@Service
 @AllArgsConstructor
+@Service("leorcesExternalTaskService")
 public class ExternalTaskServiceImpl implements ExternalTaskService {
 
     private final TaskRestClient taskRestClient;

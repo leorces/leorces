@@ -8,8 +8,8 @@ import com.leorces.rest.client.client.HistoryClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
 @RequiredArgsConstructor
+@Service("leorcesHistoryService")
 public class HistoryServiceImpl implements HistoryService {
 
     private final HistoryClient historyClient;

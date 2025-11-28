@@ -85,6 +85,7 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
 
         var variables = filter.variables() == null ? Map.<String, Object>of() : filter.variables();
         return processRepository.findAll(
+                        filter.processId(),
                         filter.processDefinitionKey(),
                         filter.processDefinitionId(),
                         filter.businessKey(),

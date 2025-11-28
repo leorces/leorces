@@ -115,6 +115,32 @@ public class RuntimeClient {
         }
     }
 
+    @Retry(name = "resolve-incident")
+    @CircuitBreaker(name = "resolve-incident", fallbackMethod = "resolveIncidentFallback")
+    public void resolveIncident(String processId) {
+        try {
+            leorcesRestClient.put()
+                    .uri(RESOLVE_INCIDENT_BY_PROCESS_ID.formatted(processId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (HttpClientErrorException.BadRequest e) {
+            log.warn("Bad request for resolve incident by process id: processId={}, error={}", processId, e.getMessage());
+        } catch (HttpClientErrorException.NotFound e) {
+            log.warn("Process not found: processId={}", processId);
+        } catch (HttpServerErrorException.InternalServerError e) {
+            log.error("Server error during resolving incident by process id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        } catch (HttpServerErrorException.ServiceUnavailable e) {
+            log.error("Service unavailable during resolving incident by process id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        } catch (ResourceAccessException e) {
+            log.error("Connection error during resolving incident by process id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        }
+    }
+
     @Retry(name = "move-execution")
     @CircuitBreaker(name = "move-execution", fallbackMethod = "moveExecutionFallback")
     public void moveExecution(String processId, String activityId, String targetDefinitionId) {
@@ -257,6 +283,16 @@ public class RuntimeClient {
             log.warn("Client error for terminate process: processId={}, status={}, error={}", processId, clientError.getStatusCode(), e.getMessage());
         } else {
             log.error("Unexpected error for terminate process: processId={}", processId, e);
+        }
+    }
+
+    private void resolveIncidentFallback(String processId, Exception e) {
+        if (e instanceof HttpServerErrorException || e instanceof ResourceAccessException) {
+            log.error("Service unavailable for resolving incidents in process: processId={}, error={}", processId, e.getMessage());
+        } else if (e instanceof HttpClientErrorException clientError) {
+            log.warn("Client error for resolving incidents in process: processId={}, status={}, error={}", processId, clientError.getStatusCode(), e.getMessage());
+        } else {
+            log.error("Unexpected error for resolving incidents in process: processId={}", processId, e);
         }
     }
 

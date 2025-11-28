@@ -13,6 +13,7 @@ public final class ApiConstants {
     public static final String START_PROCESS_BY_KEY_ENDPOINT = RUNTIME_ENDPOINT + "/processes/key";
     public static final String START_PROCESS_BY_ID_ENDPOINT = RUNTIME_ENDPOINT + "/processes";
     public static final String TERMINATE_PROCESS_BY_ID_ENDPOINT = RUNTIME_ENDPOINT + "/processes/%s/terminate";
+    public static final String RESOLVE_INCIDENT_BY_PROCESS_ID = RUNTIME_ENDPOINT + "/processes/%s/resolve-incident";
     public static final String MODIFY_PROCESS_BY_ID_ENDPOINT = RUNTIME_ENDPOINT + "/processes/%s/modification";
     public static final String CORRELATE_MESSAGE_ENDPOINT = RUNTIME_ENDPOINT + "/correlate";
     public static final String SET_VARIABLES_ENDPOINT = RUNTIME_ENDPOINT + "/%s/variables";
