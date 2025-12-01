@@ -32,11 +32,12 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
         var processId = process.id();
 
         if (process.state() != ProcessState.INCIDENT) {
-            log.debug("Process {} is not in INCIDENT state, current state: {}", processId, process.state());
+            log.debug("Process: {} is not in INCIDENT state, current state: {}", processId, process.state());
             return;
         }
 
         if (!activityPersistence.isAnyFailed(processId)) {
+            log.debug("Resolving incident in process: {}", processId);
             resolveProcessIncident(process);
         }
     }

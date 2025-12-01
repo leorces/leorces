@@ -21,7 +21,6 @@ public class MoveExecutionCommandHandler implements CommandHandler<MoveExecution
         log.debug("Move execution from activity: {} to: {} for process: {}", command.activityId(), command.targetDefinitionId(), command.processId());
         dispatcher.dispatch(TerminateActivityCommand.of(command.activityId(), true));
         dispatcher.dispatch(RunActivityCommand.of(command.targetDefinitionId(), command.processId()));
-        log.debug("Move execution from activity: {} to: {} for process: {} success", command.activityId(), command.targetDefinitionId(), command.processId());
     }
 
     @Override

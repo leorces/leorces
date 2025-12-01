@@ -30,7 +30,6 @@ public class TerminateAllActivitiesCommandHandler implements CommandHandler<Term
                         .map(this::terminateAsync)
                         .toArray(CompletableFuture[]::new)
         ).join();
-        log.debug("All activities: {} terminated", activityIds);
     }
 
     @Override

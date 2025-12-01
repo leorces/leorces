@@ -23,7 +23,6 @@ public class RunProcessCommandHandler implements CommandHandler<RunProcessComman
 
         log.debug("Run process with definitionId: {}, definitionKey: {} and definition version: {}", process.definitionId(), process.definitionKey(), process.definition().version());
         processRuntimeService.start(process);
-        log.debug("Process {} started with definitionId: {}, definitionKey: {} and definition version: {}", process.id(), process.definitionId(), process.definitionKey(), process.definition().version());
     }
 
     @Override

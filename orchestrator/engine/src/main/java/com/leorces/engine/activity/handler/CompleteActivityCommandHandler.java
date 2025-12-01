@@ -34,7 +34,6 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
         log.debug("Complete {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         try {
             behaviorResolver.resolveBehavior(activity.type()).complete(activity, command.variables());
-            log.debug("Activity {} with definitionId: {} and processId: {} completed", activity.type(), activity.definitionId(), activity.processId());
         } catch (Exception e) {
             dispatcher.dispatch(FailActivityCommand.of(activity, ActivityFailure.of(e)));
             throw new ExecutionException("Activity completion failed", e);

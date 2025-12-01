@@ -28,7 +28,6 @@ public class RetryActivityCommandHandler implements CommandHandler<RetryActivity
 
         log.debug("Retry {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         behaviorResolver.resolveBehavior(activity.type()).retry(activity);
-        log.debug("Retry {} activity with definitionId: {} and processId: {} success", activity.type(), activity.definitionId(), activity.processId());
     }
 
     @Override

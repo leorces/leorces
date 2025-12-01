@@ -26,10 +26,14 @@ public class HandleActivityCompletionCommandHandler
         var activity = command.activity();
 
         if (!activity.hasParent()) {
+            log.debug("{} activity with definitionId: {} and id: {} has no parent activity. Completing process: {}",
+                    activity.type(), activity.definitionId(), activity.id(), activity.processId());
             completeProcess(activity.processId());
             return;
         }
 
+        log.debug("{} activity with definitionId: {} and id: {} parent activity. Completing parent activity: {} in process: {}",
+                activity.type(), activity.definitionId(), activity.id(), activity.parentDefinitionId(), activity.processId());
         completeParentActivity(activity);
     }
 
@@ -46,8 +50,10 @@ public class HandleActivityCompletionCommandHandler
         var parent = getParentActivity(activity);
 
         if (parent.type().isEventSubprocess()) {
+            log.debug("Completing event subprocess: {} in process: {}", parent.id(), parent.processId());
             completeEventSubprocess(parent);
         } else {
+            log.debug("Completing subprocess: {} in process: {}", parent.id(), parent.processId());
             dispatcher.dispatch(CompleteActivityCommand.of(parent));
         }
     }

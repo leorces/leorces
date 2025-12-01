@@ -31,7 +31,6 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
         log.debug("Run {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         var activityToRun = processInputVariables(activity);
         behaviorResolver.resolveBehavior(activity.type()).run(activityToRun);
-        log.debug("Run {} activity with definitionId: {} and processId: {} success", activity.type(), activity.definitionId(), activity.processId());
     }
 
     @Override

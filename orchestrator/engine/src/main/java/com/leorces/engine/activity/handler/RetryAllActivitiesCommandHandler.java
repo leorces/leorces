@@ -33,7 +33,6 @@ public class RetryAllActivitiesCommandHandler implements CommandHandler<RetryAll
                         .map(this::retryAsync)
                         .toArray(CompletableFuture[]::new)
         ).join();
-        log.debug("All activities retried: {}", activityIds);
     }
 
     @Override

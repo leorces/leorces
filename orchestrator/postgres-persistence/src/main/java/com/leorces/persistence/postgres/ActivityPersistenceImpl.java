@@ -88,8 +88,10 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     @Override
     public Optional<ActivityExecution> findByDefinitionId(String processId, String definitionId) {
         log.debug("Finding activity by definition id: {} for process: {}", definitionId, processId);
-        return activityRepository.findByDefinitionId(processId, definitionId)
-                .map(activityMapper::toExecution);
+        return activityRepository.findByDefinitionId(processId, definitionId).stream()
+                .map(activityMapper::toExecution)
+                .filter(activity -> !activity.isInTerminalState())
+                .findFirst();
     }
 
     @Override

@@ -24,8 +24,11 @@ public abstract class AbstractTriggerableStartEventBehavior
 
     @Override
     public void trigger(Process process, ActivityDefinition definition) {
-        var eventSubprocess = getEventSubprocess(process, definition);
-        dispatcher.dispatchAsync(RunActivityCommand.of(process, eventSubprocess));
+        var eventSubprocessDefinition = getEventSubprocess(process, definition);
+        var existingEventSubprocess = activityPersistence.findByDefinitionId(process.id(), eventSubprocessDefinition.id());
+        if (existingEventSubprocess.isEmpty()) {
+            dispatcher.dispatchAsync(RunActivityCommand.of(process, eventSubprocessDefinition));
+        }
     }
 
     @Override

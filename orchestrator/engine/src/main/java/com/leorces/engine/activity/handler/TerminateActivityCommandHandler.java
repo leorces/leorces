@@ -28,7 +28,6 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
 
         log.debug("Terminate {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         behaviorResolver.resolveBehavior(activity.type()).terminate(activity, command.withInterruption());
-        log.debug("Activity {} with definitionId: {} and processId: {} terminated", activity.type(), activity.definitionId(), activity.processId());
     }
 
     @Override

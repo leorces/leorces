@@ -37,7 +37,6 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
         log.debug("Terminate process: {}", processId);
         terminateActivities(processId);
         terminateProcess(process, command.terminateCallActivity());
-        log.debug("Process {} terminated", processId);
     }
 
     @Override

@@ -33,6 +33,7 @@ public class IncidentProcessCommandHandler implements CommandHandler<IncidentPro
             return;
         }
 
+        log.debug("Incident process: {}", processId);
         incidentProcess(process);
     }
 

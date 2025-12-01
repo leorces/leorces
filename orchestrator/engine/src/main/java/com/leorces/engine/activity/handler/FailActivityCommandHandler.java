@@ -34,7 +34,6 @@ public class FailActivityCommandHandler implements CommandHandler<FailActivityCo
         log.debug("Fail {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         var behavior = behaviorResolver.resolveBehavior(activity.type());
         if (behavior.fail(activity)) {
-            log.debug("Activity {} with definitionId: {} and processId: {} failed", activity.type(), activity.definitionId(), activity.processId());
             dispatcher.dispatchAsync(IncidentProcessCommand.of(activity.processId()));
         }
     }

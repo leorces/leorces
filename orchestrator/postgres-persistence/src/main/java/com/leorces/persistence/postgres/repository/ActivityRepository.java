@@ -19,7 +19,7 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     Optional<ActivityExecutionEntity> findById(@Param("activityId") String activityId);
 
     @Query(FIND_BY_DEFINITION_ID)
-    Optional<ActivityExecutionEntity> findByDefinitionId(@Param("processId") String processId,
+    List<ActivityExecutionEntity> findByDefinitionId(@Param("processId") String processId,
                                                          @Param("definitionId") String definitionId);
 
     @Query(POLL)
