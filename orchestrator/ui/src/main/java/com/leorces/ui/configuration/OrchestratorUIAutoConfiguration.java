@@ -23,16 +23,14 @@ public class OrchestratorUIAutoConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Assets
-        registry.addResourceHandler("assets/**")
+        registry.addResourceHandler("/assets/**")
                 .addResourceLocations("classpath:/static/assets/")
                 .setCachePeriod(3600)
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver());
 
-        // SPA fallback
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/templates/")
+                .addResourceLocations("classpath:/static/")
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver() {
                     @Override
@@ -40,7 +38,7 @@ public class OrchestratorUIAutoConfiguration implements WebMvcConfigurer {
                         Resource requestedResource = location.createRelative(resourcePath);
                         return requestedResource.exists() && requestedResource.isReadable()
                                 ? requestedResource
-                                : new ClassPathResource("/templates/index.html");
+                                : new ClassPathResource("/static/index.html");
                     }
                 });
     }
