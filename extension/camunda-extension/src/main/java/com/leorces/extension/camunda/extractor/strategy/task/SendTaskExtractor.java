@@ -10,7 +10,7 @@ import org.w3c.dom.Element;
 
 import java.util.List;
 
-import static com.leorces.extension.camunda.BpmnConstants.*;
+import static com.leorces.extension.camunda.BpmnConstants.SEND_TASK;
 
 @Component
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class SendTaskExtractor implements ActivityExtractionStrategy {
                 .id(helper.getId(element))
                 .parentId(parentId)
                 .name(helper.getName(element))
-                .topic(element.getAttributeNS(CAMUNDA_NAMESPACE, ATTRIBUTE_TOPIC))
+                .topic(helper.getTopic(element))
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))

@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.model.definition.activity.event.boundary.*;
-import com.leorces.model.definition.activity.event.end.EndEvent;
-import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
-import com.leorces.model.definition.activity.event.end.EscalationEndEvent;
-import com.leorces.model.definition.activity.event.end.TerminateEndEvent;
+import com.leorces.model.definition.activity.event.end.*;
 import com.leorces.model.definition.activity.event.intermediate.EscalationIntermediateThrowEvent;
 import com.leorces.model.definition.activity.event.intermediate.IntermediateCatchEvent;
 import com.leorces.model.definition.activity.event.intermediate.MessageIntermediateCatchEvent;
@@ -46,6 +43,7 @@ public class ActivityDefinitionDeserializer extends JsonDeserializer<ActivityDef
 
         return switch (type) {
             case START_EVENT -> mapper.treeToValue(node, StartEvent.class);
+            case MESSAGE_END_EVENT -> mapper.treeToValue(node, MessageEndEvent.class);
             case END_EVENT -> mapper.treeToValue(node, EndEvent.class);
             case MESSAGE_START_EVENT -> mapper.treeToValue(node, MessageStartEvent.class);
             case EXTERNAL_TASK -> mapper.treeToValue(node, ExternalTask.class);

@@ -53,6 +53,10 @@ public class ActivityExtractionHelper {
         return escalationExtractor.getEscalationCode(escalationDefinition);
     }
 
+    public String getTopic(Element element) {
+        return element.getAttributeNS(CAMUNDA_NAMESPACE, ATTRIBUTE_TOPIC);
+    }
+
     public List<String> extractIncoming(Element element) {
         return flowExtractor.extractIncoming(element);
     }
