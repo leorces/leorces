@@ -48,6 +48,7 @@ public class OrchestratorEngineAutoConfiguration {
     }
 
     @Bean
+    @Primary
     @Qualifier("engineTaskExecutor")
     public AsyncTaskExecutor engineTaskExecutor() {
         return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());

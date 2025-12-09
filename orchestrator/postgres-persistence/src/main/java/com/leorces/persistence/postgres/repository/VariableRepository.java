@@ -16,7 +16,7 @@ public interface VariableRepository extends CrudRepository<VariableEntity, Strin
 
     @Query(FIND_ALL_VARIABLES_WITHIN_SCOPE)
     List<VariableEntity> findInScope(@Param("processId") String processId,
-                                     @Param("scope") List<String> scope);
+                                     @Param("scope") String[] scope);
 
     @Query(FIND_ALL_PROCESS_VARIABLES)
     List<VariableEntity> findInProcess(@Param("processId") String processId);

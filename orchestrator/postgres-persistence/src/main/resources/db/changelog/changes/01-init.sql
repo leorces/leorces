@@ -120,11 +120,11 @@ CREATE TABLE IF NOT EXISTS variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX idx_variable_exec_proc
-    ON variable (execution_id, process_id);
+CREATE INDEX idx_variable_exec_only
+    ON variable (execution_id);
 
-CREATE INDEX idx_variable_exec_execdef
-    ON variable (execution_id, execution_definition_id);
+CREATE INDEX idx_variable_process_def
+    ON variable (process_id, execution_definition_id);
 
 CREATE INDEX idx_variable_execution_lookup
     ON variable (execution_id, variable_key, variable_value);

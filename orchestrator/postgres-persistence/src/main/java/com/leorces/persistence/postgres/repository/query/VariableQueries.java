@@ -6,7 +6,7 @@ public final class VariableQueries {
             SELECT *
             FROM variable
             WHERE process_id = :processId
-              AND execution_definition_id IN (:scope)
+              AND execution_definition_id = ANY(:scope)
             """;
 
     public static final String FIND_ALL_PROCESS_VARIABLES = """
