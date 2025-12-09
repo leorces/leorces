@@ -44,7 +44,7 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
                 .toList();
     }
 
-    private ActivityDefinition getStartEvent(ActivityExecution subprocess) {
+    protected ActivityDefinition getStartEvent(ActivityExecution subprocess) {
         return subprocess.processDefinition().activities().stream()
                 .filter(activity -> subprocess.definitionId().equals(activity.parentId()))
                 .filter(activity -> activity.type().isStartEvent())

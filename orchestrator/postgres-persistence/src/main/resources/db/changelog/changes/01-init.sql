@@ -1,7 +1,10 @@
 --liquibase formatted sql
 
 --changeset leorces:1
--- Create the process_definition table
+
+-- ============================
+-- Table: definition
+-- ============================
 CREATE TABLE definition
 (
     definition_id         TEXT      NOT NULL,
@@ -15,40 +18,49 @@ CREATE TABLE definition
     definition_updated_at TIMESTAMP NOT NULL,
     definition_data       JSONB     NOT NULL,
 
-    -- Primary key constraint
     CONSTRAINT pk_definition PRIMARY KEY (definition_id),
-
-    -- Unique constraint on definition_key + definition_version
     CONSTRAINT uq_definition_key_version UNIQUE (definition_key, definition_version)
 );
 
--- Create the process table
-CREATE TABLE process
+CREATE INDEX IF NOT EXISTS idx_definition_created
+    ON definition (definition_created_at DESC);
+
+-- ============================
+-- Table: process
+-- ============================
+CREATE TABLE IF NOT EXISTS process
 (
     process_id             TEXT      NOT NULL,
     root_process_id        TEXT,
     process_parent_id      TEXT,
     process_definition_id  TEXT      NOT NULL,
     process_definition_key TEXT      NOT NULL,
-    process_business_key   TEXT,
+    process_business_key TEXT NOT NULL,
     process_state          TEXT      NOT NULL,
     process_created_at     TIMESTAMP NOT NULL,
     process_updated_at     TIMESTAMP NOT NULL,
     process_started_at     TIMESTAMP NOT NULL,
     process_completed_at   TIMESTAMP,
 
-    -- Primary key constraint
     CONSTRAINT pk_process PRIMARY KEY (process_id)
 );
 
 CREATE INDEX idx_process_state_defkey_created
     ON process (process_state, process_definition_key, process_created_at DESC);
 
+CREATE INDEX idx_process_business_defkey
+    ON process (process_business_key, process_definition_key);
+
 CREATE INDEX idx_process_business
     ON process (process_business_key);
 
--- Create the activity table
-CREATE TABLE activity
+CREATE INDEX IF NOT EXISTS idx_process_defkey_created
+    ON process (process_definition_key, process_created_at DESC);
+
+-- ============================
+-- Table: activity
+-- ============================
+CREATE TABLE IF NOT EXISTS activity
 (
     activity_id                   TEXT      NOT NULL,
     activity_definition_id        TEXT      NOT NULL,
@@ -64,12 +76,11 @@ CREATE TABLE activity
     activity_timeout        TIMESTAMP,
     activity_failure_reason TEXT,
     activity_failure_trace  TEXT,
-    activity_async                BOOLEAN   NOT NULL,
+    activity_async BOOLEAN NOT NULL DEFAULT false,
     process_id                    TEXT      NOT NULL,
     process_definition_id         TEXT      NOT NULL,
     process_definition_key        TEXT      NOT NULL,
 
-    -- Primary key constraint
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)
 );
 
@@ -82,27 +93,30 @@ CREATE INDEX idx_activity_topic_scheduled
 
 CREATE INDEX idx_activity_timeout_active_scheduled
     ON activity (activity_timeout)
-    WHERE activity_state IN ('ACTIVE', 'SCHEDULED')
-        AND activity_timeout IS NOT NULL;
+    WHERE activity_state IN ('ACTIVE', 'SCHEDULED') AND activity_timeout IS NOT NULL;
 
 CREATE INDEX idx_activity_process_def_state_completed
     ON activity (process_id, activity_definition_id, activity_state, activity_completed_at)
     WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
 
--- Create the execution_variable table
-CREATE TABLE variable
+CREATE INDEX IF NOT EXISTS idx_activity_defid_created
+    ON activity (activity_definition_id, activity_created_at);
+
+-- ============================
+-- Table: variable
+-- ============================
+CREATE TABLE IF NOT EXISTS variable
 (
     variable_id             TEXT      NOT NULL,
     variable_key            TEXT      NOT NULL,
-    variable_value          TEXT      NULL,
-    variable_type           TEXT      NULL,
+    variable_value TEXT,
+    variable_type  TEXT,
     variable_created_at     TIMESTAMP NOT NULL,
     variable_updated_at     TIMESTAMP NOT NULL,
     process_id              TEXT      NOT NULL,
-    execution_id            TEXT      NOT NULL, -- Process or activity
+    execution_id   TEXT NOT NULL, -- Process id or activity id (polymorphic, no FK)
     execution_definition_id TEXT      NOT NULL,
 
-    -- Primary key constraint
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
@@ -115,8 +129,10 @@ CREATE INDEX idx_variable_exec_execdef
 CREATE INDEX idx_variable_execution_lookup
     ON variable (execution_id, variable_key, variable_value);
 
--- Create the history table
-CREATE TABLE history
+-- ============================
+-- Table: history
+-- ============================
+CREATE TABLE IF NOT EXISTS history
 (
     process_id           TEXT      NOT NULL,
     root_process_id      TEXT,
@@ -128,18 +144,21 @@ CREATE TABLE history
     process_started_at   TIMESTAMP,
     process_completed_at TIMESTAMP,
 
-    -- Primary key constraint
     CONSTRAINT pk_history_item PRIMARY KEY (process_id)
 );
 
--- Create the shedlock table
-CREATE TABLE shedlock
+-- ============================
+-- Table: shedlock
+-- ============================
+CREATE TABLE IF NOT EXISTS shedlock
 (
     name       VARCHAR(64)  NOT NULL,
     lock_until TIMESTAMP    NOT NULL,
     locked_at  TIMESTAMP    NOT NULL,
     locked_by  VARCHAR(255) NOT NULL,
 
-    -- Primary key constraint
     CONSTRAINT pk_name PRIMARY KEY (name)
 );
+
+-- End of changeset
+

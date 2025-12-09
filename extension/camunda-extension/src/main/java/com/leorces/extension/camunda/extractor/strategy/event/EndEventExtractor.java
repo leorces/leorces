@@ -3,10 +3,7 @@ package com.leorces.extension.camunda.extractor.strategy.event;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper;
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.definition.activity.event.end.EndEvent;
-import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
-import com.leorces.model.definition.activity.event.end.EscalationEndEvent;
-import com.leorces.model.definition.activity.event.end.TerminateEndEvent;
+import com.leorces.model.definition.activity.event.end.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -41,6 +38,11 @@ public class EndEventExtractor implements ActivityExtractionStrategy {
         var escalationDefinition = helper.findEscalationEventDefinition(element);
         if (escalationDefinition != null) {
             return createEscalationEndEvent(element, parentId, escalationDefinition);
+        }
+
+        var messageDefinition = helper.findMessageDefinition(element);
+        if (messageDefinition != null) {
+            return createMessageEndEvent(element, parentId, messageDefinition);
         }
 
         if (hasTerminateDefinition(element)) {
@@ -83,6 +85,20 @@ public class EndEventExtractor implements ActivityExtractionStrategy {
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .escalationCode(helper.getEscalationCode(escalationDefinition))
+                .build();
+    }
+
+    private MessageEndEvent createMessageEndEvent(Element element, String parentId, Element messageDefinition) {
+        return MessageEndEvent.builder()
+                .id(helper.getId(element))
+                .parentId(parentId)
+                .name(helper.getName(element))
+                .topic(helper.getTopic(messageDefinition))
+                .messageReference(helper.getMessageName(messageDefinition))
+                .incoming(helper.extractIncoming(element))
+                .outgoing(helper.extractOutgoing(element))
+                .inputs(helper.extractInputParameters(element))
+                .outputs(helper.extractOutputParameters(element))
                 .build();
     }
 

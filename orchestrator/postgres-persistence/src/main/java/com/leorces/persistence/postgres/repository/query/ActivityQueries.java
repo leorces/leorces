@@ -39,8 +39,8 @@ public final class ActivityQueries {
                 SELECT 1 FROM activity
                 WHERE process_id = :processId
                   AND activity_definition_id = ANY(:definitionIds)
+                  AND activity_async = false
                   AND activity_completed_at IS NULL
-                LIMIT 1
             );
             """;
 

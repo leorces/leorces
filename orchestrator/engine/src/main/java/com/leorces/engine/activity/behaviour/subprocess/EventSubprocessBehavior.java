@@ -3,6 +3,7 @@ package com.leorces.engine.activity.behaviour.subprocess;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
+import com.leorces.model.definition.activity.event.start.StartEventActivityDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,15 @@ public class EventSubprocessBehavior extends AbstractSubprocessBehavior {
 
     @Override
     public void complete(ActivityExecution eventSubprocess, Map<String, Object> variables) {
-        if (isAllChildActivitiesCompleted(eventSubprocess)) {
-            activityPersistence.complete(eventSubprocess);
+        if (!isAllChildActivitiesCompleted(eventSubprocess)) {
+            return;
+        }
+
+        var completedEventSubprocess = activityPersistence.complete(eventSubprocess);
+
+        var startEvent = (StartEventActivityDefinition) getStartEvent(completedEventSubprocess);
+        if (startEvent.isInterrupting()) {
+            postComplete(completedEventSubprocess, variables);
         }
     }
 

@@ -18,10 +18,4 @@ public class MessageCorrelationException extends RuntimeException {
         );
     }
 
-    public static MessageCorrelationException invalidProcessState(String processId) {
-        return new MessageCorrelationException(
-                "Process: %s is not in ACTIVE or INCIDENT state".formatted(processId)
-        );
-    }
-
 }

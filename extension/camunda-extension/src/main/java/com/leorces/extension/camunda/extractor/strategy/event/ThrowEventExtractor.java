@@ -4,6 +4,7 @@ import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionHelper
 import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrategy;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.event.intermediate.EscalationIntermediateThrowEvent;
+import com.leorces.model.definition.activity.event.intermediate.MessageIntermediateThrowEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -36,6 +37,11 @@ public class ThrowEventExtractor implements ActivityExtractionStrategy {
             return createEscalationThrowEvent(element, parentId, escalationDefinition);
         }
 
+        var messageDefinition = helper.findMessageDefinition(element);
+        if (messageDefinition != null) {
+            return createMessageThrowEvent(element, parentId, messageDefinition);
+        }
+
         throw new IllegalArgumentException("Unsupported throw event type for element: %s".formatted(element.getAttribute(ATTRIBUTE_ID)));
     }
 
@@ -47,6 +53,20 @@ public class ThrowEventExtractor implements ActivityExtractionStrategy {
                 .incoming(helper.extractIncoming(element))
                 .outgoing(helper.extractOutgoing(element))
                 .escalationCode(helper.getEscalationCode(escalationDefinition))
+                .inputs(helper.extractInputParameters(element))
+                .outputs(helper.extractOutputParameters(element))
+                .build();
+    }
+
+    private MessageIntermediateThrowEvent createMessageThrowEvent(Element element, String parentId, Element messageDefinition) {
+        return MessageIntermediateThrowEvent.builder()
+                .id(helper.getId(element))
+                .parentId(parentId)
+                .name(helper.getName(element))
+                .topic(helper.getTopic(messageDefinition))
+                .messageReference(helper.getMessageName(messageDefinition))
+                .incoming(helper.extractIncoming(element))
+                .outgoing(helper.extractOutgoing(element))
                 .inputs(helper.extractInputParameters(element))
                 .outputs(helper.extractOutputParameters(element))
                 .build();

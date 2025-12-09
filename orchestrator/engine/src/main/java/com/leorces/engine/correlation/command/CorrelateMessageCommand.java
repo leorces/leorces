@@ -18,4 +18,9 @@ public record CorrelateMessageCommand(
         return new CorrelateMessageCommand(messageName, businessKey, correlationKeys, processVariables);
     }
 
+    public static CorrelateMessageCommand of(String messageName,
+                                             String businessKey) {
+        return new CorrelateMessageCommand(messageName, businessKey, Map.of(), Map.of());
+    }
+
 }

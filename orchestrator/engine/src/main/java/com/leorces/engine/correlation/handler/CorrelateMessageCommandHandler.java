@@ -79,12 +79,6 @@ public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateM
             log.warn("Found more than one process correlated with message: {}", messageName);
             throw MessageCorrelationException.multipleProcessesCorrelated(messageName);
         }
-
-        var process = processes.getFirst();
-        if (process.state().isTerminal()) {
-            log.warn("Process: {} is not in terminal state", process.id());
-            throw MessageCorrelationException.invalidProcessState(process.id());
-        }
     }
 
     private List<MessageActivityDefinition> correlateActivities(String messageName, Process process) {

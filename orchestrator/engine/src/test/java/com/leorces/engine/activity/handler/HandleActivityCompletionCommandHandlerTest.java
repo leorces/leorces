@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@DisplayName("HandleActivityCompletionCommandHandler Extended Tests")
+@DisplayName("HandleActivityCompletionCommandHandler Tests")
 class HandleActivityCompletionCommandHandlerTest {
 
     @Mock
@@ -101,14 +101,13 @@ class HandleActivityCompletionCommandHandlerTest {
         handler.handle(command);
 
         verify(dispatcher).dispatch(CompleteActivityCommand.of(parentActivity));
-        verify(dispatcher).dispatch(CompleteProcessCommand.of("process-id"));
         verifyNoMoreInteractions(dispatcher);
     }
 
     @Test
     @DisplayName("Complete event subprocess with parent")
     void shouldCompleteEventSubprocessWithParent() {
-        ActivityExecution grandParent = mock(ActivityExecution.class);
+        var grandParent = mock(ActivityExecution.class);
 
         when(activity.hasParent()).thenReturn(true);
         when(activity.parentDefinitionId()).thenReturn("parent-def-id");
@@ -125,7 +124,6 @@ class HandleActivityCompletionCommandHandlerTest {
         handler.handle(command);
 
         verify(dispatcher).dispatch(CompleteActivityCommand.of(parentActivity));
-        verify(dispatcher).dispatch(CompleteActivityCommand.of(grandParent));
         verifyNoMoreInteractions(dispatcher);
     }
 

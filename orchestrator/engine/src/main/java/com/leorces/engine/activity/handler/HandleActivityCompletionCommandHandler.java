@@ -48,27 +48,7 @@ public class HandleActivityCompletionCommandHandler
 
     private void completeParentActivity(ActivityExecution activity) {
         var parent = getParentActivity(activity);
-
-        if (parent.type().isEventSubprocess()) {
-            log.debug("Completing event subprocess: {} in process: {}", parent.id(), parent.processId());
-            completeEventSubprocess(parent);
-        } else {
-            log.debug("Completing subprocess: {} in process: {}", parent.id(), parent.processId());
-            dispatcher.dispatch(CompleteActivityCommand.of(parent));
-        }
-    }
-
-    private void completeEventSubprocess(ActivityExecution eventSubprocess) {
-        dispatcher.dispatch(CompleteActivityCommand.of(eventSubprocess));
-
-        var process = eventSubprocess.process();
-
-        if (!eventSubprocess.hasParent()) {
-            completeProcess(process.id());
-            return;
-        }
-
-        var parent = getParentActivity(eventSubprocess);
+        log.debug("Completing subprocess: {} in process: {}", parent.id(), parent.processId());
         dispatcher.dispatch(CompleteActivityCommand.of(parent));
     }
 
