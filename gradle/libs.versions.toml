@@ -15,6 +15,9 @@ springdoc-openapi = "2.8.14"
 # Resilience4j
 resilience4j = "2.2.0"
 
+# Cache
+guava = "33.5.0-jre"
+
 # Utilities
 commons-lang3 = "3.18.0"
 
@@ -44,6 +47,9 @@ resilience4j-all = { module = "io.github.resilience4j:resilience4j-all", version
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 jackson-dataformat-xml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-xml" }
+
+# Cache
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 # Testing Framework
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }

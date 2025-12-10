@@ -37,8 +37,8 @@ services:
           - node.role == manager
       resources:
         limits:
-          cpus: "2"
-          memory: 8G
+          cpus: "4"
+          memory: 12G
         reservations:
           cpus: "1"
           memory: 2G

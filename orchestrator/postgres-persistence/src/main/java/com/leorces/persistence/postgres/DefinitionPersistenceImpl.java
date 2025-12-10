@@ -4,6 +4,7 @@ import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
 import com.leorces.persistence.DefinitionPersistence;
+import com.leorces.persistence.postgres.cache.DefinitionCache;
 import com.leorces.persistence.postgres.mapper.DefinitionMapper;
 import com.leorces.persistence.postgres.repository.DefinitionRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,16 @@ public class DefinitionPersistenceImpl implements DefinitionPersistence {
 
     private final DefinitionRepository definitionRepository;
     private final DefinitionMapper definitionMapper;
+    private final DefinitionCache cache;
     private final DefinitionPersistenceImpl self;
 
     public DefinitionPersistenceImpl(DefinitionRepository definitionRepository,
                                      DefinitionMapper definitionMapper,
+                                     DefinitionCache cache,
                                      @Lazy DefinitionPersistenceImpl self) {
         this.definitionRepository = definitionRepository;
         this.definitionMapper = definitionMapper;
+        this.cache = cache;
         this.self = self;
     }
 
@@ -42,20 +46,35 @@ public class DefinitionPersistenceImpl implements DefinitionPersistence {
 
     @Override
     public Optional<ProcessDefinition> findById(String definitionId) {
-        return definitionRepository.findById(definitionId)
-                .map(definitionMapper::toDefinition);
+        return cache.findById(definitionId).or(() -> {
+            var definition = definitionRepository.findById(definitionId)
+                    .map(definitionMapper::toDefinition);
+
+            definition.ifPresent(pd -> cache.putById(definitionId, pd));
+            return definition;
+        });
     }
 
     @Override
     public Optional<ProcessDefinition> findLatestByKey(String key) {
-        return definitionRepository.findLatestByKey(key)
-                .map(definitionMapper::toDefinition);
+        return cache.findLatestByKey(key).or(() -> {
+            var definition = definitionRepository.findLatestByKey(key)
+                    .map(definitionMapper::toDefinition);
+
+            definition.ifPresent(pd -> cache.putLatestByKey(key, pd));
+            return definition;
+        });
     }
 
     @Override
     public Optional<ProcessDefinition> findByKeyAndVersion(String key, Integer version) {
-        return definitionRepository.findByKeyAndVersion(key, version)
-                .map(definitionMapper::toDefinition);
+        return cache.findByKeyAndVersion(key, version).or(() -> {
+            var definition = definitionRepository.findByKeyAndVersion(key, version)
+                    .map(definitionMapper::toDefinition);
+
+            definition.ifPresent(pd -> cache.putByKeyAndVersion(key, version, pd));
+            return definition;
+        });
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.leorces.persistence.postgres;
 
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.*;
+import com.leorces.persistence.postgres.cache.DefinitionCache;
 import com.leorces.persistence.postgres.repository.*;
 import com.leorces.persistence.postgres.utils.ProcessDefinitionTestData;
 import com.leorces.persistence.postgres.utils.ProcessTestData;
@@ -50,6 +51,8 @@ public abstract class RepositoryIT {
     protected ShedlockRepository shedlockRepository;
     @Autowired
     protected HistoryRepository historyRepository;
+    @Autowired
+    protected DefinitionCache definitionCache;
 
     @DynamicPropertySource
     private static void properties(DynamicPropertyRegistry registry) {
@@ -85,6 +88,7 @@ public abstract class RepositoryIT {
         variableRepository.deleteAll();
         shedlockRepository.deleteAll();
         historyRepository.deleteAll();
+        definitionCache.invalidateAll();
     }
 
 }

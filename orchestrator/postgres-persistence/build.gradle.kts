@@ -16,6 +16,9 @@ dependencies {
     // JSON Processing
     implementation(libs.bundles.jackson)
 
+    // Cache
+    implementation(libs.guava)
+
     // Development Tools
     implementation(libs.lombok)
     annotationProcessor(libs.lombok)
