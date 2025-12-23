@@ -28,7 +28,7 @@ public class CompleteProcessCommandHandler implements CommandHandler<CompletePro
         var process = getProcess(command);
         var processId = process.id();
 
-        if (!process.isActive() || !isAllActivitiesCompleted(processId)) {
+        if (process.isInTerminalState() || !isAllActivitiesCompleted(processId)) {
             log.debug("Can't complete process: {}", processId);
             return;
         }

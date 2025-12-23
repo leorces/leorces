@@ -160,6 +160,9 @@ public class RuntimeClient {
                     .body(filter)
                     .retrieve()
                     .body(Process.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            log.debug("Process not found by filter={}", filter);
+            return null;
         } catch (HttpClientErrorException.BadRequest e) {
             log.warn("Can't find process by filter={}, error={}", filter, e.getMessage());
             throw e;

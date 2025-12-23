@@ -432,8 +432,9 @@ class RuntimeClientTest {
         when(responseSpec.body(Process.class))
                 .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "Not found", null, null, null));
 
-        assertThrows(HttpClientErrorException.class,
-                () -> runtimeClient.findProcess(ProcessFilter.builder().build()));
+        var result = runtimeClient.findProcess(ProcessFilter.builder().build());
+
+        assertNull(result);
     }
 
 }

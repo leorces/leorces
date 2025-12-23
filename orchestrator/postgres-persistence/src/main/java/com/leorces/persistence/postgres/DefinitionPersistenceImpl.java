@@ -109,7 +109,9 @@ public class DefinitionPersistenceImpl implements DefinitionPersistence {
     private ProcessDefinition createNewProcessDefinition(ProcessDefinition definition, int version) {
         var entity = definitionMapper.toNewEntity(definition, version);
         var savedEntity = definitionRepository.save(entity);
-        return definitionMapper.toDefinition(savedEntity);
+        var newDefinition = definitionMapper.toDefinition(savedEntity);
+        cache.putLatest(newDefinition);
+        return newDefinition;
     }
 
     private boolean isSchemaChanged(ProcessDefinition existingDefinition, ProcessDefinition newDefinition) {

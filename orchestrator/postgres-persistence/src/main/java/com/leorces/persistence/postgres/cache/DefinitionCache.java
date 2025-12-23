@@ -44,6 +44,12 @@ public class DefinitionCache {
         cache.put(FIND_BY_KEY_AND_VERSION_CACHE_NAME.formatted(key, version), definition);
     }
 
+    public void putLatest(ProcessDefinition definition) {
+        putById(definition.id(), definition);
+        putLatestByKey(definition.key(), definition);
+        putByKeyAndVersion(definition.key(), definition.version(), definition);
+    }
+
     public void invalidateAll() {
         cache.invalidateAll();
     }

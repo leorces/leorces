@@ -2,10 +2,14 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.RunActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
+import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
 import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.model.runtime.activity.ActivityExecution;
+import com.leorces.model.runtime.process.Process;
+import com.leorces.model.runtime.process.ProcessState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,6 +22,7 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
     private final VariablesService variablesService;
     private final ActivityBehaviorResolver behaviorResolver;
     private final ActivityFactory activityFactory;
+    private final CommandDispatcher dispatcher;
 
     @Override
     public void handle(RunActivityCommand command) {
@@ -31,6 +36,7 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
         log.debug("Run {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         var activityToRun = processInputVariables(activity);
         behaviorResolver.resolveBehavior(activity.type()).run(activityToRun);
+        resolveProcessIncidentIfNeeded(activityToRun.process());
     }
 
     @Override
@@ -41,6 +47,12 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
     private ActivityExecution processInputVariables(ActivityExecution activity) {
         var variables = variablesService.evaluate(activity, activity.inputs());
         return activity.toBuilder().variables(variables).build();
+    }
+
+    private void resolveProcessIncidentIfNeeded(Process process) {
+        if (process.state() == ProcessState.INCIDENT) {
+            dispatcher.dispatch(ResolveProcessIncidentCommand.of(process.id()));
+        }
     }
 
     private ActivityExecution getActivity(RunActivityCommand command) {
