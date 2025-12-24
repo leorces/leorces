@@ -2,6 +2,7 @@ package com.leorces.rest.client.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.model.runtime.process.ProcessState;
@@ -65,6 +66,12 @@ public record ExternalTask(
                 .orElse(null);
     }
 
+    public <T> T getVariable(String name, TypeReference<T> type) {
+        return findVariableByName(name)
+                .map(v -> deserializeWithType(v, type))
+                .orElse(null);
+    }
+
     public <T> T getVariable(String name, Class<T> clazz) {
         return findVariableByName(name)
                 .map(variable -> convertVariableToCustomObject(variable, clazz))
@@ -95,6 +102,17 @@ public record ExternalTask(
             throw new VariableDeserializationException(String.format(
                     "Failed to deserialize variable '%s' to %s from value: %s",
                     variable.varKey(), clazz.getSimpleName(), variable.varValue()), e);
+        }
+    }
+
+    private <T> T deserializeWithType(Variable variable, TypeReference<T> type) {
+        if (variable.varValue() == null) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(variable.varValue(), type);
+        } catch (Exception e) {
+            throw new VariableDeserializationException("Failed to deserialize variable '%s'".formatted(variable.varKey()), e);
         }
     }
 

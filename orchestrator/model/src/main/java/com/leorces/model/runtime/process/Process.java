@@ -44,6 +44,7 @@ public record Process(
     }
 
     @JsonIgnore
+    @Deprecated(forRemoval = true)
     public boolean isActive() {
         return state == ProcessState.ACTIVE;
     }
