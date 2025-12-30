@@ -95,6 +95,119 @@ class ProcessPersistenceIT extends RepositoryIT {
     }
 
     @Test
+    @DisplayName("Should mark process as suspended")
+    void suspendById() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+
+        // When
+        processPersistence.suspendById(process.id());
+        var result = processPersistence.findById(process.id()).get();
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(process.id());
+        assertThat(result.suspended()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("Should mark processes as suspended by definition id")
+    void suspendByDefinitionId() {
+        // Given
+        var process1 = processPersistence.run(createOrderSubmittedProcess());
+        var process2 = processPersistence.run(createOrderSubmittedProcess());
+
+        // When
+        processPersistence.suspendByDefinitionId(process1.definitionId());
+        var result1 = processPersistence.findById(process1.id()).get();
+        var result2 = processPersistence.findById(process2.id()).get();
+
+        // Then
+        assertThat(result1.suspended()).isEqualTo(true);
+        assertThat(result2.suspended()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("Should mark processes as suspended by definition key")
+    void suspendByDefinitionKey() {
+        // Given
+        var process1 = processPersistence.run(createOrderSubmittedProcess());
+        var process2 = processPersistence.run(createOrderSubmittedProcess());
+
+        // When
+        processPersistence.suspendByDefinitionKey(process1.definitionKey());
+        var result1 = processPersistence.findById(process1.id()).get();
+        var result2 = processPersistence.findById(process2.id()).get();
+
+        // Then
+        assertThat(result1.suspended()).isEqualTo(true);
+        assertThat(result2.suspended()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("Should resume process")
+    void resumeById() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+        processPersistence.suspendById(process.id());
+        var suspendedProcess = processPersistence.findById(process.id()).get();
+        assertThat(suspendedProcess.suspended()).isEqualTo(true);
+
+        // When
+        processPersistence.resumeById(process.id());
+        var result = processPersistence.findById(process.id()).get();
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo(process.id());
+        assertThat(result.suspended()).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("Should resume processes by definition id")
+    void resumeByDefinitionId() {
+        // Given
+        var process1 = processPersistence.run(createOrderSubmittedProcess());
+        var process2 = processPersistence.run(createOrderSubmittedProcess());
+        processPersistence.suspendByDefinitionId(process1.definitionId());
+        var suspendedProcess1 = processPersistence.findById(process1.id()).get();
+        var suspendedProcess2 = processPersistence.findById(process2.id()).get();
+        assertThat(suspendedProcess1.suspended()).isEqualTo(true);
+        assertThat(suspendedProcess2.suspended()).isEqualTo(true);
+
+        // When
+        processPersistence.resumeByDefinitionId(process1.definitionId());
+        var result1 = processPersistence.findById(process1.id()).get();
+        var result2 = processPersistence.findById(process2.id()).get();
+
+        // Then
+        assertThat(result1.suspended()).isEqualTo(false);
+        assertThat(result2.suspended()).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("Should resume processes by definition key")
+    void resumeByDefinitionKey() {
+        // Given
+        var process1 = processPersistence.run(createOrderSubmittedProcess());
+        var process2 = processPersistence.run(createOrderSubmittedProcess());
+        processPersistence.suspendByDefinitionKey(process1.definitionKey());
+        var suspendedProcess1 = processPersistence.findById(process1.id()).get();
+        var suspendedProcess2 = processPersistence.findById(process2.id()).get();
+        assertThat(suspendedProcess1.suspended()).isEqualTo(true);
+        assertThat(suspendedProcess2.suspended()).isEqualTo(true);
+
+        // When
+        processPersistence.resumeByDefinitionId(process1.definitionId());
+        var result1 = processPersistence.findById(process1.id()).get();
+        var result2 = processPersistence.findById(process2.id()).get();
+
+        // Then
+        assertThat(result1.suspended()).isEqualTo(false);
+        assertThat(result2.suspended()).isEqualTo(false);
+    }
+
+    @Test
     @DisplayName("Should find process by ID and return empty for non-existent ID")
     void findById() {
         // Given

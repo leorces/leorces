@@ -46,21 +46,27 @@ public final class ActivityQueries {
 
     public static final String POLL = """
             WITH updated AS (
-                UPDATE activity
-                    SET activity_state = 'ACTIVE',
-                        activity_started_at = NOW(),
-                        activity_updated_at = NOW()
-                    WHERE activity_id IN (
-                        SELECT activity_id
-                        FROM activity
-                        WHERE activity_topic = :topic
-                          AND activity_state = 'SCHEDULED'
-                          AND process_definition_key = :processDefinitionKey
-                        ORDER BY activity_created_at ASC
-                        LIMIT :limit
-                        FOR UPDATE SKIP LOCKED
-                    )
-                    RETURNING *
+                UPDATE activity a
+                SET activity_state = 'ACTIVE',
+                    activity_started_at = NOW(),
+                    activity_updated_at = NOW()
+                WHERE a.activity_id IN (
+                    SELECT a_sub.activity_id
+                    FROM activity a_sub
+                    WHERE a_sub.activity_state = 'SCHEDULED'
+                      AND a_sub.activity_topic = :topic
+                      AND a_sub.process_definition_key = :processDefinitionKey
+                      AND EXISTS (
+                          SELECT 1
+                          FROM process p
+                          WHERE p.process_id = a_sub.process_id
+                            AND p.process_suspended = false
+                      )
+                    ORDER BY a_sub.activity_created_at ASC
+                    LIMIT :limit
+                    FOR UPDATE SKIP LOCKED
+                )
+                RETURNING *
             )
             SELECT
                 u.*,
@@ -111,6 +117,7 @@ public final class ActivityQueries {
                    process.process_parent_id,
                    process.process_business_key,
                    process.process_state,
+                   process.process_suspended,
             
                    definition.definition_id,
                    definition.definition_key,
@@ -168,6 +175,7 @@ public final class ActivityQueries {
                    process.process_parent_id,
                    process.process_business_key,
                    process.process_state,
+                   process.process_suspended,
             
                    definition.definition_id,
                    definition.definition_key,

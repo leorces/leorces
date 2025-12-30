@@ -43,8 +43,8 @@ public class ProcessEntity implements Persistable<String> {
     @Column("process_state")
     private String state;
 
-    @ReadOnlyProperty
-    private PGobject variablesJson;
+    @Column("process_suspended")
+    private boolean suspended;
 
     @Column("process_created_at")
     private LocalDateTime createdAt;
@@ -57,6 +57,9 @@ public class ProcessEntity implements Persistable<String> {
 
     @Column("process_completed_at")
     private LocalDateTime completedAt;
+
+    @ReadOnlyProperty
+    private PGobject variablesJson;
 
     @ReadOnlyProperty
     private String definitionId;

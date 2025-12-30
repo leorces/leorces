@@ -68,6 +68,36 @@ public class RuntimeServiceImpl implements RuntimeService {
     }
 
     @Override
+    public void suspendProcessById(String processId) {
+        runtimeClient.suspendProcessById(processId);
+    }
+
+    @Override
+    public void suspendProcessesByDefinitionId(String definitionId) {
+        runtimeClient.suspendProcessesByDefinitionId(definitionId);
+    }
+
+    @Override
+    public void suspendProcessesByDefinitionKey(String definitionKey) {
+        runtimeClient.suspendProcessesByDefinitionKey(definitionKey);
+    }
+
+    @Override
+    public void resumeProcessById(String processId) {
+        runtimeClient.resumeProcessById(processId);
+    }
+
+    @Override
+    public void resumeProcessesByDefinitionId(String definitionId) {
+        runtimeClient.resumeProcessesByDefinitionId(definitionId);
+    }
+
+    @Override
+    public void resumeProcessesByDefinitionKey(String definitionKey) {
+        runtimeClient.resumeProcessesByDefinitionKey(definitionKey);
+    }
+
+    @Override
     public Process findProcess(ProcessFilter filter) {
         return runtimeClient.findProcess(filter);
     }

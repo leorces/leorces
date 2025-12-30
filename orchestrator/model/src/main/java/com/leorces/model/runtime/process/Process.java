@@ -18,6 +18,7 @@ public record Process(
         List<Variable> variables,
         ProcessState state,
         ProcessDefinition definition,
+        boolean suspended,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         LocalDateTime startedAt,
@@ -43,19 +44,28 @@ public record Process(
         return parentId != null;
     }
 
-    @JsonIgnore
-    @Deprecated(forRemoval = true)
-    public boolean isActive() {
-        return state == ProcessState.ACTIVE;
-    }
-
     public boolean isRootProcess() {
         return parentId == null;
     }
 
-    @JsonIgnore
+    public boolean isActive() {
+        return state == ProcessState.ACTIVE;
+    }
+
+    public boolean isCompleted() {
+        return state == ProcessState.COMPLETED;
+    }
+
+    public boolean isTerminated() {
+        return state == ProcessState.TERMINATED;
+    }
+
+    public boolean isIncident() {
+        return state == ProcessState.INCIDENT;
+    }
+
     public boolean isInTerminalState() {
-        return state.isTerminal();
+        return state == ProcessState.TERMINATED || state == ProcessState.COMPLETED;
     }
 
 }

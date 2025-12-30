@@ -85,6 +85,90 @@ public class RuntimeClient {
         }
     }
 
+    public void suspendProcessById(String processId) {
+        try {
+            leorcesRestClient.put()
+                    .uri(SUSPEND_PROCESS_BY_ID.formatted(processId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Can't suspend process by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        }
+    }
+
+    public void suspendProcessesByDefinitionId(String definitionId) {
+        try {
+            leorcesRestClient.put()
+                    .uri(SUSPEND_PROCESS_BY_DEFINITION_ID.formatted(definitionId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Can't suspend processes by definition id: definitionId={}, error={}", definitionId, e.getMessage());
+            throw e;
+        }
+    }
+
+    public void suspendProcessesByDefinitionKey(String definitionKey) {
+        try {
+            leorcesRestClient.put()
+                    .uri(SUSPEND_PROCESS_BY_DEFINITION_KEY.formatted(definitionKey))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Can't suspend processes by definition key: definitionKey={}, error={}", definitionKey, e.getMessage());
+            throw e;
+        }
+    }
+
+    public void resumeProcessById(String processId) {
+        try {
+            leorcesRestClient.put()
+                    .uri(RESUME_PROCESS_BY_ID.formatted(processId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Can't resume process by id: processId={}, error={}", processId, e.getMessage());
+            throw e;
+        }
+    }
+
+    public void resumeProcessesByDefinitionId(String definitionId) {
+        try {
+            leorcesRestClient.put()
+                    .uri(RESUME_PROCESSES_BY_DEFINITION_ID.formatted(definitionId))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Can't resume processes by definition id: definitionId={}, error={}", definitionId, e.getMessage());
+            throw e;
+        }
+    }
+
+    public void resumeProcessesByDefinitionKey(String definitionKey) {
+        try {
+            leorcesRestClient.put()
+                    .uri(RESUME_PROCESSES_BY_DEFINITION_KEY.formatted(definitionKey))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (Exception e) {
+            log.warn("Can't resume processes by definition key: definitionKey={}, error={}", definitionKey, e.getMessage());
+            throw e;
+        }
+    }
+
     public void moveExecution(String processId, String activityId, String targetDefinitionId) {
         try {
             leorcesRestClient.put()

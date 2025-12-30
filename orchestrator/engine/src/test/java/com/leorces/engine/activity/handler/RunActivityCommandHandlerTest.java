@@ -155,7 +155,7 @@ class RunActivityCommandHandlerTest {
     @Test
     @DisplayName("should resolve process incident if process is in INCIDENT state")
     void shouldResolveProcessIncident() {
-        when(process.state()).thenReturn(ProcessState.INCIDENT);
+        when(process.isIncident()).thenReturn(true);
 
         var command = RunActivityCommand.of(activityExecution);
 

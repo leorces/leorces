@@ -22,21 +22,25 @@ CREATE TABLE definition
     CONSTRAINT uq_definition_key_version UNIQUE (definition_key, definition_version)
 );
 
-CREATE INDEX IF NOT EXISTS idx_definition_created
+CREATE INDEX idx_definition_created_at_desc
     ON definition (definition_created_at DESC);
+
+CREATE INDEX idx_definition_search_lower
+    ON definition (LOWER(definition_id), LOWER(definition_key), LOWER(definition_name));
 
 -- ============================
 -- Table: process
 -- ============================
-CREATE TABLE IF NOT EXISTS process
+CREATE TABLE process
 (
     process_id             TEXT      NOT NULL,
     root_process_id        TEXT,
     process_parent_id      TEXT,
     process_definition_id  TEXT      NOT NULL,
     process_definition_key TEXT      NOT NULL,
-    process_business_key TEXT NOT NULL,
+    process_business_key TEXT    NOT NULL,
     process_state          TEXT      NOT NULL,
+    process_suspended    BOOLEAN NOT NULL DEFAULT FALSE,
     process_created_at     TIMESTAMP NOT NULL,
     process_updated_at     TIMESTAMP NOT NULL,
     process_started_at     TIMESTAMP NOT NULL,
@@ -51,16 +55,21 @@ CREATE INDEX idx_process_state_defkey_created
 CREATE INDEX idx_process_business_defkey
     ON process (process_business_key, process_definition_key);
 
-CREATE INDEX idx_process_business
-    ON process (process_business_key);
+CREATE INDEX idx_process_defid_suspended_completed
+    ON process (process_definition_id)
+    WHERE process_suspended = false AND process_completed_at IS NULL;
 
-CREATE INDEX IF NOT EXISTS idx_process_defkey_created
-    ON process (process_definition_key, process_created_at DESC);
+CREATE INDEX idx_process_defkey_suspended_completed
+    ON process (process_definition_key)
+    WHERE process_suspended = false AND process_completed_at IS NULL;
+
+CREATE INDEX idx_process_parent
+    ON process (process_parent_id);
 
 -- ============================
 -- Table: activity
 -- ============================
-CREATE TABLE IF NOT EXISTS activity
+CREATE TABLE activity
 (
     activity_id                   TEXT      NOT NULL,
     activity_definition_id        TEXT      NOT NULL,
@@ -99,13 +108,13 @@ CREATE INDEX idx_activity_process_def_state_completed
     ON activity (process_id, activity_definition_id, activity_state, activity_completed_at)
     WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
 
-CREATE INDEX IF NOT EXISTS idx_activity_defid_created
+CREATE INDEX idx_activity_defid_created
     ON activity (activity_definition_id, activity_created_at);
 
 -- ============================
 -- Table: variable
 -- ============================
-CREATE TABLE IF NOT EXISTS variable
+CREATE TABLE variable
 (
     variable_id             TEXT      NOT NULL,
     variable_key            TEXT      NOT NULL,
@@ -120,19 +129,19 @@ CREATE TABLE IF NOT EXISTS variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX idx_variable_exec_only
+CREATE INDEX idx_variable_execution
     ON variable (execution_id);
 
 CREATE INDEX idx_variable_process_def
     ON variable (process_id, execution_definition_id);
 
-CREATE INDEX idx_variable_execution_lookup
+CREATE INDEX idx_variable_key_value_execution
     ON variable (execution_id, variable_key, variable_value);
 
 -- ============================
 -- Table: history
 -- ============================
-CREATE TABLE IF NOT EXISTS history
+CREATE TABLE history
 (
     process_id           TEXT      NOT NULL,
     root_process_id      TEXT,
@@ -150,7 +159,7 @@ CREATE TABLE IF NOT EXISTS history
 -- ============================
 -- Table: shedlock
 -- ============================
-CREATE TABLE IF NOT EXISTS shedlock
+CREATE TABLE shedlock
 (
     name       VARCHAR(64)  NOT NULL,
     lock_until TIMESTAMP    NOT NULL,

@@ -5,6 +5,8 @@ import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
 import com.leorces.engine.process.command.MoveExecutionCommand;
+import com.leorces.engine.process.command.ResumeProcessCommand;
+import com.leorces.engine.process.command.SuspendProcessCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.engine.service.process.ProcessRuntimeService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
@@ -85,6 +87,42 @@ public class RuntimeServiceImpl implements RuntimeService {
     public void resolveIncident(String processId) {
         log.debug("Resolve incident by process id: {}", processId);
         dispatcher.dispatch(RetryAllActivitiesCommand.of(processId));
+    }
+
+    @Override
+    public void suspendProcessById(String processId) {
+        log.debug("Suspend process by process id: {}", processId);
+        dispatcher.dispatchAsync(SuspendProcessCommand.ofProcessId(processId));
+    }
+
+    @Override
+    public void suspendProcessesByDefinitionId(String definitionId) {
+        log.debug("Suspend processes by definition id: {}", definitionId);
+        dispatcher.dispatchAsync(SuspendProcessCommand.ofDefinitionId(definitionId));
+    }
+
+    @Override
+    public void suspendProcessesByDefinitionKey(String definitionKey) {
+        log.debug("Suspend processes by definition key: {}", definitionKey);
+        dispatcher.dispatchAsync(SuspendProcessCommand.ofDefinitionKey(definitionKey));
+    }
+
+    @Override
+    public void resumeProcessById(String processId) {
+        log.debug("Resume process by process id: {}", processId);
+        dispatcher.dispatchAsync(ResumeProcessCommand.ofProcessId(processId));
+    }
+
+    @Override
+    public void resumeProcessesByDefinitionId(String definitionId) {
+        log.debug("Resume processes by definition id: {}", definitionId);
+        dispatcher.dispatchAsync(ResumeProcessCommand.ofDefinitionId(definitionId));
+    }
+
+    @Override
+    public void resumeProcessesByDefinitionKey(String definitionKey) {
+        log.debug("Resume processes by definition key: {}", definitionKey);
+        dispatcher.dispatchAsync(ResumeProcessCommand.ofDefinitionKey(definitionKey));
     }
 
     @Override

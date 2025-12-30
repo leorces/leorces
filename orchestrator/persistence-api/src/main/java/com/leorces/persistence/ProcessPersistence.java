@@ -46,6 +46,76 @@ public interface ProcessPersistence {
     void incident(String processId);
 
     /**
+     * Suspends a process instance by its identifier.
+     * <p>
+     * A suspended process remains persisted but is prevented from
+     * further execution until it is activated again.
+     * </p>
+     *
+     * @param processId the process identifier
+     */
+    void suspendById(String processId);
+
+    /**
+     * Suspends all process instances associated with the given
+     * process definition identifier.
+     * <p>
+     * This operation updates the state of all matching process
+     * instances to suspended.
+     * </p>
+     *
+     * @param definitionId the process definition identifier
+     */
+    void suspendByDefinitionId(String definitionId);
+
+    /**
+     * Suspends all process instances associated with the given
+     * process definition key.
+     * <p>
+     * All process instances belonging to any version of the
+     * specified process definition key are suspended.
+     * </p>
+     *
+     * @param definitionKey the process definition key
+     */
+    void suspendByDefinitionKey(String definitionKey);
+
+    /**
+     * Activates a suspended process instance by its identifier.
+     * <p>
+     * Activation restores the process to an executable state
+     * and allows further state transitions.
+     * </p>
+     *
+     * @param processId the process identifier
+     */
+    void resumeById(String processId);
+
+    /**
+     * Activates all suspended process instances associated with the given
+     * process definition identifier.
+     * <p>
+     * This operation updates the state of all matching suspended
+     * process instances to active.
+     * </p>
+     *
+     * @param definitionId the process definition identifier
+     */
+    void resumeByDefinitionId(String definitionId);
+
+    /**
+     * Activates all suspended process instances associated with the given
+     * process definition key.
+     * <p>
+     * All suspended process instances belonging to any version of the
+     * specified process definition key are activated.
+     * </p>
+     *
+     * @param definitionKey the process definition key
+     */
+    void resumeByDefinitionKey(String definitionKey);
+
+    /**
      * Changes the state of a process by its identifier.
      *
      * @param processId the process identifier

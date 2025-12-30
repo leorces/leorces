@@ -11,6 +11,8 @@ public final class ProcessQueries {
                    process.process_definition_key,
                    process.process_business_key,
                    process.process_state,
+                   process.process_suspended,
+                   process.process_completed_at,
                    process.process_created_at,
                    process.process_updated_at,
                    process.process_started_at,
@@ -55,6 +57,7 @@ public final class ProcessQueries {
                 process.process_definition_key,
                 process.process_business_key,
                 process.process_state,
+                process.process_suspended,
                 process.process_created_at,
                 process.process_updated_at,
                 process.process_started_at,
@@ -136,6 +139,7 @@ public final class ProcessQueries {
     public static final String COMPLETE = """
             UPDATE process
             SET process_state = 'COMPLETED',
+                process_suspended = false,
                 process_updated_at = NOW(),
                 process_completed_at = NOW()
             WHERE process_id = :processId;
@@ -144,6 +148,7 @@ public final class ProcessQueries {
     public static final String TERMINATE = """
             UPDATE process
             SET process_state = 'TERMINATED',
+                process_suspended = false,
                 process_updated_at = NOW(),
                 process_completed_at = NOW()
             WHERE process_id = :processId;
@@ -156,6 +161,105 @@ public final class ProcessQueries {
             WHERE process_id = :processId;
             """;
 
+    public static final String SUSPEND_BY_ID = """
+            WITH RECURSIVE child_processes AS (
+                SELECT process_id
+                FROM process
+                WHERE process_id = :processId
+              UNION ALL
+                SELECT p.process_id
+                FROM process p
+                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+            )
+            UPDATE process
+            SET process_suspended = true,
+                process_updated_at = NOW()
+            WHERE process_id IN (SELECT process_id FROM child_processes);
+            """;
+
+    public static final String SUSPEND_BY_DEFINITION_ID = """
+            WITH RECURSIVE child_processes AS (
+                SELECT process_id
+                FROM process
+                WHERE process_definition_id = :definitionId AND process_suspended = false AND process_completed_at IS NULL
+              UNION ALL
+                SELECT p.process_id
+                FROM process p
+                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+            )
+            UPDATE process
+            SET process_suspended = true,
+                process_updated_at = NOW()
+            WHERE process_id IN (SELECT process_id FROM child_processes);
+            """;
+
+    public static final String SUSPEND_BY_DEFINITION_KEY = """
+            WITH RECURSIVE child_processes AS (
+                SELECT process_id
+                FROM process
+                WHERE process_definition_key = :definitionKey AND process_suspended = false AND process_completed_at IS NULL
+              UNION ALL
+                SELECT p.process_id
+                FROM process p
+                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+            )
+            UPDATE process
+            SET process_suspended = true,
+                process_updated_at = NOW()
+            WHERE process_id IN (SELECT process_id FROM child_processes);
+            """;
+
+    public static final String RESUME_BY_ID = """
+            WITH RECURSIVE child_processes AS (
+                SELECT process_id
+                FROM process
+                WHERE process_id = :processId
+              UNION ALL
+                SELECT p.process_id
+                FROM process p
+                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+            )
+            UPDATE process
+            SET process_suspended = false,
+                process_updated_at = NOW()
+            WHERE process_id IN (SELECT process_id FROM child_processes)
+              AND process_completed_at IS NULL;
+            """;
+
+    public static final String RESUME_BY_DEFINITION_ID = """
+            WITH RECURSIVE child_processes AS (
+                SELECT process_id
+                FROM process
+                WHERE process_definition_id = :definitionId AND process_suspended = true AND process_completed_at IS NULL
+              UNION ALL
+                SELECT p.process_id
+                FROM process p
+                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+            )
+            UPDATE process
+            SET process_suspended = false,
+                process_updated_at = NOW()
+            WHERE process_id IN (SELECT process_id FROM child_processes)
+              AND process_completed_at IS NULL;
+            """;
+
+    public static final String RESUME_BY_DEFINITION_KEY = """
+            WITH RECURSIVE child_processes AS (
+                SELECT process_id
+                FROM process
+                WHERE process_definition_key = :definitionKey AND process_suspended = true AND process_completed_at IS NULL
+              UNION ALL
+                SELECT p.process_id
+                FROM process p
+                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+            )
+            UPDATE process
+            SET process_suspended = false,
+                process_updated_at = NOW()
+            WHERE process_id IN (SELECT process_id FROM child_processes)
+              AND process_completed_at IS NULL;
+            """;
+
     private static final String BASE_SELECT_WITH_ACTIVITIES = """
             SELECT
                    process.process_id,
@@ -165,6 +269,7 @@ public final class ProcessQueries {
                    process.process_definition_key,
                    process.process_business_key,
                    process.process_state,
+                   process.process_suspended,
                    process.process_created_at,
                    process.process_updated_at,
                    process.process_started_at,

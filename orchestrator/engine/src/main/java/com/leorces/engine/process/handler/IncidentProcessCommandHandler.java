@@ -8,7 +8,6 @@ import com.leorces.engine.process.command.IncidentProcessCommand;
 import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.activity.ActivityFailure;
 import com.leorces.model.runtime.process.Process;
-import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +27,7 @@ public class IncidentProcessCommandHandler implements CommandHandler<IncidentPro
         var process = getProcess(command);
         var processId = process.id();
 
-        if (process.state() == ProcessState.INCIDENT) {
+        if (process.isIncident()) {
             log.debug("Process {} is already in INCIDENT state", processId);
             return;
         }

@@ -1,11 +1,16 @@
 package com.leorces.engine;
 
+import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
 import com.leorces.engine.process.command.MoveExecutionCommand;
+import com.leorces.engine.process.command.ResumeProcessCommand;
+import com.leorces.engine.process.command.SuspendProcessCommand;
+import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.engine.service.process.ProcessRuntimeService;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.search.ProcessFilter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -151,6 +156,151 @@ class RuntimeServiceImplTest {
         assertThat(command.businessKey()).isEqualTo(businessKey);
         assertThat(command.correlationKeys()).isEqualTo(correlationKeys);
         assertThat(command.processVariables()).isEqualTo(processVariables);
+    }
+
+    @Test
+    @DisplayName("terminateProcess dispatches TerminateProcessCommand")
+    void terminateProcessDelegates() {
+        var processId = "proc1";
+
+        service.terminateProcess(processId);
+
+        var captor = ArgumentCaptor.forClass(TerminateProcessCommand.class);
+        verify(dispatcher).dispatch(captor.capture());
+        assertThat(captor.getValue().processId()).isEqualTo(processId);
+    }
+
+    @Test
+    @DisplayName("resolveIncident dispatches RetryAllActivitiesCommand")
+    void resolveIncidentDelegates() {
+        var processId = "proc1";
+
+        service.resolveIncident(processId);
+
+        var captor = ArgumentCaptor.forClass(RetryAllActivitiesCommand.class);
+        verify(dispatcher).dispatch(captor.capture());
+        assertThat(captor.getValue().processId()).isEqualTo(processId);
+    }
+
+    @Test
+    @DisplayName("suspendProcessById dispatches async SuspendProcessCommand")
+    void suspendProcessByIdDelegatesAsync() {
+        var processId = "proc1";
+
+        service.suspendProcessById(processId);
+
+        var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
+        verify(dispatcher).dispatchAsync(captor.capture());
+        assertThat(captor.getValue().processId()).isEqualTo(processId);
+    }
+
+    @Test
+    @DisplayName("suspendProcessesByDefinitionId dispatches async SuspendProcessCommand")
+    void suspendByDefinitionIdDelegatesAsync() {
+        var definitionId = "def1";
+
+        service.suspendProcessesByDefinitionId(definitionId);
+
+        var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
+        verify(dispatcher).dispatchAsync(captor.capture());
+        assertThat(captor.getValue().definitionId()).isEqualTo(definitionId);
+    }
+
+    @Test
+    @DisplayName("suspendProcessesByDefinitionKey dispatches async SuspendProcessCommand")
+    void suspendByDefinitionKeyDelegatesAsync() {
+        var definitionKey = "key1";
+
+        service.suspendProcessesByDefinitionKey(definitionKey);
+
+        var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
+        verify(dispatcher).dispatchAsync(captor.capture());
+        assertThat(captor.getValue().definitionKey()).isEqualTo(definitionKey);
+    }
+
+    @Test
+    @DisplayName("resumeProcessById dispatches async ResumeProcessCommand")
+    void resumeProcessByIdDelegatesAsync() {
+        var processId = "proc1";
+
+        service.resumeProcessById(processId);
+
+        var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
+        verify(dispatcher).dispatchAsync(captor.capture());
+        assertThat(captor.getValue().processId()).isEqualTo(processId);
+    }
+
+    @Test
+    @DisplayName("resumeProcessesByDefinitionId dispatches async ResumeProcessCommand")
+    void resumeByDefinitionIdDelegatesAsync() {
+        var definitionId = "def1";
+
+        service.resumeProcessesByDefinitionId(definitionId);
+
+        var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
+        verify(dispatcher).dispatchAsync(captor.capture());
+        assertThat(captor.getValue().definitionId()).isEqualTo(definitionId);
+    }
+
+    @Test
+    @DisplayName("resumeProcessesByDefinitionKey dispatches async ResumeProcessCommand")
+    void resumeByDefinitionKeyDelegatesAsync() {
+        var definitionKey = "key1";
+
+        service.resumeProcessesByDefinitionKey(definitionKey);
+
+        var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
+        verify(dispatcher).dispatchAsync(captor.capture());
+        assertThat(captor.getValue().definitionKey()).isEqualTo(definitionKey);
+    }
+
+    @Test
+    @DisplayName("findProcess delegates to ProcessRuntimeService")
+    void findProcessDelegates() {
+        var filter = mock(ProcessFilter.class);
+        var process = mock(Process.class);
+        when(processRuntimeService.find(filter)).thenReturn(process);
+
+        var result = service.findProcess(filter);
+
+        assertThat(result).isEqualTo(process);
+        verify(processRuntimeService).find(filter);
+        verifyNoMoreInteractions(processRuntimeService);
+    }
+
+    @Test
+    @DisplayName("correlateMessage with businessKey only delegates correctly")
+    void correlateMessageWithBusinessKeyOnly() {
+        var messageName = "msg1";
+        var businessKey = "bk1";
+
+        service.correlateMessage(messageName, businessKey);
+
+        var captor = ArgumentCaptor.forClass(CorrelateMessageCommand.class);
+        verify(dispatcher).dispatch(captor.capture());
+
+        var command = captor.getValue();
+        assertThat(command.messageName()).isEqualTo(messageName);
+        assertThat(command.businessKey()).isEqualTo(businessKey);
+        assertThat(command.correlationKeys()).isEmpty();
+        assertThat(command.processVariables()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("correlateMessage with correlation keys only delegates correctly")
+    void correlateMessageWithCorrelationKeysOnly() {
+        var messageName = "msg1";
+        Map<String, Object> keys = Map.of("k", 1);
+
+        service.correlateMessage(messageName, keys);
+
+        var captor = ArgumentCaptor.forClass(CorrelateMessageCommand.class);
+        verify(dispatcher).dispatch(captor.capture());
+
+        var command = captor.getValue();
+        assertThat(command.messageName()).isEqualTo(messageName);
+        assertThat(command.businessKey()).isNull();
+        assertThat(command.correlationKeys()).isEqualTo(keys);
     }
 
 }

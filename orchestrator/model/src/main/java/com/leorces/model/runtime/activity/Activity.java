@@ -24,4 +24,28 @@ public record Activity(
         LocalDateTime completedAt
 ) {
 
+    public boolean isScheduled() {
+        return ActivityState.SCHEDULED.equals(state());
+    }
+
+    public boolean isActive() {
+        return ActivityState.ACTIVE.equals(state());
+    }
+
+    public boolean isCompleted() {
+        return ActivityState.COMPLETED.equals(state());
+    }
+
+    public boolean isTerminated() {
+        return ActivityState.TERMINATED.equals(state());
+    }
+
+    public boolean isFailed() {
+        return ActivityState.FAILED.equals(state());
+    }
+
+    public boolean isInTerminalState() {
+        return state == ActivityState.TERMINATED || state == ActivityState.COMPLETED;
+    }
+
 }

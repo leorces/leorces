@@ -32,10 +32,7 @@ public class CorrelateVariablesCommandHandler implements CommandHandler<Correlat
         var variables = command.variables();
 
         log.debug("Correlate variables with processId: {} and variables: {}", process.id(), variables);
-
-        if (variables.isEmpty()) {
-            return;
-        }
+        if (variables.isEmpty() || process.suspended()) return;
 
         var processDefinition = process.definition();
         var variablesByExecutionId = variables.stream()

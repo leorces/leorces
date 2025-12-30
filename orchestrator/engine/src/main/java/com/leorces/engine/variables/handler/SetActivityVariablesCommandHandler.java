@@ -23,7 +23,10 @@ public class SetActivityVariablesCommandHandler implements CommandHandler<SetAct
     @Override
     public void handle(SetActivityVariablesCommand command) {
         var activity = command.activity();
+        var process = activity.process();
         var variables = command.variables();
+
+        if (process.suspended()) return;
 
         var outputVariables = variablesService.evaluate(activity, activity.outputs());
         var outputVariablesMap = variablesService.toMap(outputVariables);

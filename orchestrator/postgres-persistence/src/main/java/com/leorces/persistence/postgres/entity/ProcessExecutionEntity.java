@@ -41,7 +41,8 @@ public class ProcessExecutionEntity {
     @Column("process_state")
     private String state;
 
-    private ProcessDefinitionEntity definition;
+    @Column("process_suspended")
+    private boolean suspended;
 
     @Column("process_created_at")
     private LocalDateTime createdAt;
@@ -54,6 +55,8 @@ public class ProcessExecutionEntity {
 
     @Column("process_completed_at")
     private LocalDateTime completedAt;
+
+    private ProcessDefinitionEntity definition;
 
     @ReadOnlyProperty
     private PGobject variablesJson;

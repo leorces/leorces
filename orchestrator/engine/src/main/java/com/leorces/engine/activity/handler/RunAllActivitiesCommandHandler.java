@@ -7,7 +7,6 @@ import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.runtime.process.Process;
-import com.leorces.model.runtime.process.ProcessState;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,7 +36,7 @@ public class RunAllActivitiesCommandHandler
     }
 
     private void resolveProcessIncidentIfNeeded(Process process) {
-        if (process.state() == ProcessState.INCIDENT) {
+        if (process.isIncident()) {
             dispatcher.dispatch(ResolveProcessIncidentCommand.of(process.id()));
         }
     }

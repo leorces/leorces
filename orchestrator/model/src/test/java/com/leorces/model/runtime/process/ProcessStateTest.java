@@ -52,22 +52,6 @@ class ProcessStateTest {
     }
 
     @Test
-    @DisplayName("Should return true for terminal states")
-    void shouldReturnTrueForTerminalStates() {
-        // When & Then
-        assertTrue(ProcessState.TERMINATED.isTerminal());
-        assertTrue(ProcessState.COMPLETED.isTerminal());
-    }
-
-    @Test
-    @DisplayName("Should return false for non-terminal states")
-    void shouldReturnFalseForNonTerminalStates() {
-        // When & Then
-        assertFalse(ProcessState.ACTIVE.isTerminal());
-        assertFalse(ProcessState.INCIDENT.isTerminal());
-    }
-
-    @Test
     @DisplayName("Should support valueOf functionality")
     void shouldSupportValueOfFunctionality() {
         // Given
@@ -130,30 +114,6 @@ class ProcessStateTest {
 
         // Then
         assertEquals(hashCode1, hashCode2);
-    }
-
-    @Test
-    @DisplayName("Should correctly identify all terminal states")
-    void shouldCorrectlyIdentifyAllTerminalStates() {
-        // Given
-        var terminalStates = new ProcessState[]{
-                ProcessState.TERMINATED,
-                ProcessState.COMPLETED
-        };
-
-        var nonTerminalStates = new ProcessState[]{
-                ProcessState.ACTIVE,
-                ProcessState.INCIDENT
-        };
-
-        // When & Then
-        for (ProcessState state : terminalStates) {
-            assertTrue(state.isTerminal(), "State %s should be terminal".formatted(state));
-        }
-
-        for (ProcessState state : nonTerminalStates) {
-            assertFalse(state.isTerminal(), "State %s should not be terminal".formatted(state));
-        }
     }
 
     private boolean contains(ProcessState[] processStates, ProcessState target) {

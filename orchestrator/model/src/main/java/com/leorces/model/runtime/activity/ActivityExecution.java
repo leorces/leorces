@@ -130,14 +130,28 @@ public record ActivityExecution(
         return definition().outgoing();
     }
 
-    @JsonIgnore
+    public boolean isScheduled() {
+        return ActivityState.SCHEDULED.equals(state());
+    }
+
     public boolean isActive() {
         return ActivityState.ACTIVE.equals(state());
     }
 
-    @JsonIgnore
+    public boolean isCompleted() {
+        return ActivityState.COMPLETED.equals(state());
+    }
+
+    public boolean isTerminated() {
+        return ActivityState.TERMINATED.equals(state());
+    }
+
+    public boolean isFailed() {
+        return ActivityState.FAILED.equals(state());
+    }
+
     public boolean isInTerminalState() {
-        return state.isTerminal();
+        return state == ActivityState.TERMINATED || state == ActivityState.COMPLETED;
     }
 
 }

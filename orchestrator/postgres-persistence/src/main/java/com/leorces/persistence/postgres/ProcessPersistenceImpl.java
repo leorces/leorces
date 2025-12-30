@@ -58,6 +58,42 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
+    public void suspendById(String processId) {
+        log.debug("Suspend process by id: {}", processId);
+        processRepository.suspendById(processId);
+    }
+
+    @Override
+    public void suspendByDefinitionId(String definitionId) {
+        log.debug("Suspend processes by definition id: {}", definitionId);
+        processRepository.suspendByDefinitionId(definitionId);
+    }
+
+    @Override
+    public void suspendByDefinitionKey(String definitionKey) {
+        log.debug("Suspend processes by definition key: {}", definitionKey);
+        processRepository.suspendByDefinitionKey(definitionKey);
+    }
+
+    @Override
+    public void resumeById(String processId) {
+        log.debug("Resume process by id: {}", processId);
+        processRepository.resumeById(processId);
+    }
+
+    @Override
+    public void resumeByDefinitionId(String definitionId) {
+        log.debug("Resume processes by definition id: {}", definitionId);
+        processRepository.resumeByDefinitionId(definitionId);
+    }
+
+    @Override
+    public void resumeByDefinitionKey(String definitionKey) {
+        log.debug("Resume processes by definition key: {}", definitionKey);
+        processRepository.resumeByDefinitionKey(definitionKey);
+    }
+
+    @Override
     public void changeState(String processId, ProcessState state) {
         log.debug("Change process: {} state to: {}", processId, state);
         processRepository.changeState(processId, state.name());

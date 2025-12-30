@@ -49,9 +49,10 @@ public class ProcessFactory {
         var callActivity = (CallActivity) activity.definition();
         var definition = getDefinition(callActivity.calledElement(), callActivity.calledElementVersion());
         var variables = callActivityService.getInputMappings(activity);
-        var rootProcessId = activity.process().rootProcessId() == null
-                ? activity.process().id()
-                : activity.process().rootProcessId();
+        var parentProcess = activity.process();
+        var rootProcessId = parentProcess.rootProcessId() == null
+                ? parentProcess.id()
+                : parentProcess.rootProcessId();
 
         return Process.builder()
                 .id(activity.id())
@@ -60,6 +61,7 @@ public class ProcessFactory {
                 .businessKey(activity.process().businessKey())
                 .definition(definition)
                 .variables(variablesService.toList(variables))
+                .suspended(parentProcess.suspended())
                 .build();
     }
 

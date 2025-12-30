@@ -120,6 +120,114 @@ public class RuntimeController {
     }
 
     @Operation(
+            summary = "Suspend process by ID",
+            description = "Suspend process by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/{processId}/suspend")
+    public ResponseEntity<Void> suspendProcessById(
+            @Parameter(description = "The ID of the process to suspend", required = true)
+            @PathVariable("processId") String processId
+    ) {
+        runtimeService.suspendProcessById(processId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Suspend processes by definition ID",
+            description = "Suspend processes by its definition ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/definition-id/{definitionId}/suspend")
+    public ResponseEntity<Void> suspendProcessByDefinitionId(
+            @Parameter(description = "The ID of the processes definition to suspend", required = true)
+            @PathVariable("definitionId") String processDefinitionId
+    ) {
+        runtimeService.suspendProcessesByDefinitionId(processDefinitionId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Suspend processes by definition key",
+            description = "Suspend processes by its definition key"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/key/{definitionKey}/suspend")
+    public ResponseEntity<Void> suspendProcessByDefinitionKey(
+            @Parameter(description = "The key of the processes definition to suspend", required = true)
+            @PathVariable("definitionKey") String processDefinitionKey
+    ) {
+        runtimeService.suspendProcessesByDefinitionKey(processDefinitionKey);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Resume process by ID",
+            description = "Resume process by its ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/{processId}/resume")
+    public ResponseEntity<Void> resumeProcessById(
+            @Parameter(description = "The ID of the process to resume", required = true)
+            @PathVariable("processId") String processId
+    ) {
+        runtimeService.resumeProcessById(processId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Resume process by definition ID",
+            description = "Resume processes by its definition ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/definition-id/{definitionId}/resume")
+    public ResponseEntity<Void> resumeProcessesByDefinitionId(
+            @Parameter(description = "The ID of the processes definition to resume", required = true)
+            @PathVariable("definitionId") String processDefinitionId
+    ) {
+        runtimeService.resumeProcessesByDefinitionId(processDefinitionId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Resume process by definition key",
+            description = "Resume processes by its definition key"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = STATUS_204_NO_CONTENT, description = RESPONSE_204_NO_CONTENT),
+            @ApiResponse(responseCode = STATUS_400_BAD_REQUEST, description = RESPONSE_400_BAD_REQUEST),
+            @ApiResponse(responseCode = STATUS_500_INTERNAL_ERROR, description = RESPONSE_500_INTERNAL_ERROR)
+    })
+    @PutMapping("/processes/key/{definitionKey}/resume")
+    public ResponseEntity<Void> resumeProcessesByDefinitionKey(
+            @Parameter(description = "The key of the processes definition to resume", required = true)
+            @PathVariable("definitionKey") String processDefinitionKey
+    ) {
+        runtimeService.resumeProcessesByDefinitionKey(processDefinitionKey);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
             summary = "Modify process by ID",
             description = "Process modification by its ID"
     )

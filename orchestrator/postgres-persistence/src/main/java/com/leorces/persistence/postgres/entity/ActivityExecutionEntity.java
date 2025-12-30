@@ -96,6 +96,9 @@ public class ActivityExecutionEntity implements Persistable<String> {
     private String processState;
 
     @ReadOnlyProperty
+    private boolean processSuspended;
+
+    @ReadOnlyProperty
     private LocalDateTime processCreatedAt;
 
     @ReadOnlyProperty

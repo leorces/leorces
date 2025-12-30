@@ -61,7 +61,7 @@ class RunAllActivitiesCommandHandlerTest {
     @Test
     @DisplayName("Should resolve process incident and run activities when process in INCIDENT state")
     void shouldResolveIncidentAndRunActivities() {
-        when(process.state()).thenReturn(ProcessState.INCIDENT);
+        when(process.isIncident()).thenReturn(true);
         var command = RunAllActivitiesCommand.of(process, List.of(activity1));
 
         handler.handle(command);

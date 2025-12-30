@@ -36,9 +36,7 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
         var process = command.process();
         var variables = command.variables();
 
-        if (variables.isEmpty()) {
-            return;
-        }
+        if (variables.isEmpty()) return;
 
         if (process != null) {
             setProcessVariables(process, variables);
@@ -59,12 +57,18 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
     }
 
     private void setProcessVariables(Process process, Map<String, Object> input) {
+        if (process.suspended()) return;
+
         var existing = toMapByKey(process.variables());
         var updated = mergeAndPersist(input, existing, variable -> variablesMapper.map(process, variable));
         correlate(process, updated);
     }
 
-    private void updateActivityVariables(ActivityExecution activity, Map<String, Object> input, boolean localOnly) {
+    private void updateActivityVariables(ActivityExecution activity,
+                                         Map<String, Object> input,
+                                         boolean localOnly) {
+        if (activity.process().suspended()) return;
+
         var existing = activity.variables().stream()
                 .filter(variable -> localOnly
                         ? Objects.equals(variable.executionId(), activity.id())
@@ -85,13 +89,13 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
         var incoming = variablesMapper.map(input);
 
         var updated = incoming.stream()
-                .filter(v -> existingByKey.containsKey(v.varKey()))
-                .map(v -> updateExisting(existingByKey.get(v.varKey()), v))
+                .filter(variable -> existingByKey.containsKey(variable.varKey()))
+                .map(variable -> updateExisting(existingByKey.get(variable.varKey()), variable))
                 .toList();
 
         var updatedKeys = updated.stream().map(Variable::varKey).collect(Collectors.toSet());
         var newOnes = incoming.stream()
-                .filter(v -> !updatedKeys.contains(v.varKey()) && !existingByKey.containsKey(v.varKey()))
+                .filter(variable -> !updatedKeys.contains(variable.varKey()) && !existingByKey.containsKey(variable.varKey()))
                 .map(newVariableMapper)
                 .toList();
 

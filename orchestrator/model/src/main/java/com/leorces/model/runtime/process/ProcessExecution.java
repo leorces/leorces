@@ -18,10 +18,31 @@ public record ProcessExecution(
         List<Activity> activities,
         ProcessState state,
         ProcessDefinition definition,
+        boolean suspended,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         LocalDateTime startedAt,
         LocalDateTime completedAt
 ) {
+
+    public boolean isActive() {
+        return state == ProcessState.ACTIVE;
+    }
+
+    public boolean isCompleted() {
+        return state == ProcessState.COMPLETED;
+    }
+
+    public boolean isTerminated() {
+        return state == ProcessState.TERMINATED;
+    }
+
+    public boolean isIncident() {
+        return state == ProcessState.INCIDENT;
+    }
+
+    public boolean isInTerminalState() {
+        return state == ProcessState.TERMINATED || state == ProcessState.COMPLETED;
+    }
 
 }

@@ -437,4 +437,139 @@ class RuntimeClientTest {
         assertNull(result);
     }
 
+    @Test
+    @DisplayName("Should suspend process by id successfully")
+    void shouldSuspendProcessByIdSuccessfully() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        assertDoesNotThrow(() -> runtimeClient.suspendProcessById(TEST_EXECUTION_ID));
+
+        verify(restClient).put();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should suspend processes by definition id successfully")
+    void shouldSuspendProcessesByDefinitionIdSuccessfully() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        assertDoesNotThrow(() -> runtimeClient.suspendProcessesByDefinitionId(TEST_DEFINITION_ID));
+
+        verify(restClient).put();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should suspend processes by definition key successfully")
+    void shouldSuspendProcessesByDefinitionKeySuccessfully() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        assertDoesNotThrow(() -> runtimeClient.suspendProcessesByDefinitionKey(TEST_DEFINITION_KEY));
+
+        verify(restClient).put();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should resume process by id successfully")
+    void shouldResumeProcessByIdSuccessfully() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        assertDoesNotThrow(() -> runtimeClient.resumeProcessById(TEST_EXECUTION_ID));
+
+        verify(restClient).put();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should resume processes by definition id successfully")
+    void shouldResumeProcessesByDefinitionIdSuccessfully() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        assertDoesNotThrow(() -> runtimeClient.resumeProcessesByDefinitionId(TEST_DEFINITION_ID));
+
+        verify(restClient).put();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should resume processes by definition key successfully")
+    void shouldResumeProcessesByDefinitionKeySuccessfully() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+
+        assertDoesNotThrow(() -> runtimeClient.resumeProcessesByDefinitionKey(TEST_DEFINITION_KEY));
+
+        verify(restClient).put();
+        verify(responseSpec).toBodilessEntity();
+    }
+
+    @Test
+    @DisplayName("Should throw bad request when suspending process by id")
+    void shouldThrowBadRequestWhenSuspendingProcessById() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(HttpClientErrorException.create(HttpStatus.BAD_REQUEST, "Bad request", null, null, null));
+
+        assertThrows(HttpClientErrorException.class,
+                () -> runtimeClient.suspendProcessById(TEST_EXECUTION_ID));
+    }
+
+    @Test
+    @DisplayName("Should throw server error when resuming process by id")
+    void shouldThrowServerErrorWhenResumingProcessById() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(HttpServerErrorException.create(HttpStatus.INTERNAL_SERVER_ERROR, "Server error", null, null, null));
+
+        assertThrows(HttpServerErrorException.class,
+                () -> runtimeClient.resumeProcessById(TEST_EXECUTION_ID));
+    }
+
+    @Test
+    @DisplayName("Should throw resource access exception when suspending processes by definition key")
+    void shouldThrowResourceAccessExceptionWhenSuspendingByDefinitionKey() {
+        when(restClient.put()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodySpec);
+        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.accept(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.toBodilessEntity())
+                .thenThrow(new ResourceAccessException("Connection error"));
+
+        assertThrows(ResourceAccessException.class,
+                () -> runtimeClient.suspendProcessesByDefinitionKey(TEST_DEFINITION_KEY));
+    }
+
 }

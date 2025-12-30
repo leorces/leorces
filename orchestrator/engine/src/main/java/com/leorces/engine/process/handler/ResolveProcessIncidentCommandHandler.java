@@ -31,7 +31,7 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
         var process = getProcess(command);
         var processId = process.id();
 
-        if (process.state() != ProcessState.INCIDENT) {
+        if (!process.isIncident()) {
             log.debug("Process: {} is not in INCIDENT state, current state: {}", processId, process.state());
             return;
         }
