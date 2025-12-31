@@ -1,6 +1,6 @@
 package com.leorces.engine.service.process;
 
-import com.leorces.engine.exception.process.ProcessDefinitionNotFoundException;
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.service.activity.CallActivityService;
 import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.model.definition.ProcessDefinition;
@@ -68,7 +68,7 @@ class ProcessFactoryTest {
     void createByDefinitionIdShouldThrowWhenDefinitionNotFound() {
         when(definitionPersistence.findById("def-1")).thenReturn(Optional.empty());
 
-        assertThrows(ProcessDefinitionNotFoundException.class,
+        assertThrows(ExecutionException.class,
                 () -> processFactory.createByDefinitionId("def-1", "bk1", Map.of()));
     }
 
@@ -91,7 +91,7 @@ class ProcessFactoryTest {
     void createByDefinitionKeyShouldThrowWhenLatestDefinitionNotFound() {
         when(definitionPersistence.findLatestByKey("order-process")).thenReturn(Optional.empty());
 
-        assertThrows(ProcessDefinitionNotFoundException.class,
+        assertThrows(ExecutionException.class,
                 () -> processFactory.createByDefinitionKey("order-process", "bk1", Map.of()));
     }
 

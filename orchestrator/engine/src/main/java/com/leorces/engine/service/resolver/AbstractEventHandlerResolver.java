@@ -1,6 +1,6 @@
 package com.leorces.engine.service.resolver;
 
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.process.Process;
@@ -105,7 +105,7 @@ public abstract class AbstractEventHandlerResolver<
 
     private ActivityDefinition findActivityById(String id, Process process) {
         return process.definition().getActivityById(id)
-                .orElseThrow(() -> ActivityNotFoundException.activityDefinitionNotFound(id, process.id()));
+                .orElseThrow(() -> ExecutionException.of("Activity definition not found", "Activity definition not found for definitionId: %s in process: %s".formatted(id, process.id()), process));
     }
 
     private boolean isProcessLevelScope(String scope, Process process) {

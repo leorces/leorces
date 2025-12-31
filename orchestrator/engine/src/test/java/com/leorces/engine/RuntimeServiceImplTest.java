@@ -183,74 +183,74 @@ class RuntimeServiceImplTest {
     }
 
     @Test
-    @DisplayName("suspendProcessById dispatches async SuspendProcessCommand")
-    void suspendProcessByIdDelegatesAsync() {
+    @DisplayName("suspendProcessById dispatches SuspendProcessCommand")
+    void suspendProcessByIdDelegates() {
         var processId = "proc1";
 
         service.suspendProcessById(processId);
 
         var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
-        verify(dispatcher).dispatchAsync(captor.capture());
+        verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().processId()).isEqualTo(processId);
     }
 
     @Test
-    @DisplayName("suspendProcessesByDefinitionId dispatches async SuspendProcessCommand")
-    void suspendByDefinitionIdDelegatesAsync() {
+    @DisplayName("suspendProcessesByDefinitionId dispatches SuspendProcessCommand")
+    void suspendByDefinitionIdDelegates() {
         var definitionId = "def1";
 
         service.suspendProcessesByDefinitionId(definitionId);
 
         var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
-        verify(dispatcher).dispatchAsync(captor.capture());
+        verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().definitionId()).isEqualTo(definitionId);
     }
 
     @Test
-    @DisplayName("suspendProcessesByDefinitionKey dispatches async SuspendProcessCommand")
-    void suspendByDefinitionKeyDelegatesAsync() {
+    @DisplayName("suspendProcessesByDefinitionKey dispatches SuspendProcessCommand")
+    void suspendByDefinitionKeyDelegates() {
         var definitionKey = "key1";
 
         service.suspendProcessesByDefinitionKey(definitionKey);
 
         var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
-        verify(dispatcher).dispatchAsync(captor.capture());
+        verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().definitionKey()).isEqualTo(definitionKey);
     }
 
     @Test
-    @DisplayName("resumeProcessById dispatches async ResumeProcessCommand")
-    void resumeProcessByIdDelegatesAsync() {
+    @DisplayName("resumeProcessById dispatches ResumeProcessCommand")
+    void resumeProcessByIdDelegates() {
         var processId = "proc1";
 
         service.resumeProcessById(processId);
 
         var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
-        verify(dispatcher).dispatchAsync(captor.capture());
+        verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().processId()).isEqualTo(processId);
     }
 
     @Test
-    @DisplayName("resumeProcessesByDefinitionId dispatches async ResumeProcessCommand")
-    void resumeByDefinitionIdDelegatesAsync() {
+    @DisplayName("resumeProcessesByDefinitionId dispatches ResumeProcessCommand")
+    void resumeByDefinitionIdDelegates() {
         var definitionId = "def1";
 
         service.resumeProcessesByDefinitionId(definitionId);
 
         var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
-        verify(dispatcher).dispatchAsync(captor.capture());
+        verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().definitionId()).isEqualTo(definitionId);
     }
 
     @Test
-    @DisplayName("resumeProcessesByDefinitionKey dispatches async ResumeProcessCommand")
-    void resumeByDefinitionKeyDelegatesAsync() {
+    @DisplayName("resumeProcessesByDefinitionKey dispatches ResumeProcessCommand")
+    void resumeByDefinitionKeyDelegates() {
         var definitionKey = "key1";
 
         service.resumeProcessesByDefinitionKey(definitionKey);
 
         var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
-        verify(dispatcher).dispatchAsync(captor.capture());
+        verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().definitionKey()).isEqualTo(definitionKey);
     }
 

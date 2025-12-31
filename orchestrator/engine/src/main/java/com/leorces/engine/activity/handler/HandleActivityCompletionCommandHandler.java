@@ -1,10 +1,10 @@
 package com.leorces.engine.activity.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.CompleteProcessCommand;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
@@ -57,9 +57,7 @@ public class HandleActivityCompletionCommandHandler
         var parentDefinitionId = activity.parentDefinitionId();
 
         return activityPersistence.findByDefinitionId(processId, parentDefinitionId)
-                .orElseThrow(() ->
-                        ActivityNotFoundException.activityDefinitionNotFound(parentDefinitionId, processId)
-                );
+                .orElseThrow(() -> ExecutionException.of("Parent activity not found", "Parent activity with definitionId: %s not found".formatted(parentDefinitionId), activity));
     }
 
 }

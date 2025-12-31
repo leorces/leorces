@@ -1,10 +1,10 @@
 package com.leorces.engine.correlation.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
-import com.leorces.engine.exception.correlation.MessageCorrelationException;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.definition.activity.MessageActivityDefinition;
 import com.leorces.model.runtime.process.Process;
@@ -37,7 +37,9 @@ public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateM
 
         var correlatedProcess = correlatedProcesses.getFirst();
 
-        if (correlatedProcess.suspended()) return;
+        if (correlatedProcess.suspended()) {
+            throw ExecutionException.of("Message correlation error", "Process suspended", correlatedProcess);
+        }
 
         var correlatedActivities = correlateActivities(messageName, correlatedProcess);
 
@@ -75,12 +77,12 @@ public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateM
     private void validateCorrelatedProcesses(String messageName, List<Process> processes) {
         if (processes.isEmpty()) {
             log.warn("No process correlated with message: {}", messageName);
-            throw MessageCorrelationException.noProcessesCorrelated(messageName);
+            throw ExecutionException.of("Message correlation error", "No process correlated with message: %s".formatted(messageName));
         }
 
         if (processes.size() > 1) {
             log.warn("Found more than one process correlated with message: {}", messageName);
-            throw MessageCorrelationException.multipleProcessesCorrelated(messageName);
+            throw ExecutionException.of("Message correlation error", "Found more than one process correlated with message: %s".formatted(messageName));
         }
     }
 

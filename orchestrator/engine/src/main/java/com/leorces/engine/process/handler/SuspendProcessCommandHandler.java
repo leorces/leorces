@@ -1,7 +1,7 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.SuspendExecutionException;
 import com.leorces.engine.process.command.SuspendProcessCommand;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class SuspendProcessCommandHandler implements CommandHandler<SuspendProce
     @Override
     public void handle(SuspendProcessCommand command) {
         if (!command.isIdentifierPresent()) {
-            throw new SuspendExecutionException("Can't suspend process without identifier");
+            throw ExecutionException.of("Can't suspend process without identifier");
         }
 
         if (command.processId() != null) {

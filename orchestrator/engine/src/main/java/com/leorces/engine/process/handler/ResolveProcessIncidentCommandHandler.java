@@ -1,9 +1,8 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
-import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
 import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -59,12 +58,12 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
 
     private Process getProcess(ResolveProcessIncidentCommand command) {
         return processPersistence.findById(command.processId())
-                .orElseThrow(ProcessNotFoundException::new);
+                .orElseThrow(() -> ExecutionException.of("Can't resolve incident in process", "Process with id: %s not found".formatted(command.processId())));
     }
 
-    private ActivityExecution getCallActivity(String activityId) {
-        return activityPersistence.findById(activityId)
-                .orElseThrow(() -> ActivityNotFoundException.activityNotFoundById(activityId));
+    private ActivityExecution getCallActivity(String callActivityId) {
+        return activityPersistence.findById(callActivityId)
+                .orElseThrow(() -> ExecutionException.of("Can't resolve incident in call activity", "Call activity with id: %s not found".formatted(callActivityId)));
     }
 
 }

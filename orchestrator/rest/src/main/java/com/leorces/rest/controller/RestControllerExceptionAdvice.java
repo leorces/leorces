@@ -1,5 +1,6 @@
 package com.leorces.rest.controller;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.rest.model.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,21 @@ import java.util.HashMap;
 @Slf4j
 @RestControllerAdvice
 public class RestControllerExceptionAdvice {
+
+    @ExceptionHandler(ExecutionException.class)
+    public ResponseEntity<ErrorResponse> handleExecutionException(ExecutionException exception) {
+        log.warn("Execution error: {}", exception.getMessage());
+        var errorResponse = ErrorResponse.builder()
+                .error("Execution error")
+                .message(exception.getMessage())
+                .detailedMessage(exception.getDetailedMessage())
+                .details(exception.getDetails())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.internalServerError().body(errorResponse);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException exception) {

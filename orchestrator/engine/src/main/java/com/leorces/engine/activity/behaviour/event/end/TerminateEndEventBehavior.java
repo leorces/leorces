@@ -1,9 +1,9 @@
 package com.leorces.engine.activity.behaviour.event.end;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -80,9 +80,7 @@ public class TerminateEndEventBehavior extends AbstractActivityBehavior {
         var parentDefinitionId = terminateEndEvent.parentDefinitionId();
 
         return activityPersistence.findByDefinitionId(processId, parentDefinitionId)
-                .orElseThrow(() ->
-                        ActivityNotFoundException.activityDefinitionNotFound(parentDefinitionId, processId)
-                );
+                .orElseThrow(() -> ExecutionException.of("Parent activity not found", "Parent activity with definitionId: %s not found".formatted(parentDefinitionId), terminateEndEvent));
     }
 
 }

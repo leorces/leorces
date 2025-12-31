@@ -1,6 +1,6 @@
 package com.leorces.engine.core;
 
-import com.leorces.engine.exception.ExecutionException;
+import com.leorces.api.exception.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -35,8 +35,11 @@ public class ExecutionDispatcher {
         try {
             var handler = getHandler(command);
             handler.handle(command);
+        } catch (ExecutionException e) {
+            throw e;
         } catch (Exception e) {
-            throw new ExecutionException("Command dispatch failed", e);
+            log.error("Command dispatch failed", e);
+            throw ExecutionException.of("Execution failed", e);
         }
     }
 
@@ -44,7 +47,8 @@ public class ExecutionDispatcher {
     private <T extends ExecutionCommand> CommandHandler<T> getHandler(T command) {
         var handler = (CommandHandler<T>) handlers.get(command.getClass());
         if (handler == null) {
-            throw new ExecutionException("No handler found for command type: %s".formatted(command.getClass().getSimpleName()));
+            log.error("No handler found for command type: {}", command.getClass().getSimpleName());
+            throw ExecutionException.of("No handler found for command type: %s".formatted(command.getClass().getSimpleName()));
         }
         return handler;
     }

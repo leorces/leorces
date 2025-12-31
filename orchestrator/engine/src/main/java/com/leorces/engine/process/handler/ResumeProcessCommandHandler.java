@@ -1,7 +1,7 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.SuspendExecutionException;
 import com.leorces.engine.process.command.ResumeProcessCommand;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,8 @@ public class ResumeProcessCommandHandler implements CommandHandler<ResumeProcess
     @Override
     public void handle(ResumeProcessCommand command) {
         if (!command.isIdentifierPresent()) {
-            throw new SuspendExecutionException("Can't resume process without identifier");
+            log.warn("Can't resume process without identifier");
+            throw ExecutionException.of("Can't resume process without identifier");
         }
 
         if (command.processId() != null) {

@@ -1,10 +1,10 @@
 package com.leorces.engine.activity.behaviour.event.end;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.IncidentProcessCommand;
 import com.leorces.engine.service.resolver.ErrorHandlerResolver;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -114,14 +114,14 @@ public class ErrorEndEventBehavior extends AbstractActivityBehavior {
         return true;
     }
 
-    private ActivityExecution findCallActivity(String id) {
-        return activityPersistence.findById(id)
-                .orElseThrow(() -> ActivityNotFoundException.activityNotFoundById(id));
+    private ActivityExecution findCallActivity(String callActivityId) {
+        return activityPersistence.findById(callActivityId)
+                .orElseThrow(() -> ExecutionException.of("Call activity not found", "Call activity with id: %s not found".formatted(callActivityId)));
     }
 
     private ActivityDefinition getActivityDefinition(String definitionId, Process process) {
         return process.definition().getActivityById(definitionId)
-                .orElseThrow(() -> ActivityNotFoundException.activityDefinitionNotFound(definitionId, process.id()));
+                .orElseThrow(() -> ExecutionException.of("Activity definition not found", "Activity definition not found for definitionId: %s in process: %s".formatted(definitionId, process.id()), process));
     }
 
     private String extractErrorCode(ActivityExecution activity) {

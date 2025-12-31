@@ -1,8 +1,8 @@
 package com.leorces.engine.activity.behaviour.gateway;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractConditionalGatewayBehavior;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.GatewayException;
 import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.activity.ActivityDefinition;
@@ -33,7 +33,7 @@ public class ExclusiveGatewayBehavior extends AbstractConditionalGatewayBehavior
         var nextActivities = getNextActivities(exclusiveGateway);
 
         if (nextActivities.size() != 1) {
-            throw GatewayException.noValidPath(exclusiveGateway);
+            throw ExecutionException.of("No valid path", exclusiveGateway);
         }
 
         var completedExclusiveGateway = activityPersistence.complete(exclusiveGateway);

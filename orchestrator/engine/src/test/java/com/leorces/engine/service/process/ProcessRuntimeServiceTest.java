@@ -1,8 +1,8 @@
 package com.leorces.engine.service.process;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.runtime.process.Process;
@@ -102,7 +102,7 @@ class ProcessRuntimeServiceTest {
         when(processPersistence.run(process)).thenReturn(process);
 
         assertThatThrownBy(() -> runtimeService.start(process))
-                .isInstanceOf(ActivityNotFoundException.class);
+                .isInstanceOf(ExecutionException.class);
 
         verify(dispatcher, never()).dispatch(any());
     }

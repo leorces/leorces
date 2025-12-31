@@ -1,10 +1,10 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
@@ -49,7 +49,7 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
                 .filter(activity -> subprocess.definitionId().equals(activity.parentId()))
                 .filter(activity -> activity.type().isStartEvent())
                 .findFirst()
-                .orElseThrow(() -> ActivityNotFoundException.startEventNotFoundForSubprocess(subprocess.definitionId()));
+                .orElseThrow(() -> ExecutionException.of("Can't start subprocess", "Start event not found for subprocess: %s".formatted(subprocess.definitionId()), subprocess));
     }
 
     private void terminateChildActivities(ActivityExecution subprocess) {

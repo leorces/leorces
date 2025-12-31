@@ -1,10 +1,10 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
@@ -59,7 +59,7 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
 
     private Process getProcess(TerminateProcessCommand command) {
         return processPersistence.findById(command.processId())
-                .orElseThrow(ProcessNotFoundException::new);
+                .orElseThrow(() -> ExecutionException.of("Can't terminate process", "Process with id: %s not found".formatted(command.processId())));
     }
 
 }

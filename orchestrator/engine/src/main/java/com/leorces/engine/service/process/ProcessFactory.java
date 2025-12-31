@@ -1,6 +1,6 @@
 package com.leorces.engine.service.process;
 
-import com.leorces.engine.exception.process.ProcessDefinitionNotFoundException;
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.service.activity.CallActivityService;
 import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.model.definition.ProcessDefinition;
@@ -25,7 +25,7 @@ public class ProcessFactory {
                                         String businessKey,
                                         Map<String, Object> variables) {
         var definition = definitionPersistence.findById(definitionId)
-                .orElseThrow(() -> new ProcessDefinitionNotFoundException(definitionId));
+                .orElseThrow(() -> ExecutionException.of("Process definition not found", "Process definition not found by id: %s".formatted(definitionId)));
 
         return Process.builder()
                 .businessKey(businessKey)
@@ -68,15 +68,15 @@ public class ProcessFactory {
     private ProcessDefinition getDefinition(String definitionKey, Integer version) {
         if (version == null) {
             return definitionPersistence.findLatestByKey(definitionKey)
-                    .orElseThrow(() -> ProcessDefinitionNotFoundException.byKey(definitionKey));
+                    .orElseThrow(() -> ExecutionException.of("Process definition not found", "Latest process definition not found for key: %s".formatted(definitionKey)));
         }
         return definitionPersistence.findByKeyAndVersion(definitionKey, version)
-                .orElseThrow(() -> ProcessDefinitionNotFoundException.byKeyAndVersion(definitionKey, version));
+                .orElseThrow(() -> ExecutionException.of("Process definition not found", "Process definition not found by key: %s and version: %s".formatted(definitionKey, version)));
     }
 
     private ProcessDefinition getDefinitionByKey(String definitionKey) {
         return definitionPersistence.findLatestByKey(definitionKey)
-                .orElseThrow(() -> new ProcessDefinitionNotFoundException(definitionKey));
+                .orElseThrow(() -> ExecutionException.of("Process definition not found", "Process definition not found for key: %s".formatted(definitionKey)));
     }
 
 }

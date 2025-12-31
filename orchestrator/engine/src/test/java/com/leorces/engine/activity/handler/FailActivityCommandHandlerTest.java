@@ -1,10 +1,10 @@
 package com.leorces.engine.activity.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.ExecutionException;
 import com.leorces.engine.process.command.IncidentProcessCommand;
 import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.definition.activity.ActivityType;
@@ -111,7 +111,7 @@ class FailActivityCommandHandlerTest {
     void shouldThrowExecutionExceptionWhenActivityNotFound() {
         var command = FailActivityCommand.of(ACTIVITY_ID);
 
-        when(activityFactory.getById(ACTIVITY_ID)).thenThrow(new ExecutionException("Activity not found: " + ACTIVITY_ID));
+        when(activityFactory.getById(ACTIVITY_ID)).thenThrow(ExecutionException.of("Activity not found: " + ACTIVITY_ID));
 
         assertThatThrownBy(() -> handler.handle(command))
                 .isInstanceOf(ExecutionException.class)

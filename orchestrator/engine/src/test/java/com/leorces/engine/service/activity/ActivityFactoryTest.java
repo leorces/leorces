@@ -1,7 +1,6 @@
 package com.leorces.engine.service.activity;
 
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
-import com.leorces.engine.exception.process.ProcessNotFoundException;
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -96,7 +95,7 @@ class ActivityFactoryTest {
 
         // When & Then
         assertThatThrownBy(() -> activityFactory.getById(ACTIVITY_ID))
-                .isInstanceOf(ActivityNotFoundException.class);
+                .isInstanceOf(ExecutionException.class);
         verify(activityPersistence).findById(ACTIVITY_ID);
     }
 
@@ -126,8 +125,8 @@ class ActivityFactoryTest {
 
         // When & Then
         assertThatThrownBy(() -> activityFactory.getNewByDefinitionId(DEFINITION_ID, PROCESS_ID))
-                .isInstanceOf(ProcessNotFoundException.class)
-                .hasMessageContaining(PROCESS_ID);
+                .isInstanceOf(ExecutionException.class)
+                .hasMessageContaining("Process not found");
         verify(processPersistence).findById(PROCESS_ID);
     }
 
@@ -140,7 +139,7 @@ class ActivityFactoryTest {
 
         // When & Then
         assertThatThrownBy(() -> activityFactory.getNewByDefinitionId(DEFINITION_ID, PROCESS_ID))
-                .isInstanceOf(ActivityNotFoundException.class);
+                .isInstanceOf(ExecutionException.class);
         verify(processPersistence).findById(PROCESS_ID);
         verify(processDefinition).getActivityById(DEFINITION_ID);
     }
@@ -169,7 +168,7 @@ class ActivityFactoryTest {
 
         // When & Then
         assertThatThrownBy(() -> activityFactory.getByDefinitionId(DEFINITION_ID, PROCESS_ID))
-                .isInstanceOf(ActivityNotFoundException.class);
+                .isInstanceOf(ExecutionException.class);
         verify(activityPersistence).findByDefinitionId(PROCESS_ID, DEFINITION_ID);
     }
 

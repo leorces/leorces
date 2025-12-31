@@ -1,9 +1,9 @@
 package com.leorces.engine.activity.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.process.command.CompleteProcessCommand;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -138,8 +138,8 @@ class HandleActivityCompletionCommandHandlerTest {
         var command = HandleActivityCompletionCommand.of(activity);
 
         assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(ActivityNotFoundException.class)
-                .hasMessageContaining("missing-def-id");
+                .isInstanceOf(ExecutionException.class)
+                .hasMessage("Parent activity not found");
 
         verify(dispatcher, never()).dispatch(any());
     }

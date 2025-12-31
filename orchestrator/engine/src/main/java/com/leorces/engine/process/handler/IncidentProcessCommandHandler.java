@@ -1,9 +1,9 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.command.IncidentProcessCommand;
 import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.activity.ActivityFailure;
@@ -51,7 +51,7 @@ public class IncidentProcessCommandHandler implements CommandHandler<IncidentPro
 
     private Process getProcess(IncidentProcessCommand command) {
         return processPersistence.findById(command.processId())
-                .orElseThrow(ProcessNotFoundException::new);
+                .orElseThrow(() -> ExecutionException.of("Can't incident process", "Process with id: %s not found".formatted(command.processId())));
     }
 
 }

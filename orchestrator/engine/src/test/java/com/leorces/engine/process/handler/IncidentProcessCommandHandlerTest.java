@@ -1,8 +1,8 @@
 package com.leorces.engine.process.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.process.ProcessNotFoundException;
 import com.leorces.engine.process.command.IncidentProcessCommand;
 import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
@@ -113,13 +113,13 @@ class IncidentProcessCommandHandlerTest {
     }
 
     @Test
-    @DisplayName("Handle should throw ProcessNotFoundException if process not found")
+    @DisplayName("Handle should throw ExecutionException if process not found")
     void handleShouldThrowExceptionIfProcessNotFound() {
         var command = new IncidentProcessCommand("unknown-id");
         when(processPersistence.findById("unknown-id")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(ProcessNotFoundException.class);
+                .isInstanceOf(ExecutionException.class);
 
         verifyNoInteractions(processMetrics, dispatcher);
     }

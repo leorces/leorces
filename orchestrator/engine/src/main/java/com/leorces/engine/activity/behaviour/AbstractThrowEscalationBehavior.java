@@ -1,8 +1,8 @@
 package com.leorces.engine.activity.behaviour;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.engine.service.resolver.EscalationHandlerResolver;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.model.definition.activity.EscalationActivityDefinition;
@@ -90,7 +90,7 @@ public abstract class AbstractThrowEscalationBehavior extends AbstractActivityBe
 
     private ActivityExecution findParentCallActivity(String callActivityId) {
         return activityPersistence.findById(callActivityId)
-                .orElseThrow(() -> ActivityNotFoundException.activityNotFoundById(callActivityId));
+                .orElseThrow(() -> ExecutionException.of("Call activity not found", "Call activity with id: %s not found".formatted(callActivityId)));
     }
 
     private void setVariables(ActivityExecution completedThrowEvent, Map<String, Object> variables) {

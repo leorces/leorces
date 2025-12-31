@@ -1,9 +1,9 @@
 package com.leorces.engine.activity.behaviour;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.activity.ActivityNotFoundException;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.event.start.StartEventActivityDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -59,7 +59,7 @@ public abstract class AbstractTriggerableStartEventBehavior
 
     private ActivityDefinition getEventSubprocess(Process process, ActivityDefinition definition) {
         return process.definition().getActivityById(definition.parentId())
-                .orElseThrow(ActivityNotFoundException::eventSubprocessNotFound);
+                .orElseThrow(() -> ExecutionException.of("Event subprocess not found", "Event subprocess with definition id %s not found".formatted(definition.parentId()), process));
     }
 
     private List<ActivityExecution> getActivitiesToTerminate(Process process, String definitionId) {

@@ -1,5 +1,6 @@
 package com.leorces.engine.variables.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.service.variable.VariablesService;
@@ -26,7 +27,9 @@ public class SetActivityVariablesCommandHandler implements CommandHandler<SetAct
         var process = activity.process();
         var variables = command.variables();
 
-        if (process.suspended()) return;
+        if (process.suspended()) {
+            throw ExecutionException.of("Can't update variables", "Process suspended", process);
+        }
 
         var outputVariables = variablesService.evaluate(activity, activity.outputs());
         var outputVariablesMap = variablesService.toMap(outputVariables);

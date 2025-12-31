@@ -1,11 +1,11 @@
 package com.leorces.engine.activity.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.exception.ExecutionException;
 import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -127,7 +127,7 @@ class CompleteActivityCommandHandlerTest {
 
         assertThatThrownBy(() -> handler.handle(command))
                 .isInstanceOf(ExecutionException.class)
-                .hasMessageContaining("Activity completion failed")
+                .hasMessageContaining("Can't complete activity")
                 .hasCause(exception);
 
         verify(dispatcher).dispatch(isA(FailActivityCommand.class));

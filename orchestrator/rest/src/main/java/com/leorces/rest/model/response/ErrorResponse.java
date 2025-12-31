@@ -12,7 +12,8 @@ public record ErrorResponse(
         String detailedMessage,
         int status,
         LocalDateTime timestamp,
-        Map<String, String> validationErrors
+        Map<String, String> validationErrors,
+        Map<String, Object> details
 ) {
 
 }

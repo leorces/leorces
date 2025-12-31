@@ -92,37 +92,37 @@ public class RuntimeServiceImpl implements RuntimeService {
     @Override
     public void suspendProcessById(String processId) {
         log.debug("Suspend process by process id: {}", processId);
-        dispatcher.dispatchAsync(SuspendProcessCommand.ofProcessId(processId));
+        dispatcher.dispatch(SuspendProcessCommand.ofProcessId(processId));
     }
 
     @Override
     public void suspendProcessesByDefinitionId(String definitionId) {
         log.debug("Suspend processes by definition id: {}", definitionId);
-        dispatcher.dispatchAsync(SuspendProcessCommand.ofDefinitionId(definitionId));
+        dispatcher.dispatch(SuspendProcessCommand.ofDefinitionId(definitionId));
     }
 
     @Override
     public void suspendProcessesByDefinitionKey(String definitionKey) {
         log.debug("Suspend processes by definition key: {}", definitionKey);
-        dispatcher.dispatchAsync(SuspendProcessCommand.ofDefinitionKey(definitionKey));
+        dispatcher.dispatch(SuspendProcessCommand.ofDefinitionKey(definitionKey));
     }
 
     @Override
     public void resumeProcessById(String processId) {
         log.debug("Resume process by process id: {}", processId);
-        dispatcher.dispatchAsync(ResumeProcessCommand.ofProcessId(processId));
+        dispatcher.dispatch(ResumeProcessCommand.ofProcessId(processId));
     }
 
     @Override
     public void resumeProcessesByDefinitionId(String definitionId) {
         log.debug("Resume processes by definition id: {}", definitionId);
-        dispatcher.dispatchAsync(ResumeProcessCommand.ofDefinitionId(definitionId));
+        dispatcher.dispatch(ResumeProcessCommand.ofDefinitionId(definitionId));
     }
 
     @Override
     public void resumeProcessesByDefinitionKey(String definitionKey) {
         log.debug("Resume processes by definition key: {}", definitionKey);
-        dispatcher.dispatchAsync(ResumeProcessCommand.ofDefinitionKey(definitionKey));
+        dispatcher.dispatch(ResumeProcessCommand.ofDefinitionKey(definitionKey));
     }
 
     @Override

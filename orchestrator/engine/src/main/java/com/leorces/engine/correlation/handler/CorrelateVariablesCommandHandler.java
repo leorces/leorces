@@ -1,5 +1,6 @@
 package com.leorces.engine.correlation.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
@@ -31,8 +32,12 @@ public class CorrelateVariablesCommandHandler implements CommandHandler<Correlat
         var process = command.process();
         var variables = command.variables();
 
+        if (process.suspended()) {
+            throw ExecutionException.of("Can't correlate variables", "Process suspended", process);
+        }
+
         log.debug("Correlate variables with processId: {} and variables: {}", process.id(), variables);
-        if (variables.isEmpty() || process.suspended()) return;
+        if (variables.isEmpty()) return;
 
         var processDefinition = process.definition();
         var variablesByExecutionId = variables.stream()

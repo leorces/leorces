@@ -1,11 +1,11 @@
 package com.leorces.engine.activity.handler;
 
+import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.exception.ExecutionException;
 import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityFailure;
@@ -36,7 +36,7 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
             behaviorResolver.resolveBehavior(activity.type()).complete(activity, command.variables());
         } catch (Exception e) {
             dispatcher.dispatch(FailActivityCommand.of(activity, ActivityFailure.of(e)));
-            throw new ExecutionException("Activity completion failed", e);
+            throw ExecutionException.of("Can't complete activity", activity, e);
         }
     }
 
