@@ -12,7 +12,6 @@ public final class ProcessQueries {
                    process.process_business_key,
                    process.process_state,
                    process.process_suspended,
-                   process.process_completed_at,
                    process.process_created_at,
                    process.process_updated_at,
                    process.process_started_at,
@@ -50,61 +49,61 @@ public final class ProcessQueries {
 
     public static final String FIND_ALL_WITH_PAGINATION = """
             SELECT
-                process.process_id,
-                process.root_process_id,
-                process.process_parent_id,
-                process.process_definition_id,
-                process.process_definition_key,
-                process.process_business_key,
-                process.process_state,
-                process.process_suspended,
-                process.process_created_at,
-                process.process_updated_at,
-                process.process_started_at,
-                process.process_completed_at,
+                p.process_id,
+                p.root_process_id,
+                p.process_parent_id,
+                p.process_definition_id,
+                p.process_definition_key,
+                p.process_business_key,
+                p.process_state,
+                p.process_suspended,
+                p.process_created_at,
+                p.process_updated_at,
+                p.process_started_at,
+                p.process_completed_at,
             
-                definition.definition_id,
-                definition.definition_key,
-                definition.definition_name,
-                definition.definition_version,
-                definition.definition_data
-            FROM process
-            LEFT JOIN definition ON process.process_definition_id = definition.definition_id
+                d.definition_id,
+                d.definition_key,
+                d.definition_name,
+                d.definition_version,
+                d.definition_data
+            FROM process p
+            LEFT JOIN definition d ON p.process_definition_id = d.definition_id
             WHERE
                 (
                     :filter IS NULL OR :filter = '' OR
-                    LOWER(process.process_id) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                    LOWER(process.process_definition_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                    LOWER(process.process_business_key) LIKE LOWER(CONCAT('%', :filter, '%'))
+                    p.process_id = :filter OR
+                    p.process_definition_key = :filter OR
+                    p.process_business_key = :filter
                 )
                 AND
                 (
-                    :state IS NULL OR :state = '' OR :state = 'all' OR process.process_state = :state
+                    :state IS NULL OR :state = '' OR :state = 'all' OR p.process_state = :state
                 )
             ORDER BY
-                CASE WHEN :sort_by_field = 'created_at' AND :order = 'ASC' THEN process.process_created_at END ASC,
-                CASE WHEN :sort_by_field = 'created_at' AND :order = 'DESC' THEN process.process_created_at END DESC,
-                CASE WHEN :sort_by_field = 'updated_at' AND :order = 'ASC' THEN process.process_updated_at END ASC,
-                CASE WHEN :sort_by_field = 'updated_at' AND :order = 'DESC' THEN process.process_updated_at END DESC,
-                CASE WHEN :sort_by_field = 'started_at' AND :order = 'ASC' THEN process.process_started_at END ASC,
-                CASE WHEN :sort_by_field = 'started_at' AND :order = 'DESC' THEN process.process_started_at END DESC,
-                CASE WHEN :sort_by_field = 'completed_at' AND :order = 'ASC' THEN process.process_completed_at END ASC,
-                CASE WHEN :sort_by_field = 'completed_at' AND :order = 'DESC' THEN process.process_completed_at END DESC,
-                process.process_created_at DESC
+                CASE WHEN :sort_by_field = 'created_at' AND :order = 'ASC' THEN p.process_created_at END ASC,
+                CASE WHEN :sort_by_field = 'created_at' AND :order = 'DESC' THEN p.process_created_at END DESC,
+                CASE WHEN :sort_by_field = 'updated_at' AND :order = 'ASC' THEN p.process_updated_at END ASC,
+                CASE WHEN :sort_by_field = 'updated_at' AND :order = 'DESC' THEN p.process_updated_at END DESC,
+                CASE WHEN :sort_by_field = 'started_at' AND :order = 'ASC' THEN p.process_started_at END ASC,
+                CASE WHEN :sort_by_field = 'started_at' AND :order = 'DESC' THEN p.process_started_at END DESC,
+                CASE WHEN :sort_by_field = 'completed_at' AND :order = 'ASC' THEN p.process_completed_at END ASC,
+                CASE WHEN :sort_by_field = 'completed_at' AND :order = 'DESC' THEN p.process_completed_at END DESC,
+                p.process_created_at DESC
             OFFSET :offset
             LIMIT :limit;
             """;
 
     public static final String COUNT_ALL_WITH_FILTERS = """
             SELECT COUNT(*)
-            FROM process
-            LEFT JOIN definition ON process.process_definition_id = definition.definition_id
+            FROM process p
+            LEFT JOIN definition d ON p.process_definition_id = d.definition_id
             WHERE (:filter IS NULL OR :filter = '' OR
-                   LOWER(process.process_id) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(process.process_definition_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(process.process_business_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(definition.definition_name) LIKE LOWER(CONCAT('%', :filter, '%')))
-              AND (:state IS NULL OR :state = '' OR :state = 'all' OR process.process_state = :state)
+                   p.process_id = :filter OR
+                   p.process_definition_key = :filter OR
+                   p.process_business_key = :filter OR
+                   d.definition_name = :filter)
+              AND (:state IS NULL OR :state = '' OR :state = 'all' OR p.process_state = :state)
             """;
 
     public static final String FIND_ALL_BY_FILTERS = BASE_SELECT + """
@@ -134,6 +133,41 @@ public final class ProcessQueries {
             SET process_state = :state,
                 process_updated_at = NOW()
             WHERE process_id = :processId;
+            """;
+
+    public static final String RUN = """
+            INSERT INTO process (
+                process_id,
+                root_process_id,
+                process_parent_id,
+                process_definition_id,
+                process_definition_key,
+                process_business_key,
+                process_state,
+                process_suspended,
+                process_created_at,
+                process_updated_at,
+                process_started_at
+            )
+            SELECT
+                :processId,
+                :rootProcessId,
+                :parentProcessId,
+                :definitionId,
+                :definitionKey,
+                :businessKey,
+                'ACTIVE',
+                CASE
+                    WHEN :suspended = TRUE THEN TRUE
+                    ELSE COALESCE(ds.definition_suspended, FALSE)
+                END,
+                NOW(),
+                NOW(),
+                NOW()
+            FROM (SELECT 1) v
+            LEFT JOIN definition_suspended ds
+                   ON ds.definition_id = :definitionId
+            RETURNING *;
             """;
 
     public static final String COMPLETE = """
@@ -228,13 +262,25 @@ public final class ProcessQueries {
 
     public static final String RESUME_BY_DEFINITION_ID = """
             WITH RECURSIVE child_processes AS (
-                SELECT process_id
-                FROM process
-                WHERE process_definition_id = :definitionId AND process_suspended = true AND process_completed_at IS NULL
+                SELECT p.process_id,
+                       p.process_definition_id,
+                       p.process_parent_id
+                FROM process p
+                LEFT JOIN definition_suspended ds
+                       ON ds.definition_id = p.process_definition_id
+                WHERE p.process_definition_id = :definitionId
+                  AND p.process_suspended = true
+                  AND p.process_completed_at IS NULL
+                  AND COALESCE(ds.definition_suspended, FALSE) = FALSE  -- фильтр по definition_suspended
               UNION ALL
-                SELECT p.process_id
+                SELECT p.process_id,
+                       p.process_definition_id,
+                       p.process_parent_id
                 FROM process p
                 INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                LEFT JOIN definition_suspended ds
+                       ON ds.definition_id = p.process_definition_id
+                WHERE COALESCE(ds.definition_suspended, FALSE) = FALSE  -- тоже фильтруем подпроцессы
             )
             UPDATE process
             SET process_suspended = false,
@@ -245,13 +291,25 @@ public final class ProcessQueries {
 
     public static final String RESUME_BY_DEFINITION_KEY = """
             WITH RECURSIVE child_processes AS (
-                SELECT process_id
-                FROM process
-                WHERE process_definition_key = :definitionKey AND process_suspended = true AND process_completed_at IS NULL
+                SELECT p.process_id,
+                       p.process_definition_id,
+                       p.process_parent_id
+                FROM process p
+                LEFT JOIN definition_suspended ds
+                       ON ds.definition_id = p.process_definition_id
+                WHERE p.process_definition_key = :definitionKey
+                  AND p.process_suspended = true
+                  AND p.process_completed_at IS NULL
+                  AND COALESCE(ds.definition_suspended, FALSE) = FALSE
               UNION ALL
-                SELECT p.process_id
+                SELECT p.process_id,
+                       p.process_definition_id,
+                       p.process_parent_id
                 FROM process p
                 INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                LEFT JOIN definition_suspended ds
+                       ON ds.definition_id = p.process_definition_id
+                WHERE COALESCE(ds.definition_suspended, FALSE) = FALSE
             )
             UPDATE process
             SET process_suspended = false,

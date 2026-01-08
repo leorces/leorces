@@ -83,6 +83,30 @@ public class DefinitionPersistenceImpl implements DefinitionPersistence {
         return new PageableData<>(definitionMapper.toDefinitions(pageableResult.data()), pageableResult.total());
     }
 
+    @Override
+    public void suspendById(String definitionId) {
+        log.debug("Suspend definition by id: {}", definitionId);
+        definitionRepository.suspendById(definitionId);
+    }
+
+    @Override
+    public void suspendByKey(String definitionKey) {
+        log.debug("Suspend definition by key: {}", definitionKey);
+        definitionRepository.suspendByKey(definitionKey);
+    }
+
+    @Override
+    public void resumeById(String definitionId) {
+        log.debug("Resume definition by id: {}", definitionId);
+        definitionRepository.resumeById(definitionId);
+    }
+
+    @Override
+    public void resumeByKey(String definitionKey) {
+        log.debug("Resume definition by key: {}", definitionKey);
+        definitionRepository.resumeByKey(definitionKey);
+    }
+
     @Transactional
     public ProcessDefinition save(ProcessDefinition definition) {
         try {

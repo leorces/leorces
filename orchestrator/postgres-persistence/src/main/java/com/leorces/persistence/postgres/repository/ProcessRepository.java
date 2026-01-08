@@ -51,6 +51,15 @@ public interface ProcessRepository extends CrudRepository<ProcessEntity, String>
     @Query(CHANGE_STATE)
     void changeState(@Param("processId") String processId, @Param("state") String state);
 
+    @Query(RUN)
+    ProcessEntity run(@Param("processId") String processId,
+                      @Param("rootProcessId") String rootProcessId,
+                      @Param("parentProcessId") String parentProcessId,
+                      @Param("definitionId") String definitionId,
+                      @Param("definitionKey") String definitionKey,
+                      @Param("businessKey") String businessKey,
+                      @Param("suspended") boolean suspended);
+
     @Modifying
     @Query(COMPLETE)
     void complete(@Param("processId") String processId);

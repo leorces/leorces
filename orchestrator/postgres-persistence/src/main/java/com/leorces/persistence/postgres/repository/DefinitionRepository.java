@@ -3,6 +3,7 @@ package com.leorces.persistence.postgres.repository;
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
 import com.leorces.persistence.postgres.entity.ProcessDefinitionEntity;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -31,6 +32,22 @@ public interface DefinitionRepository extends CrudRepository<ProcessDefinitionEn
 
     @Query(COUNT_ALL_WITH_FILTERS)
     long countAllWithFilters(@Param("filter") String filter);
+
+    @Modifying
+    @Query(SUSPEND_BY_ID)
+    void suspendById(@Param("definitionId") String definitionId);
+
+    @Modifying
+    @Query(SUSPEND_BY_KEY)
+    void suspendByKey(@Param("definitionKey") String definitionKey);
+
+    @Modifying
+    @Query(RESUME_BY_ID)
+    void resumeById(@Param("definitionId") String definitionId);
+
+    @Modifying
+    @Query(RESUME_BY_KEY)
+    void resumeByKey(@Param("definitionKey") String definitionKey);
 
     default PageableData<ProcessDefinitionEntity> findAll(Pageable pageable) {
         var order = pageable.order() != null ? pageable.order().name() : "DESC";

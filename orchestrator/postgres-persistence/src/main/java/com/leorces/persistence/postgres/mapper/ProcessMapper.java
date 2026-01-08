@@ -6,11 +6,9 @@ import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.postgres.entity.ActivityExecutionEntity;
 import com.leorces.persistence.postgres.entity.ProcessEntity;
 import com.leorces.persistence.postgres.entity.ProcessExecutionEntity;
-import com.leorces.persistence.postgres.utils.IdGenerator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -20,25 +18,6 @@ public class ProcessMapper {
     private final DefinitionMapper definitionMapper;
     private final ActivityMapper activityMapper;
     private final VariableMapper variableMapper;
-
-    public ProcessEntity toNewEntity(Process process) {
-        var now = LocalDateTime.now();
-        var businessKey = process.businessKey() != null ? process.businessKey() : IdGenerator.getNewId();
-        return ProcessEntity.builder()
-                .isNew(true)
-                .id(process.id() == null ? IdGenerator.getNewId() : process.id())
-                .rootProcessId(process.rootProcessId())
-                .parentProcessId(process.parentId())
-                .businessKey(businessKey)
-                .processDefinitionId(process.definitionId())
-                .processDefinitionKey(process.definitionKey())
-                .state(ProcessState.ACTIVE.name())
-                .suspended(process.suspended())
-                .createdAt(now)
-                .updatedAt(now)
-                .startedAt(now)
-                .build();
-    }
 
     public List<Process> toProcesses(List<ProcessEntity> entities) {
         return entities.stream()

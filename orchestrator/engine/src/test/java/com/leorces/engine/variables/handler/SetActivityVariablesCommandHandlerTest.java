@@ -1,6 +1,5 @@
 package com.leorces.engine.variables.handler;
 
-import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -51,28 +49,10 @@ class SetActivityVariablesCommandHandlerTest {
     }
 
     @Test
-    @DisplayName("should not set variables when process suspended")
-    void shouldNotSetWhenSuspended() {
-        // Given
-        when(activity.process()).thenReturn(process);
-        when(process.suspended()).thenReturn(true);
-        Map<String, Object> input = Map.of("a", 1);
-        var command = SetActivityVariablesCommand.of(activity, input);
-
-        // Then
-        assertThatThrownBy(() -> handler.handle(command))
-                .isInstanceOf(ExecutionException.class)
-                .hasMessageContaining("Can't update variables");
-        verifyNoInteractions(variablesService);
-        verifyNoInteractions(dispatcher);
-    }
-
-    @Test
     @DisplayName("should evaluate outputs, merge with inputs and dispatch SetVariablesCommand")
     void shouldEvaluateMergeAndDispatch() {
         // Given
         when(activity.process()).thenReturn(process);
-        when(process.suspended()).thenReturn(false);
 
         Map<String, Object> inputs = Map.of("x", 1, "same", "in");
         Map<String, Object> outputsTemplate = Map.of("y", "${x}");

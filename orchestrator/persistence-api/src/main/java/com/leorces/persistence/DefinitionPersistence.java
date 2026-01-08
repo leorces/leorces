@@ -9,7 +9,7 @@ import java.util.Optional;
 
 /**
  * Persistence layer for managing process definitions.
- * Provides operations for storing, retrieving, and querying process definitions.
+ * Provides operations for storing, retrieving, querying, suspending, and resuming process definitions.
  */
 public interface DefinitionPersistence {
 
@@ -54,4 +54,35 @@ public interface DefinitionPersistence {
      */
     PageableData<ProcessDefinition> findAll(Pageable pageable);
 
+    /**
+     * Suspends a process definition by its unique identifier.
+     * After suspension, all new process instances of this definition should not start.
+     *
+     * @param definitionId the unique identifier of the process definition to suspend
+     */
+    void suspendById(String definitionId);
+
+    /**
+     * Suspends all versions of a process definition by its key.
+     * After suspension, all new process instances for this key should not start.
+     *
+     * @param definitionKey the key of the process definition to suspend
+     */
+    void suspendByKey(String definitionKey);
+
+    /**
+     * Resumes a suspended process definition by its unique identifier.
+     * After resuming, new process instances can be started for this definition.
+     *
+     * @param definitionId the unique identifier of the process definition to resume
+     */
+    void resumeById(String definitionId);
+
+    /**
+     * Resumes all suspended versions of a process definition by its key.
+     * After resuming, new process instances can be started for this key.
+     *
+     * @param definitionKey the key of the process definition to resume
+     */
+    void resumeByKey(String definitionKey);
 }

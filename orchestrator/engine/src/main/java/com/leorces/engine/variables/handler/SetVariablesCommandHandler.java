@@ -1,6 +1,5 @@
 package com.leorces.engine.variables.handler;
 
-import com.leorces.api.exception.ExecutionException;
 import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
@@ -58,10 +57,6 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
     }
 
     private void setProcessVariables(Process process, Map<String, Object> input) {
-        if (process.suspended()) {
-            throw ExecutionException.of("Can't update variables", "Process suspended", process);
-        }
-
         var existing = toMapByKey(process.variables());
         var updated = mergeAndPersist(input, existing, variable -> variablesMapper.map(process, variable));
         correlate(process, updated);
@@ -70,10 +65,6 @@ public class SetVariablesCommandHandler implements CommandHandler<SetVariablesCo
     private void updateActivityVariables(ActivityExecution activity,
                                          Map<String, Object> input,
                                          boolean localOnly) {
-        if (activity.process().suspended()) {
-            throw ExecutionException.of("Can't update variables", "Process suspended", activity);
-        }
-
         var existing = activity.variables().stream()
                 .filter(variable -> localOnly
                         ? Objects.equals(variable.executionId(), activity.id())

@@ -53,15 +53,11 @@ public final class ActivityQueries {
                 WHERE a.activity_id IN (
                     SELECT a_sub.activity_id
                     FROM activity a_sub
+                    INNER JOIN process p ON p.process_id = a_sub.process_id
                     WHERE a_sub.activity_state = 'SCHEDULED'
                       AND a_sub.activity_topic = :topic
                       AND a_sub.process_definition_key = :processDefinitionKey
-                      AND EXISTS (
-                          SELECT 1
-                          FROM process p
-                          WHERE p.process_id = a_sub.process_id
-                            AND p.process_suspended = false
-                      )
+                      AND p.process_suspended = false
                     ORDER BY a_sub.activity_created_at ASC
                     LIMIT :limit
                     FOR UPDATE SKIP LOCKED
@@ -73,11 +69,10 @@ public final class ActivityQueries {
                 p.process_business_key,
                 COALESCE(vars.variables_json, '[]'::json) AS variables_json
             FROM updated u
-            LEFT JOIN process p
-                   ON p.process_id = u.process_id
+            INNER JOIN process p ON p.process_id = u.process_id
             LEFT JOIN LATERAL (
                 SELECT json_agg(
-                               json_build_object(
+                               jsonb_build_object(
                                        'id', v.variable_id,
                                        'process_id', v.process_id,
                                        'execution_id', v.execution_id,

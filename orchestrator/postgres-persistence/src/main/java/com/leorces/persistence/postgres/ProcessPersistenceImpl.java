@@ -10,14 +10,20 @@ import com.leorces.persistence.ProcessPersistence;
 import com.leorces.persistence.VariablePersistence;
 import com.leorces.persistence.postgres.mapper.ProcessMapper;
 import com.leorces.persistence.postgres.repository.ProcessRepository;
+import com.leorces.persistence.postgres.utils.IdGenerator;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.leorces.persistence.postgres.repository.query.ProcessQueries.RUN;
 
 @Slf4j
 @Service
@@ -27,12 +33,13 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     private final VariablePersistence variablePersistence;
     private final ProcessRepository processRepository;
     private final ProcessMapper processMapper;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
     @Transactional
     public Process run(Process process) {
         log.debug("Run process: {}", process.definitionKey());
-        var newProcess = save(process);
+        var newProcess = saveNewProcess(process);
         var newVariables = variablePersistence.save(newProcess);
         return newProcess.toBuilder()
                 .variables(newVariables)
@@ -148,18 +155,29 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
         return new PageableData<>(processMapper.toProcesses(result.data()), result.total());
     }
 
-    private Process save(Process process) {
-        var entity = processMapper.toNewEntity(process);
-        var newEntity = processRepository.save(entity);
-        return process.toBuilder()
-                .id(newEntity.getId())
-                .businessKey(newEntity.getBusinessKey())
-                .state(ProcessState.valueOf(newEntity.getState()))
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .startedAt(entity.getStartedAt())
-                .completedAt(entity.getCompletedAt())
-                .build();
+    private Process saveNewProcess(Process process) {
+        return jdbcTemplate.queryForObject(
+                RUN,
+                new MapSqlParameterSource()
+                        .addValue("processId", process.id() == null ? IdGenerator.getNewId() : process.id())
+                        .addValue("businessKey", process.businessKey() != null ? process.businessKey() : IdGenerator.getNewId())
+                        .addValue("rootProcessId", process.rootProcessId())
+                        .addValue("parentProcessId", process.parentId())
+                        .addValue("definitionId", process.definitionId())
+                        .addValue("definitionKey", process.definitionKey())
+                        .addValue("suspended", process.suspended()),
+                (rs, rowNum) ->
+                        process.toBuilder()
+                                .id(rs.getString("process_id"))
+                                .businessKey(rs.getString("process_business_key"))
+                                .state(ProcessState.ACTIVE)
+                                .suspended(rs.getBoolean("process_suspended"))
+                                .createdAt(rs.getObject("process_created_at", LocalDateTime.class))
+                                .updatedAt(rs.getObject("process_updated_at", LocalDateTime.class))
+                                .startedAt(rs.getObject("process_started_at", LocalDateTime.class))
+                                .completedAt(rs.getObject("process_completed_at", LocalDateTime.class))
+                                .build()
+        );
     }
 
     private String[] extractVariableKeys(Map<String, Object> variables) {

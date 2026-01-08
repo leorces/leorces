@@ -67,6 +67,42 @@ public final class DefinitionQueries {
                    LOWER(definition.definition_name) LIKE LOWER(CONCAT('%', :filter, '%')))
             """;
 
+    public static final String SUSPEND_BY_ID = """
+            INSERT INTO definition_suspended (definition_id, definition_suspended)
+            VALUES (:definitionId, TRUE)
+            ON CONFLICT (definition_id)
+            DO UPDATE
+            SET definition_suspended = TRUE;
+            """;
+
+    public static final String SUSPEND_BY_KEY = """
+            INSERT INTO definition_suspended (definition_id, definition_suspended)
+            SELECT d.definition_id, TRUE
+            FROM definition d
+            WHERE d.definition_key = :definitionKey
+            ON CONFLICT (definition_id)
+            DO UPDATE
+            SET definition_suspended = TRUE;
+            """;
+
+    public static final String RESUME_BY_ID = """
+            INSERT INTO definition_suspended (definition_id, definition_suspended)
+            VALUES (:definitionId, FALSE)
+            ON CONFLICT (definition_id)
+            DO UPDATE
+            SET definition_suspended = FALSE;
+            """;
+
+    public static final String RESUME_BY_KEY = """
+            INSERT INTO definition_suspended (definition_id, definition_suspended)
+            SELECT d.definition_id, FALSE
+            FROM definition d
+            WHERE d.definition_key = :definitionKey
+            ON CONFLICT (definition_id)
+            DO UPDATE
+            SET definition_suspended = FALSE;
+            """;
+
     private DefinitionQueries() {
         // Utility class
     }

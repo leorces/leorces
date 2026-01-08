@@ -22,11 +22,26 @@ CREATE TABLE definition
     CONSTRAINT uq_definition_key_version UNIQUE (definition_key, definition_version)
 );
 
-CREATE INDEX idx_definition_created_at_desc
+CREATE INDEX idx_definition_created
     ON definition (definition_created_at DESC);
 
-CREATE INDEX idx_definition_search_lower
-    ON definition (LOWER(definition_id), LOWER(definition_key), LOWER(definition_name));
+-- ============================
+-- Table: definition_suspended
+-- ============================
+CREATE TABLE definition_suspended
+(
+    definition_id        TEXT    NOT NULL,
+    definition_suspended BOOLEAN NOT NULL DEFAULT FALSE,
+
+    CONSTRAINT pk_definition_suspended PRIMARY KEY (definition_id)
+);
+
+CREATE INDEX idx_definition_suspended_id_flag
+    ON definition_suspended (definition_id, definition_suspended);
+
+CREATE INDEX idx_definition_suspended_flag_partial
+    ON definition_suspended (definition_id)
+    WHERE definition_suspended = TRUE;
 
 -- ============================
 -- Table: process
@@ -55,16 +70,11 @@ CREATE INDEX idx_process_state_defkey_created
 CREATE INDEX idx_process_business_defkey
     ON process (process_business_key, process_definition_key);
 
-CREATE INDEX idx_process_defid_suspended_completed
-    ON process (process_definition_id)
-    WHERE process_suspended = false AND process_completed_at IS NULL;
+CREATE INDEX idx_process_business
+    ON process (process_business_key);
 
-CREATE INDEX idx_process_defkey_suspended_completed
-    ON process (process_definition_key)
-    WHERE process_suspended = false AND process_completed_at IS NULL;
-
-CREATE INDEX idx_process_parent
-    ON process (process_parent_id);
+CREATE INDEX idx_process_defkey_created
+    ON process (process_definition_key, process_created_at DESC);
 
 -- ============================
 -- Table: activity
@@ -85,7 +95,7 @@ CREATE TABLE activity
     activity_timeout        TIMESTAMP,
     activity_failure_reason TEXT,
     activity_failure_trace  TEXT,
-    activity_async BOOLEAN NOT NULL DEFAULT false,
+    activity_async BOOLEAN NOT NULL DEFAULT FALSE,
     process_id                    TEXT      NOT NULL,
     process_definition_id         TEXT      NOT NULL,
     process_definition_key        TEXT      NOT NULL,
@@ -108,7 +118,7 @@ CREATE INDEX idx_activity_process_def_state_completed
     ON activity (process_id, activity_definition_id, activity_state, activity_completed_at)
     WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
 
-CREATE INDEX idx_activity_defid_created
+CREATE INDEX IF NOT EXISTS idx_activity_defid_created
     ON activity (activity_definition_id, activity_created_at);
 
 -- ============================
@@ -129,13 +139,13 @@ CREATE TABLE variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX idx_variable_execution
+CREATE INDEX idx_variable_exec_only
     ON variable (execution_id);
 
 CREATE INDEX idx_variable_process_def
     ON variable (process_id, execution_definition_id);
 
-CREATE INDEX idx_variable_key_value_execution
+CREATE INDEX idx_variable_execution_lookup
     ON variable (execution_id, variable_key, variable_value);
 
 -- ============================
@@ -170,4 +180,3 @@ CREATE TABLE shedlock
 );
 
 -- End of changeset
-

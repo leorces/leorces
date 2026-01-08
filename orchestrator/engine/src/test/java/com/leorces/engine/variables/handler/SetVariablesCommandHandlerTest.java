@@ -85,7 +85,6 @@ class SetVariablesCommandHandlerTest {
     @DisplayName("should set process variables and correlate when process provided and active")
     void shouldSetProcessVariablesWhenProcessProvided() {
         // Given
-        when(process.suspended()).thenReturn(false);
         when(process.variables()).thenReturn(List.of());
 
         Map<String, Object> input = Map.of("a", 1, "b", true);
@@ -128,7 +127,6 @@ class SetVariablesCommandHandlerTest {
         when(activityPersistence.findById(ACTIVITY_ID)).thenReturn(Optional.of(activity));
         when(activity.id()).thenReturn(ACTIVITY_ID);
         when(activity.process()).thenReturn(process);
-        when(process.suspended()).thenReturn(false);
 
         // existing vars: one local (will be updated), one non-local (ignored)
         var localExisting = Variable.builder()

@@ -36,11 +36,6 @@ public class CorrelateMessageCommandHandler implements CommandHandler<CorrelateM
         validateCorrelatedProcesses(messageName, correlatedProcesses);
 
         var correlatedProcess = correlatedProcesses.getFirst();
-
-        if (correlatedProcess.suspended()) {
-            throw ExecutionException.of("Message correlation error", "Process suspended", correlatedProcess);
-        }
-
         var correlatedActivities = correlateActivities(messageName, correlatedProcess);
 
         setVariables(correlatedProcess, processVariables);
