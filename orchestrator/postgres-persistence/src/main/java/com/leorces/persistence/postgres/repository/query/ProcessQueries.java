@@ -114,15 +114,13 @@ public final class ProcessQueries {
               AND (
                     :variableKeys IS NULL OR :variableValues IS NULL OR :variableCount = 0
                     OR process.process_id IN (
-                        SELECT variable.execution_id
-                        FROM variable
-                        WHERE variable.execution_id = process.process_id
-                        GROUP BY variable.execution_id
-                        HAVING COUNT(DISTINCT CASE
-                                 WHEN variable.variable_key = ANY(:variableKeys)
-                                  AND variable.variable_value::text = ANY(:variableValues)
-                                 THEN variable.variable_key
-                                 END) = :variableCount
+                        SELECT v.execution_id
+                        FROM variable v
+                        WHERE v.execution_id = process.process_id
+                          AND v.variable_key = ANY(:variableKeys)
+                          AND v.variable_value = ANY(:variableValues)
+                        GROUP BY v.execution_id
+                        HAVING COUNT(DISTINCT v.variable_key) = :variableCount
                     )
                   )
               LIMIT 100;
@@ -200,47 +198,60 @@ public final class ProcessQueries {
                 SELECT process_id
                 FROM process
                 WHERE process_id = :processId
-              UNION ALL
+                  AND process_completed_at IS NULL
+                  AND process_suspended = FALSE
+            
+                UNION ALL
+            
                 SELECT p.process_id
                 FROM process p
-                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                WHERE p.process_completed_at IS NULL
             )
             UPDATE process
-            SET process_suspended = true,
+            SET process_suspended = TRUE,
                 process_updated_at = NOW()
-            WHERE process_id IN (SELECT process_id FROM child_processes);
+            WHERE process_id = ANY (SELECT process_id FROM child_processes);
             """;
 
     public static final String SUSPEND_BY_DEFINITION_ID = """
             WITH RECURSIVE child_processes AS (
                 SELECT process_id
                 FROM process
-                WHERE process_definition_id = :definitionId AND process_suspended = false AND process_completed_at IS NULL
-              UNION ALL
+                WHERE process_definition_id = :definitionId
+                  AND process_completed_at IS NULL
+                  AND process_suspended = FALSE
+            
+                UNION ALL
+            
                 SELECT p.process_id
                 FROM process p
-                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                WHERE p.process_completed_at IS NULL
             )
             UPDATE process
-            SET process_suspended = true,
+            SET process_suspended = TRUE,
                 process_updated_at = NOW()
-            WHERE process_id IN (SELECT process_id FROM child_processes);
+            WHERE process_id = ANY (SELECT process_id FROM child_processes);
             """;
 
     public static final String SUSPEND_BY_DEFINITION_KEY = """
             WITH RECURSIVE child_processes AS (
                 SELECT process_id
                 FROM process
-                WHERE process_definition_key = :definitionKey AND process_suspended = false AND process_completed_at IS NULL
-              UNION ALL
+                WHERE process_definition_key = :definitionKey
+                  AND process_suspended = FALSE
+                  AND process_completed_at IS NULL
+                UNION ALL
                 SELECT p.process_id
                 FROM process p
-                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                WHERE p.process_completed_at IS NULL
             )
             UPDATE process
-            SET process_suspended = true,
+            SET process_suspended = TRUE,
                 process_updated_at = NOW()
-            WHERE process_id IN (SELECT process_id FROM child_processes);
+            WHERE process_id = ANY (SELECT process_id FROM child_processes);
             """;
 
     public static final String RESUME_BY_ID = """
@@ -248,74 +259,62 @@ public final class ProcessQueries {
                 SELECT process_id
                 FROM process
                 WHERE process_id = :processId
-              UNION ALL
+                  AND process_completed_at IS NULL
+                  AND process_suspended = TRUE
+            
+                UNION ALL
+            
                 SELECT p.process_id
                 FROM process p
-                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                WHERE p.process_completed_at IS NULL
             )
             UPDATE process
-            SET process_suspended = false,
+            SET process_suspended = FALSE,
                 process_updated_at = NOW()
-            WHERE process_id IN (SELECT process_id FROM child_processes)
-              AND process_completed_at IS NULL;
+            WHERE process_id = ANY (SELECT process_id FROM child_processes);
             """;
 
     public static final String RESUME_BY_DEFINITION_ID = """
             WITH RECURSIVE child_processes AS (
-                SELECT p.process_id,
-                       p.process_definition_id,
-                       p.process_parent_id
+                SELECT process_id
+                FROM process
+                WHERE process_definition_id = :definitionId
+                  AND process_completed_at IS NULL
+                  AND process_suspended = TRUE
+            
+                UNION ALL
+            
+                SELECT p.process_id
                 FROM process p
-                LEFT JOIN definition_suspended ds
-                       ON ds.definition_id = p.process_definition_id
-                WHERE p.process_definition_id = :definitionId
-                  AND p.process_suspended = true
-                  AND p.process_completed_at IS NULL
-                  AND COALESCE(ds.definition_suspended, FALSE) = FALSE  -- фильтр по definition_suspended
-              UNION ALL
-                SELECT p.process_id,
-                       p.process_definition_id,
-                       p.process_parent_id
-                FROM process p
-                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
-                LEFT JOIN definition_suspended ds
-                       ON ds.definition_id = p.process_definition_id
-                WHERE COALESCE(ds.definition_suspended, FALSE) = FALSE  -- тоже фильтруем подпроцессы
+                JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                WHERE p.process_completed_at IS NULL
             )
             UPDATE process
-            SET process_suspended = false,
+            SET process_suspended = FALSE,
                 process_updated_at = NOW()
-            WHERE process_id IN (SELECT process_id FROM child_processes)
-              AND process_completed_at IS NULL;
+            WHERE process_id = ANY (SELECT process_id FROM child_processes);
             """;
 
     public static final String RESUME_BY_DEFINITION_KEY = """
             WITH RECURSIVE child_processes AS (
-                SELECT p.process_id,
-                       p.process_definition_id,
-                       p.process_parent_id
+                SELECT process_id
+                FROM process
+                WHERE process_definition_key = :definitionKey
+                  AND process_completed_at IS NULL
+                  AND process_suspended = TRUE
+            
+                UNION ALL
+            
+                SELECT p.process_id
                 FROM process p
-                LEFT JOIN definition_suspended ds
-                       ON ds.definition_id = p.process_definition_id
-                WHERE p.process_definition_key = :definitionKey
-                  AND p.process_suspended = true
-                  AND p.process_completed_at IS NULL
-                  AND COALESCE(ds.definition_suspended, FALSE) = FALSE
-              UNION ALL
-                SELECT p.process_id,
-                       p.process_definition_id,
-                       p.process_parent_id
-                FROM process p
-                INNER JOIN child_processes cp ON p.process_parent_id = cp.process_id
-                LEFT JOIN definition_suspended ds
-                       ON ds.definition_id = p.process_definition_id
-                WHERE COALESCE(ds.definition_suspended, FALSE) = FALSE
+                JOIN child_processes cp ON p.process_parent_id = cp.process_id
+                WHERE p.process_completed_at IS NULL
             )
             UPDATE process
-            SET process_suspended = false,
+            SET process_suspended = FALSE,
                 process_updated_at = NOW()
-            WHERE process_id IN (SELECT process_id FROM child_processes)
-              AND process_completed_at IS NULL;
+            WHERE process_id = ANY (SELECT process_id FROM child_processes);
             """;
 
     private static final String BASE_SELECT_WITH_ACTIVITIES = """

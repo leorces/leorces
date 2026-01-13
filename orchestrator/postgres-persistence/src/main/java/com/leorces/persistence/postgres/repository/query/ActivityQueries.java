@@ -60,7 +60,7 @@ public final class ActivityQueries {
                       AND p.process_suspended = false
                     ORDER BY a_sub.activity_created_at ASC
                     LIMIT :limit
-                    FOR UPDATE SKIP LOCKED
+                    FOR UPDATE OF a_sub SKIP LOCKED
                 )
                 RETURNING *
             )
@@ -82,9 +82,11 @@ public final class ActivityQueries {
                                        'type', v.variable_type
                                )
                        ) AS variables_json
-                FROM variable v
-                WHERE v.execution_id = u.process_id
-                   OR v.execution_id = u.activity_id
+                FROM (
+                    SELECT * FROM variable WHERE execution_id = u.process_id
+                    UNION ALL
+                    SELECT * FROM variable WHERE execution_id = u.activity_id
+                ) v
             ) vars ON TRUE;
             """;
 

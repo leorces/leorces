@@ -2,6 +2,8 @@
 
 --changeset leorces:1
 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- ============================
 -- Table: definition
 -- ============================
@@ -25,6 +27,10 @@ CREATE TABLE definition
 CREATE INDEX idx_definition_created
     ON definition (definition_created_at DESC);
 
+-- Trigram index for fast search by ID, Key or Name
+CREATE INDEX idx_definition_search_trgm
+    ON definition USING GIN ((definition_id::TEXT || ' ' || definition_key || ' ' || definition_name) gin_trgm_ops);
+
 -- ============================
 -- Table: definition_suspended
 -- ============================
@@ -35,13 +41,6 @@ CREATE TABLE definition_suspended
 
     CONSTRAINT pk_definition_suspended PRIMARY KEY (definition_id)
 );
-
-CREATE INDEX idx_definition_suspended_id_flag
-    ON definition_suspended (definition_id, definition_suspended);
-
-CREATE INDEX idx_definition_suspended_flag_partial
-    ON definition_suspended (definition_id)
-    WHERE definition_suspended = TRUE;
 
 -- ============================
 -- Table: process
@@ -70,11 +69,22 @@ CREATE INDEX idx_process_state_defkey_created
 CREATE INDEX idx_process_business_defkey
     ON process (process_business_key, process_definition_key);
 
-CREATE INDEX idx_process_business
-    ON process (process_business_key);
+CREATE INDEX idx_process_parent_id
+    ON process (process_parent_id)
+    WHERE process_parent_id IS NOT NULL;
 
-CREATE INDEX idx_process_defkey_created
-    ON process (process_definition_key, process_created_at DESC);
+CREATE INDEX idx_process_created_at
+    ON process (process_created_at DESC);
+
+CREATE INDEX idx_process_completed_at
+    ON process (process_completed_at ASC)
+    WHERE process_completed_at IS NOT NULL;
+
+CREATE INDEX idx_process_definition_id
+    ON process (process_definition_id);
+
+CREATE INDEX idx_process_definition_key
+    ON process (process_definition_key);
 
 -- ============================
 -- Table: activity
@@ -86,7 +96,7 @@ CREATE TABLE activity
     activity_parent_definition_id TEXT,
     activity_type                 TEXT      NOT NULL,
     activity_state                TEXT      NOT NULL,
-    activity_topic TEXT,
+    activity_topic          TEXT,
     activity_created_at           TIMESTAMP NOT NULL,
     activity_updated_at           TIMESTAMP NOT NULL,
     activity_started_at           TIMESTAMP,
@@ -95,7 +105,7 @@ CREATE TABLE activity
     activity_timeout        TIMESTAMP,
     activity_failure_reason TEXT,
     activity_failure_trace  TEXT,
-    activity_async BOOLEAN NOT NULL DEFAULT FALSE,
+    activity_async          BOOLEAN NOT NULL DEFAULT FALSE,
     process_id                    TEXT      NOT NULL,
     process_definition_id         TEXT      NOT NULL,
     process_definition_key        TEXT      NOT NULL,
@@ -103,23 +113,16 @@ CREATE TABLE activity
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)
 );
 
-CREATE INDEX idx_activity_process_state_completed
-    ON activity (process_id, activity_state, activity_completed_at);
-
-CREATE INDEX idx_activity_topic_scheduled
-    ON activity (activity_topic, process_definition_key, activity_created_at)
+CREATE INDEX idx_activity_scheduled
+    ON activity (activity_topic, process_definition_key, activity_created_at, process_id)
     WHERE activity_state = 'SCHEDULED';
 
-CREATE INDEX idx_activity_timeout_active_scheduled
+CREATE INDEX idx_activity_timeout_active
     ON activity (activity_timeout)
     WHERE activity_state IN ('ACTIVE', 'SCHEDULED') AND activity_timeout IS NOT NULL;
 
-CREATE INDEX idx_activity_process_def_state_completed
-    ON activity (process_id, activity_definition_id, activity_state, activity_completed_at)
-    WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
-
-CREATE INDEX IF NOT EXISTS idx_activity_defid_created
-    ON activity (activity_definition_id, activity_created_at);
+CREATE INDEX idx_activity_process_lookup
+    ON activity (process_id, activity_state, activity_completed_at, activity_definition_id);
 
 -- ============================
 -- Table: variable
@@ -139,14 +142,11 @@ CREATE TABLE variable
     CONSTRAINT pk_variable PRIMARY KEY (variable_id)
 );
 
-CREATE INDEX idx_variable_exec_only
-    ON variable (execution_id);
+CREATE INDEX idx_variable_execution_lookup
+    ON variable (execution_id, variable_key, variable_value);
 
 CREATE INDEX idx_variable_process_def
     ON variable (process_id, execution_definition_id);
-
-CREATE INDEX idx_variable_execution_lookup
-    ON variable (execution_id, variable_key, variable_value);
 
 -- ============================
 -- Table: history
@@ -165,6 +165,9 @@ CREATE TABLE history
 
     CONSTRAINT pk_history_item PRIMARY KEY (process_id)
 );
+
+CREATE INDEX idx_history_created_at
+    ON history (process_created_at DESC);
 
 -- ============================
 -- Table: shedlock

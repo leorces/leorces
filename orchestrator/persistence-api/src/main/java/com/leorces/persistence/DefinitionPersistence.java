@@ -85,4 +85,5 @@ public interface DefinitionPersistence {
      * @param definitionKey the key of the process definition to resume
      */
     void resumeByKey(String definitionKey);
+
 }

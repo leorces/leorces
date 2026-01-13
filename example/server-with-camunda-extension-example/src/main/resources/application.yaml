@@ -13,10 +13,10 @@ spring:
     password: admin123
     hikari:
       maximum-pool-size: 15
-      minimum-idle: 10
-      idle-timeout: 60000
+      minimum-idle: 20
+      idle-timeout: 30000
       max-lifetime: 1800000
-      connection-timeout: 60000
+      connection-timeout: 30000
       leak-detection-threshold: 20000
   cache:
     type: caffeine

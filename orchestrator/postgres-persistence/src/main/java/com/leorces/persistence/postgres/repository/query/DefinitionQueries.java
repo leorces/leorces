@@ -22,9 +22,7 @@ public final class DefinitionQueries {
                 SELECT definition.*
                 FROM definition
                 WHERE (:filter IS NULL OR :filter = '' OR
-                       LOWER(definition.definition_id) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                       LOWER(definition.definition_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                       LOWER(definition.definition_name) LIKE LOWER(CONCAT('%', :filter, '%')))
+                       (definition_id || ' ' || definition_key || ' ' || definition_name) ILIKE CONCAT('%', :filter, '%'))
             ),
             keys_page AS (
                 SELECT DISTINCT ON (filtered.definition_key) filtered.definition_key
@@ -62,9 +60,7 @@ public final class DefinitionQueries {
             SELECT COUNT(*)
             FROM definition
             WHERE (:filter IS NULL OR :filter = '' OR
-                   LOWER(definition.definition_id) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(definition.definition_key) LIKE LOWER(CONCAT('%', :filter, '%')) OR
-                   LOWER(definition.definition_name) LIKE LOWER(CONCAT('%', :filter, '%')))
+                   (definition_id || ' ' || definition_key || ' ' || definition_name) ILIKE CONCAT('%', :filter, '%'))
             """;
 
     public static final String SUSPEND_BY_ID = """
