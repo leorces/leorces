@@ -64,9 +64,7 @@ public class VariablesService {
         return variables.values().stream()
                 .filter(String.class::isInstance)
                 .map(String.class::cast)
-                .map(expressionEvaluator::isExpression)
-                .toList()
-                .contains(true);
+                .anyMatch(expressionEvaluator::isExpression);
     }
 
 }

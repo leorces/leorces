@@ -3,6 +3,7 @@ package com.leorces.engine.service.process;
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.service.activity.CallActivityService;
 import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -37,6 +38,9 @@ class ProcessFactoryTest {
 
     @Mock
     private VariablesService variablesService;
+
+    @Mock
+    private ExpressionEvaluator expressionEvaluator;
 
     @Mock
     private CallActivityService callActivityService;
@@ -98,21 +102,24 @@ class ProcessFactoryTest {
     @Test
     @DisplayName("createByCallActivity should inherit variables and apply mappings")
     void createByCallActivityShouldInheritVariablesAndApplyMappings() {
-        // Setup activity execution and call activity
+        // given
         var activityExecution = mock(ActivityExecution.class);
         var callActivity = mock(CallActivity.class);
+        var parentProcess = Process.builder().id("p1").businessKey("bk1").build();
 
         when(activityExecution.definition()).thenReturn(callActivity);
-        when(activityExecution.process()).thenReturn(Process.builder().id("p1").businessKey("bk1").build());
+        when(activityExecution.process()).thenReturn(parentProcess);
         when(callActivity.calledElement()).thenReturn("order-process");
         when(callActivity.calledElementVersion()).thenReturn(null);
 
         when(definitionPersistence.findLatestByKey("order-process")).thenReturn(Optional.of(processDefinition));
-        when(callActivityService.getInputMappings(activityExecution)).thenReturn(Map.of("var1", "value1"));
+        when(callActivityService.getInputMappings(eq(activityExecution), anyMap())).thenReturn(Map.of("var1", "value1"));
         when(variablesService.toList(anyMap())).thenReturn(List.of());
 
+        // when
         var process = processFactory.createByCallActivity(activityExecution);
 
+        // then
         assertThat(process.definition()).isEqualTo(processDefinition);
         assertThat(process.parentId()).isEqualTo("p1");
         assertThat(process.businessKey()).isEqualTo("bk1");
@@ -122,32 +129,32 @@ class ProcessFactoryTest {
     @Test
     @DisplayName("createByCallActivity should evaluate sourceExpression and apply to target variable")
     void createByCallActivityShouldEvaluateSourceExpression() {
-        // Setup activity execution and call activity
+        // given
         var activityExecution = mock(ActivityExecution.class);
         var callActivity = mock(CallActivity.class);
+        var parentProcess = Process.builder().id("p1").businessKey("bk1").build();
 
         when(activityExecution.definition()).thenReturn(callActivity);
-        when(activityExecution.process()).thenReturn(Process.builder().id("p1").businessKey("bk1").build());
+        when(activityExecution.process()).thenReturn(parentProcess);
         when(activityExecution.id()).thenReturn("exec1");
 
         when(callActivity.calledElement()).thenReturn("order-process");
         when(callActivity.calledElementVersion()).thenReturn(null);
 
-        // Mock definition and variables
         when(definitionPersistence.findLatestByKey("order-process")).thenReturn(Optional.of(processDefinition));
         Map<String, Object> scopedVariables = Map.of("var1", "value1");
-        when(callActivityService.getInputMappings(activityExecution)).thenReturn(scopedVariables);
+        when(callActivityService.getInputMappings(eq(activityExecution), anyMap())).thenReturn(scopedVariables);
 
-        // Mock expression evaluation
         when(variablesService.toList(anyMap())).thenReturn(List.of());
 
+        // when
         var process = processFactory.createByCallActivity(activityExecution);
 
+        // then
         assertThat(process.definition()).isEqualTo(processDefinition);
         assertThat(process.parentId()).isEqualTo("p1");
         assertThat(process.businessKey()).isEqualTo("bk1");
 
-        // Verify expression evaluated and result applied
         ArgumentCaptor<Map<String, Object>> captor = ArgumentCaptor.forClass(Map.class);
         verify(variablesService).toList(captor.capture());
     }

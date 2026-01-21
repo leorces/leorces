@@ -52,14 +52,13 @@ class CallActivityServiceTest {
                 .target("mapped1")
                 .build();
 
-        Map<String, Object> scopedVars = Map.of("input1", "value1");
+        Map<String, Object> scopedVariables = Map.of("input1", "value1");
 
         when(callActivity.inputMappings()).thenReturn(List.of(mapping));
         when(callActivity.shouldProcessAllInputMappings()).thenReturn(false);
-        when(variablesService.getScopedVariables(activity)).thenReturn(scopedVars);
 
         // when
-        var result = callActivityService.getInputMappings(activity);
+        var result = callActivityService.getInputMappings(activity, scopedVariables);
 
         // then
         assertThat(result).containsEntry("mapped1", "value1");
@@ -75,19 +74,18 @@ class CallActivityServiceTest {
                 .target("result")
                 .build();
 
-        Map<String, Object> scopedVars = Map.of("x", 2);
+        Map<String, Object> scopedVariables = Map.of("x", 2);
 
         when(callActivity.inputMappings()).thenReturn(List.of(mapping));
         when(callActivity.shouldProcessAllInputMappings()).thenReturn(false);
-        when(variablesService.getScopedVariables(activity)).thenReturn(scopedVars);
-        when(expressionEvaluator.evaluate("${x + 1}", scopedVars, Object.class)).thenReturn(3);
+        when(expressionEvaluator.evaluate(eq("${x + 1}"), anyMap(), eq(Object.class))).thenReturn(3);
 
         // when
-        var result = callActivityService.getInputMappings(activity);
+        var result = callActivityService.getInputMappings(activity, scopedVariables);
 
         // then
         assertThat(result).containsEntry("result", 3);
-        verify(expressionEvaluator).evaluate("${x + 1}", scopedVars, Object.class);
+        verify(expressionEvaluator).evaluate(eq("${x + 1}"), anyMap(), eq(Object.class));
     }
 
     @Test
@@ -97,14 +95,13 @@ class CallActivityServiceTest {
         var mapping = VariableMapping.builder()
                 .source("a").target("b").build();
 
-        Map<String, Object> scopedVars = Map.of("x", 1, "y", 2);
+        Map<String, Object> scopedVariables = Map.of("x", 1, "y", 2);
 
         when(callActivity.inputMappings()).thenReturn(List.of(mapping));
         when(callActivity.shouldProcessAllInputMappings()).thenReturn(true);
-        when(variablesService.getScopedVariables(activity)).thenReturn(scopedVars);
 
         // when
-        var result = callActivityService.getInputMappings(activity);
+        var result = callActivityService.getInputMappings(activity, scopedVariables);
 
         // then
         assertThat(result).containsKeys("x", "y", "b");
@@ -117,11 +114,11 @@ class CallActivityServiceTest {
         var mapping = VariableMapping.builder()
                 .source("out1").target("mappedOut").build();
 
-        Map<String, Object> processVars = Map.of("out1", "val1");
+        Map<String, Object> processVariables = Map.of("out1", "val1");
 
         when(callActivity.outputMappings()).thenReturn(List.of(mapping));
         when(callActivity.shouldProcessAllOutputMappings()).thenReturn(false);
-        when(variablesService.getProcessVariables("exec1")).thenReturn(processVars);
+        when(variablesService.getProcessVariables("exec1")).thenReturn(processVariables);
         when(activity.id()).thenReturn("exec1");
 
         // when
@@ -136,7 +133,7 @@ class CallActivityServiceTest {
     void getInputMappings_shouldReturnEmptyMapWhenNull() {
         when(callActivity.inputMappings()).thenReturn(null);
 
-        var result = callActivityService.getInputMappings(activity);
+        var result = callActivityService.getInputMappings(activity, Map.of());
 
         assertThat(result).isEmpty();
         verifyNoInteractions(variablesService);
@@ -158,12 +155,11 @@ class CallActivityServiceTest {
     void shouldSkipMappingWithoutTarget() {
         var mapping = VariableMapping.builder().source("a").build();
 
-        Map<String, Object> scopedVars = Map.of("a", "value");
+        Map<String, Object> scopedVariables = Map.of("a", "value");
         when(callActivity.inputMappings()).thenReturn(List.of(mapping));
         when(callActivity.shouldProcessAllInputMappings()).thenReturn(false);
-        when(variablesService.getScopedVariables(activity)).thenReturn(scopedVars);
 
-        var result = callActivityService.getInputMappings(activity);
+        var result = callActivityService.getInputMappings(activity, scopedVariables);
 
         assertThat(result).isEmpty();
     }
