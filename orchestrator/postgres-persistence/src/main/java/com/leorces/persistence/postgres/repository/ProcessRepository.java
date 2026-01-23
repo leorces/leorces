@@ -44,6 +44,9 @@ public interface ProcessRepository extends CrudRepository<ProcessEntity, String>
     @Query(FIND_ALL_FULLY_COMPLETED)
     List<ProcessExecutionEntity> findAllFullyCompleted(@Param("limit") int limit);
 
+    @Query(FIND_ALL_FULLY_COMPLETED_FOR_UPDATE)
+    List<ProcessExecutionEntity> findAllFullyCompletedForUpdate(@Param("limit") int limit);
+
     @Query(COUNT_ALL_WITH_FILTERS)
     long countAllWithFilters(@Param("filter") String filter, @Param("state") String state);
 

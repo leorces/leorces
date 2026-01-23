@@ -148,6 +148,13 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
                 .toList();
     }
 
+    public List<ProcessExecution> findAllFullyCompletedForUpdate(int limit) {
+        log.debug("Finding all fully completed processes with limit: {} for update", limit);
+        return processRepository.findAllFullyCompletedForUpdate(limit).stream()
+                .map(processMapper::toExecution)
+                .toList();
+    }
+
     @Override
     public PageableData<Process> findAll(Pageable pageable) {
         log.debug("Finding all processes with pageable: {}", pageable);

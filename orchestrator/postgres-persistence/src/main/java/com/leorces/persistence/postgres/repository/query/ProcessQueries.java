@@ -431,6 +431,10 @@ public final class ProcessQueries {
             LIMIT :limit
             """;
 
+    public static final String FIND_ALL_FULLY_COMPLETED_FOR_UPDATE = FIND_ALL_FULLY_COMPLETED + """
+            FOR UPDATE OF process SKIP LOCKED
+            """;
+
     private ProcessQueries() {
         // Utility class
     }

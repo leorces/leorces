@@ -1,7 +1,9 @@
-package com.leorces.engine.scheduler;
+package com.leorces.engine.job.compaction;
 
-import com.leorces.api.AdminService;
 import com.leorces.engine.configuration.properties.CompactionProperties;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.job.compaction.command.CompactionCommand;
+import com.leorces.engine.scheduler.ShedlockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -18,7 +20,7 @@ public class CompactionScheduler implements SchedulingConfigurer {
     private static final String COMPACTION_JOB = "compaction-job";
 
     private final ShedlockService shedlockService;
-    private final AdminService adminService;
+    private final CommandDispatcher dispatcher;
     private final CompactionProperties compactionProperties;
 
     @Override
@@ -35,7 +37,7 @@ public class CompactionScheduler implements SchedulingConfigurer {
     private void doCompaction() {
         log.info("Scheduled compaction started");
         shedlockService.executeWithLock(COMPACTION_JOB, Duration.ofMinutes(60), () -> {
-            adminService.doCompaction();
+            dispatcher.dispatch(new CompactionCommand());
             return null;
         });
     }
