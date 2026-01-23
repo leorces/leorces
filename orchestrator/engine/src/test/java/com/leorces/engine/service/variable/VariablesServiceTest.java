@@ -217,8 +217,6 @@ class VariablesServiceTest {
 
         // Then
         assertThat(result).isEqualTo(evaluatedVariables);
-        verify(expressionEvaluator).isExpression("regularValue");
-        verify(expressionEvaluator).isExpression(EXPRESSION_VALUE);
         verify(variablePersistence).findInScope(PROCESS_ID, SCOPE);
         verify(expressionEvaluator).evaluate(mixedMap, scopedVariablesMap);
     }

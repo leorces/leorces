@@ -1,10 +1,10 @@
 [versions]
 # Core Spring Framework
-spring-boot = "3.5.4"
+spring-boot = "3.5.10"
 spring-dependency-management = "1.1.7"
 
 # Testing
-testcontainers = "1.19.3"
+testcontainers = "1.21.4"
 
 # Code Generation & Annotations
 mapstruct = "1.6.3"
