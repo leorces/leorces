@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -18,6 +19,19 @@ public class ExecutionDispatcher {
 
     public ExecutionDispatcher(List<CommandHandler<?>> commandHandlers) {
         registerHandlers(commandHandlers);
+    }
+
+    /**
+     * Executes a command and returns the result.
+     *
+     * @param command the command to execute
+     * @param <R>     the result type
+     * @param <T>     the command type
+     * @return the execution result
+     */
+    public <R, T extends ExecutionResultCommand<R>> R execute(T command) {
+        Objects.requireNonNull(command);
+        return performExecution(command);
     }
 
     @EventListener
@@ -32,15 +46,28 @@ public class ExecutionDispatcher {
     }
 
     private <T extends ExecutionCommand> void dispatch(T command) {
+        performExecution(command);
+    }
+
+    private <R, T extends ExecutionCommand> R performExecution(T command) {
         try {
             var handler = getHandler(command);
-            handler.handle(command);
+            return handleWithResult(handler, command);
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Command dispatch failed", e);
+            log.error("Command execution failed", e);
             throw ExecutionException.of("Execution failed", e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <R, T extends ExecutionCommand> R handleWithResult(CommandHandler<T> handler, T command) {
+        if (handler instanceof ResultCommandHandler<?, ?> resultHandler) {
+            return ((ResultCommandHandler<T, R>) resultHandler).execute(command);
+        }
+        handler.handle(command);
+        return null;
     }
 
     @SuppressWarnings("unchecked")

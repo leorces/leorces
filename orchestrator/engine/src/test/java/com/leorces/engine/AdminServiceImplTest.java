@@ -1,9 +1,9 @@
 package com.leorces.engine;
 
+import com.leorces.engine.admin.compaction.command.CompactionCommand;
+import com.leorces.engine.admin.migration.command.GenerateProcessMigrationPlanCommand;
+import com.leorces.engine.admin.migration.command.ProcessMigrationCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.job.compaction.command.CompactionCommand;
-import com.leorces.engine.job.migration.command.ProcessMigrationCommand;
-import com.leorces.engine.service.process.ProcessMigrationService;
 import com.leorces.model.job.Job;
 import com.leorces.model.job.migration.ProcessMigrationPlan;
 import com.leorces.model.pagination.Pageable;
@@ -27,9 +27,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AdminServiceImpl Tests")
 class AdminServiceImplTest {
-
-    @Mock
-    private ProcessMigrationService migrationService;
 
     @Mock
     private JobPersistence jobPersistence;
@@ -106,13 +103,13 @@ class AdminServiceImplTest {
         // Given
         var migrationPlan = ProcessMigrationPlan.builder().build();
         var expectedPlan = ProcessMigrationPlan.builder().build();
-        when(migrationService.generateMigrationPlan(migrationPlan)).thenReturn(expectedPlan);
+        when(dispatcher.execute(any(GenerateProcessMigrationPlanCommand.class))).thenReturn(expectedPlan);
 
         // When
         var result = adminService.generateMigrationPlan(migrationPlan);
 
         // Then
         assertThat(result).isEqualTo(expectedPlan);
-        verify(migrationService).generateMigrationPlan(migrationPlan);
+        verify(dispatcher).execute(any(GenerateProcessMigrationPlanCommand.class));
     }
 }
