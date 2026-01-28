@@ -15,6 +15,8 @@ public interface ActivityBehavior {
 
     void terminate(ActivityExecution activity, boolean withInterruption);
 
+    void delete(ActivityExecution activity);
+
     boolean fail(ActivityExecution activity);
 
     void retry(ActivityExecution activity);

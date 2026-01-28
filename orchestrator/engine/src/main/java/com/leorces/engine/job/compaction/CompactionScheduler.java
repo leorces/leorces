@@ -1,6 +1,6 @@
 package com.leorces.engine.job.compaction;
 
-import com.leorces.engine.configuration.properties.CompactionProperties;
+import com.leorces.engine.configuration.properties.job.CompactionProperties;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.job.compaction.command.CompactionCommand;
 import com.leorces.engine.scheduler.ShedlockService;
@@ -37,7 +37,7 @@ public class CompactionScheduler implements SchedulingConfigurer {
     private void doCompaction() {
         log.info("Scheduled compaction started");
         shedlockService.executeWithLock(COMPACTION_JOB, Duration.ofMinutes(60), () -> {
-            dispatcher.dispatch(new CompactionCommand());
+            dispatcher.dispatch(CompactionCommand.cron());
             return null;
         });
     }

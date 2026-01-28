@@ -57,7 +57,7 @@ class TerminateAllActivitiesCommandHandlerTest {
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
         when(behaviorResolver.resolveBehavior(ActivityType.RECEIVE_TASK)).thenReturn(activityBehavior);
 
-        when(taskExecutor.submit(any())).thenAnswer(invocation -> {
+        when(taskExecutor.runAsync(any())).thenAnswer(invocation -> {
             Runnable runnable = invocation.getArgument(0);
             runnable.run();
             return CompletableFuture.completedFuture(null);
@@ -81,7 +81,7 @@ class TerminateAllActivitiesCommandHandlerTest {
         handler.handle(command);
 
         // Then
-        verify(taskExecutor, times(2)).submit(any());
+        verify(taskExecutor, times(2)).runAsync(any());
         verify(activityBehavior).terminate(activity1, true);
         verify(activityBehavior).terminate(activity2, true);
     }
@@ -96,7 +96,7 @@ class TerminateAllActivitiesCommandHandlerTest {
         handler.handle(command);
 
         // Then
-        verify(taskExecutor, never()).submit(any());
+        verify(taskExecutor, never()).runAsync(any());
         verifyNoInteractions(activityBehavior);
     }
 

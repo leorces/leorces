@@ -12,11 +12,11 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Table(name = "history")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "history")
 public class HistoryEntity implements Persistable<String> {
 
     @Id
@@ -50,12 +50,10 @@ public class HistoryEntity implements Persistable<String> {
     @Transient
     private boolean isNew;
 
-
     @Override
     public String getId() {
         return processId;
     }
-
 
     @Override
     public boolean isNew() {

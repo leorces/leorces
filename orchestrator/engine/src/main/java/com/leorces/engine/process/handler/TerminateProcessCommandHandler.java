@@ -30,7 +30,7 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
         var processId = process.id();
 
         if (process.isInTerminalState()) {
-            log.debug("Process {} is already completed, current state: {}", processId, process.state());
+            log.debug("Process {} is already in terminal state: {}", processId, process.state());
             return;
         }
 

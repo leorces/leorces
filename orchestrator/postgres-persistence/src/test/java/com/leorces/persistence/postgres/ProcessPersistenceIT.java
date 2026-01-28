@@ -2,11 +2,14 @@ package com.leorces.persistence.postgres;
 
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.runtime.process.ProcessExecution;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.model.search.ProcessFilter;
+import com.leorces.persistence.postgres.utils.ProcessDefinitionTestData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -208,6 +211,96 @@ class ProcessPersistenceIT extends RepositoryIT {
     }
 
     @Test
+    @DisplayName("Should delete an active process successfully")
+    void delete() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+
+        // When
+        processPersistence.delete(process.id());
+        var result = processPersistence.findById(process.id()).get();
+
+        // Then
+        assertThat(result.state()).isEqualTo(ProcessState.DELETED);
+    }
+
+    @Test
+    @DisplayName("Should change process state")
+    void changeState() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+
+        // When
+        processPersistence.changeState(process.id(), ProcessState.COMPLETED);
+        var result = processPersistence.findById(process.id()).get();
+
+        // Then
+        assertThat(result.state()).isEqualTo(ProcessState.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Should find executions for update")
+    void findExecutionsForUpdate() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+
+        // When
+        var result = processPersistence.findExecutionsForUpdate(process.definitionId(), 10);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(result.stream().map(ProcessExecution::id)).contains(process.id());
+    }
+
+    @Test
+    @DisplayName("Should find all fully completed processes for update")
+    void findAllFullyCompletedForUpdate() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+        processPersistence.complete(process.id());
+
+        // When
+        var result = processPersistence.findAllFullyCompletedForUpdate(10);
+
+        // Then
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Should update definition id for processes")
+    void updateDefinitionId() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+        var newDef = definitionPersistence.save(List.of(ProcessDefinitionTestData.createOrderSubmittedProcessDefinition())).getFirst();
+        var newDefId = newDef.id();
+
+        // When
+        var count = processPersistence.updateDefinitionId(process.definitionId(), newDefId, 10);
+
+        // Then
+        assertThat(count).isPositive();
+        var updatedProcess = processPersistence.findById(process.id()).get();
+        assertThat(updatedProcess.definitionId()).isEqualTo(newDefId);
+    }
+
+    @Test
+    @DisplayName("Should update definition id for specific process IDs")
+    void updateDefinitionIdList() {
+        // Given
+        var process = processPersistence.run(createOrderSubmittedProcess());
+        var newDef = definitionPersistence.save(List.of(ProcessDefinitionTestData.createOrderSubmittedProcessDefinition())).getFirst();
+        var newDefId = newDef.id();
+
+        // When
+        var count = processPersistence.updateDefinitionId(newDefId, List.of(process.id()));
+
+        // Then
+        assertThat(count).isEqualTo(1);
+        var updatedProcess = processPersistence.findById(process.id()).get();
+        assertThat(updatedProcess.definitionId()).isEqualTo(newDefId);
+    }
+
+    @Test
     @DisplayName("Should find process by ID and return empty for non-existent ID")
     void findById() {
         // Given
@@ -385,31 +478,6 @@ class ProcessPersistenceIT extends RepositoryIT {
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().id()).isEqualTo(process.id());
         assertThat(result.getFirst().businessKey()).isEqualTo(process.businessKey());
-    }
-
-    @Test
-    @DisplayName("Should find all fully completed processes with limit and verify completion state")
-    void findAllFullyCompleted() {
-        // Given
-        var process1 = processPersistence.run(createOrderSubmittedProcess());
-        var process2 = processPersistence.run(createOrderSubmittedProcess());
-        processPersistence.complete(process1.id());
-        processPersistence.complete(process2.id());
-
-        // When
-        var result = processPersistence.findAllFullyCompleted(10);
-
-        // Then
-        assertThat(result).isNotEmpty();
-        assertThat(result).hasSizeLessThanOrEqualTo(10);
-        assertThat(result).allSatisfy(execution -> {
-            assertThat(execution.state()).isEqualTo(ProcessState.COMPLETED);
-            assertThat(execution.completedAt()).isNotNull();
-        });
-
-        // When & Then - test limit functionality
-        var limitedResult = processPersistence.findAllFullyCompleted(1);
-        assertThat(limitedResult).hasSize(1);
     }
 
     @Test

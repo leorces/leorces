@@ -1,9 +1,9 @@
 package com.leorces.example.client.worker.order;
 
 
+import com.leorces.rest.client.ExternalTaskService;
 import com.leorces.rest.client.handler.ExternalTaskHandler;
 import com.leorces.rest.client.model.ExternalTask;
-import com.leorces.rest.client.service.ExternalTaskService;
 import com.leorces.rest.client.worker.ExternalTaskSubscription;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

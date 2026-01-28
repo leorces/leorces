@@ -1,5 +1,6 @@
 package com.leorces.persistence.postgres;
 
+import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.variable.Variable;
 import com.leorces.persistence.postgres.utils.VariableTestData;
@@ -51,6 +52,35 @@ class VariablePersistenceIT extends RepositoryIT {
         assertEquals("{\"firstName\":\"Json\",\"lastName\":\"Statement\"}", savedClientVariable.varValue());
         assertEquals("map", savedClientVariable.type());
         assertNotNull(savedClientVariable.createdAt());
+    }
+
+    @Test
+    @DisplayName("Should save variables from activity and return them with generated IDs")
+    void saveByActivity() {
+        // Given
+        var process = runProcess();
+        var activity = activityPersistence.schedule(
+                ActivityExecution.builder()
+                        .process(process)
+                        .definitionId("NotificationToClient")
+                        .build()
+        );
+        var activityWithVariables = activity.toBuilder()
+                .variables(List.of(VariableTestData.createOrderVariable()))
+                .build();
+
+        // When
+        var result = variablePersistence.save(activityWithVariables);
+
+        // Then
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        var savedVariable = result.getFirst();
+        assertNotNull(savedVariable.id());
+        assertEquals(process.id(), savedVariable.processId());
+        assertEquals(activity.id(), savedVariable.executionId());
+        assertEquals("order", savedVariable.varKey());
     }
 
     @Test

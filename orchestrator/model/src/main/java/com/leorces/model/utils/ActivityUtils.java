@@ -40,7 +40,7 @@ public final class ActivityUtils {
         var parentActivities = new ArrayList<ActivityDefinition>();
         var currentActivity = activityDefinition;
 
-        while (currentActivity.parentId() != null) {
+        while (currentActivity != null && currentActivity.parentId() != null) {
             var parentActivity = findActivityById(processDefinition, currentActivity.parentId());
 
             if (parentActivity.isEmpty()) {

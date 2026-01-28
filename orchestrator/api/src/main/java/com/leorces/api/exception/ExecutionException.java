@@ -25,6 +25,10 @@ public class ExecutionException extends RuntimeException {
         this.details = details;
     }
 
+    public static ExecutionException of(Throwable cause) {
+        return new ExecutionException(null, null, null, cause);
+    }
+
     public static ExecutionException of(String message) {
         return new ExecutionException(message, null, null, null);
     }

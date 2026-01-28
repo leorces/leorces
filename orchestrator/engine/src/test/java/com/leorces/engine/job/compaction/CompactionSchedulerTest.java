@@ -1,6 +1,6 @@
 package com.leorces.engine.job.compaction;
 
-import com.leorces.engine.configuration.properties.CompactionProperties;
+import com.leorces.engine.configuration.properties.job.CompactionProperties;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.job.compaction.command.CompactionCommand;
 import com.leorces.engine.scheduler.ShedlockService;

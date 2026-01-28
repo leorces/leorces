@@ -3,6 +3,7 @@ package com.leorces.engine.activity.behaviour.subprocess;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.process.command.DeleteProcessCommand;
 import com.leorces.engine.process.command.RunProcessCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
 import com.leorces.engine.service.activity.CallActivityService;
@@ -56,6 +57,15 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
 
         var terminatedCallActivity = activityPersistence.terminate(callActivity);
         postTerminate(terminatedCallActivity, withInterruption);
+    }
+
+    @Override
+    public void delete(ActivityExecution callActivity) {
+        if (!callActivity.process().isInTerminalState()) {
+            dispatcher.dispatch(DeleteProcessCommand.of(callActivity.id(), false));
+        }
+
+        activityPersistence.delete(callActivity);
     }
 
     @Override

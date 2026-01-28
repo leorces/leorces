@@ -2,6 +2,7 @@ package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.command.DeleteAllActivitiesCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
@@ -31,6 +32,12 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
         postTerminate(terminatedSubprocess, withInterruption);
     }
 
+    @Override
+    public void delete(ActivityExecution subprocess) {
+        deleteChildActivities(subprocess);
+        activityPersistence.delete(subprocess);
+    }
+
     protected boolean isAllChildActivitiesCompleted(ActivityExecution subprocess) {
         return activityPersistence.isAllCompleted(
                 subprocess.processId(),
@@ -56,6 +63,12 @@ public abstract class AbstractSubprocessBehavior extends AbstractActivityBehavio
         var childActivityIds = getChildActivityIds(subprocess);
         var childActivities = activityPersistence.findActive(subprocess.processId(), childActivityIds);
         dispatcher.dispatch(TerminateAllActivitiesCommand.of(childActivities));
+    }
+
+    private void deleteChildActivities(ActivityExecution subprocess) {
+        var childActivityIds = getChildActivityIds(subprocess);
+        var childActivities = activityPersistence.findActive(subprocess.processId(), childActivityIds);
+        dispatcher.dispatch(DeleteAllActivitiesCommand.of(childActivities));
     }
 
 }

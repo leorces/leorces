@@ -50,10 +50,13 @@ public final class ApiConstants {
     // =====================
     public static final String HISTORY_ENDPOINT = API_BASE_PATH + "/history";
     // =====================
-    // Repository endpoints
+    // Admin endpoints
     // =====================
     public static final String ADMIN_ENDPOINT = API_BASE_PATH + "/admin";
-    public static final String REPOSITORY_COMPACTION_ENDPOINT = ADMIN_ENDPOINT + "/repository/compaction";
+    public static final String JOBS_ENDPOINT = ADMIN_ENDPOINT + "/jobs";
+    public static final String RUN_JOB_ENDPOINT = JOBS_ENDPOINT + "/run";
+    public static final String JOB_BY_ID_ENDPOINT = JOBS_ENDPOINT + "/%s";
+    public static final String MIGRATION_ENDPOINT = ADMIN_ENDPOINT + "/migration";
 
     private ApiConstants() {
     }

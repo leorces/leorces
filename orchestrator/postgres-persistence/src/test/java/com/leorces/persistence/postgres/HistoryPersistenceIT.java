@@ -57,6 +57,9 @@ class HistoryPersistenceIT extends RepositoryIT {
         processExecution.activities().forEach(activity ->
                 assertThat(activityRepository.existsById(activity.id())).isFalse()
         );
+        processExecution.variables().forEach(variable ->
+                assertThat(variableRepository.existsById(variable.id())).isFalse()
+        );
     }
 
     @Test

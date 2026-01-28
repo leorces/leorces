@@ -37,7 +37,7 @@ class TaskExecutorServiceTest {
 
     @Test
     @DisplayName("submit should run task asynchronously")
-    void submitShouldRunTaskAsync() throws Exception {
+    void runAsyncShouldRunTaskAsync() throws Exception {
         // Given
         var task = mock(Runnable.class);
 
@@ -48,7 +48,7 @@ class TaskExecutorServiceTest {
         }).when(taskExecutor).execute(any(Runnable.class));
 
         // When
-        var future = service.submit(task);
+        var future = service.runAsync(task);
 
         // Then
         future.join();

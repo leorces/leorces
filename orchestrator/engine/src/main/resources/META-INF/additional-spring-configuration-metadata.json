@@ -67,7 +67,7 @@
     },
     {
       "name": "leorces.compaction",
-      "type": "com.leorces.engine.configuration.properties.CompactionProperties",
+      "type": "com.leorces.engine.configuration.properties.job.CompactionProperties",
       "description": "Settings for compaction of completed process instances."
     },
     {

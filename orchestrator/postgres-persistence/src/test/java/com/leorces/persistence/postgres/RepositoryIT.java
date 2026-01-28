@@ -40,6 +40,10 @@ public abstract class RepositoryIT {
     @Autowired
     protected HistoryPersistence historyPersistence;
     @Autowired
+    protected JobPersistence jobPersistence;
+    @Autowired
+    protected AdminPersistence adminPersistence;
+    @Autowired
     protected DefinitionRepository definitionRepository;
     @Autowired
     protected ProcessRepository processRepository;
@@ -51,6 +55,8 @@ public abstract class RepositoryIT {
     protected ShedlockRepository shedlockRepository;
     @Autowired
     protected HistoryRepository historyRepository;
+    @Autowired
+    protected JobRepository jobRepository;
     @Autowired
     protected DefinitionCache definitionCache;
 
@@ -88,6 +94,7 @@ public abstract class RepositoryIT {
         variableRepository.deleteAll();
         shedlockRepository.deleteAll();
         historyRepository.deleteAll();
+        jobRepository.deleteAll();
         definitionCache.invalidateAll();
     }
 

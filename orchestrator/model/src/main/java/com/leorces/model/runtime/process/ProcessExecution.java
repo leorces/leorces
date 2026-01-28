@@ -1,5 +1,6 @@
 package com.leorces.model.runtime.process;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.runtime.activity.Activity;
 import com.leorces.model.runtime.variable.Variable;
@@ -42,7 +43,17 @@ public record ProcessExecution(
     }
 
     public boolean isInTerminalState() {
-        return state == ProcessState.TERMINATED || state == ProcessState.COMPLETED;
+        return state == ProcessState.TERMINATED
+                || state == ProcessState.COMPLETED
+                || state == ProcessState.DELETED;
+    }
+
+    // It's possible to have multiple activities with the same definition id as it can be run more than once
+    @JsonIgnore
+    public List<Activity> getActivitiesByDefinitionId(String definitionId) {
+        return activities.stream()
+                .filter(activity -> activity.definitionId().equals(definitionId))
+                .toList();
     }
 
 }

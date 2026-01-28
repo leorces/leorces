@@ -42,6 +42,11 @@ public abstract class AbstractActivityBehavior implements ActivityBehavior {
     }
 
     @Override
+    public void delete(ActivityExecution activity) {
+        activityPersistence.delete(activity);
+    }
+
+    @Override
     public boolean fail(ActivityExecution activity) {
         activityPersistence.fail(activity);
         return true;

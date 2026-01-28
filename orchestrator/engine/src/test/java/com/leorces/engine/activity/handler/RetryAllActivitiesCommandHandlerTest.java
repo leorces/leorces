@@ -58,7 +58,7 @@ class RetryAllActivitiesCommandHandlerTest {
         when(activityExecution2.type()).thenReturn(ActivityType.RECEIVE_TASK);
 
         when(behaviorResolver.resolveBehavior(any())).thenReturn(activityBehavior);
-        when(taskExecutor.submit(any(Runnable.class)))
+        when(taskExecutor.runAsync(any(Runnable.class)))
                 .thenAnswer(invocation -> {
                     Runnable r = invocation.getArgument(0);
                     r.run();
@@ -89,7 +89,7 @@ class RetryAllActivitiesCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(taskExecutor).submit(any(Runnable.class));
+        verify(taskExecutor).runAsync(any(Runnable.class));
         verify(activityBehavior).retry(activityExecution1);
     }
 
@@ -100,7 +100,7 @@ class RetryAllActivitiesCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(taskExecutor, times(2)).submit(any(Runnable.class));
+        verify(taskExecutor, times(2)).runAsync(any(Runnable.class));
         verify(activityBehavior).retry(activityExecution1);
         verify(activityBehavior).retry(activityExecution2);
     }

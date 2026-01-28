@@ -39,6 +39,13 @@ public interface ProcessPersistence {
     void terminate(String processId);
 
     /**
+     * Deletes a process.
+     *
+     * @param processId the process identifier
+     */
+    void delete(String processId);
+
+    /**
      * Marks a process as having an incident.
      *
      * @param processId the process identifier
@@ -124,6 +131,23 @@ public interface ProcessPersistence {
     void changeState(String processId, ProcessState state);
 
     /**
+     * Updates the process definition ID for all processes with the given definition ID.
+     *
+     * @param fromDefinitionId the current process definition ID
+     * @param toDefinitionId   the new process definition ID
+     * @param batchSize        the maximum number of processes to update in a single batch
+     */
+    int updateDefinitionId(String fromDefinitionId, String toDefinitionId, int batchSize);
+
+    /**
+     * Updates the process definition identifier for all processes with the given definition identifier.
+     *
+     * @param toDefinitionId the new process definition identifier
+     * @param processIds     the list of process identifiers to update
+     */
+    int updateDefinitionId(String toDefinitionId, List<String> processIds);
+
+    /**
      * Finds a process by its unique identifier.
      *
      * @param processId the process identifier
@@ -138,6 +162,15 @@ public interface ProcessPersistence {
      * @return an optional containing the process execution if found, empty otherwise
      */
     Optional<ProcessExecution> findExecutionById(String processId);
+
+    /**
+     * Finds process executions by its definition ID for update operations.
+     *
+     * @param definitionId the process definition identifier
+     * @param limit        the maximum number of executions to retrieve
+     * @return list of the process executions if found, empty otherwise
+     */
+    List<ProcessExecution> findExecutionsForUpdate(String definitionId, int limit);
 
     /**
      * Finds all processes.
@@ -156,11 +189,11 @@ public interface ProcessPersistence {
     PageableData<Process> findAll(Pageable pageable);
 
     /**
-     * Finds all fully completed processes with a limit.
+     * Finds all fully completed processes with a limit for update operations.
      *
      * @param limit the maximum number of processes to retrieve
      * @return the list of fully completed processes
      */
-    List<ProcessExecution> findAllFullyCompleted(int limit);
+    List<ProcessExecution> findAllFullyCompletedForUpdate(int limit);
 
 }

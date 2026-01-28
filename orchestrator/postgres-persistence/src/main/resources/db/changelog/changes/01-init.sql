@@ -2,7 +2,7 @@
 
 --changeset leorces:1
 
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION pg_trgm;
 
 -- ============================
 -- Table: definition
@@ -63,28 +63,27 @@ CREATE TABLE process
     CONSTRAINT pk_process PRIMARY KEY (process_id)
 );
 
-CREATE INDEX idx_process_state_defkey_created
-    ON process (process_state, process_definition_key, process_created_at DESC);
-
-CREATE INDEX idx_process_business_defkey
-    ON process (process_business_key, process_definition_key);
-
-CREATE INDEX idx_process_parent_id
-    ON process (process_parent_id)
-    WHERE process_parent_id IS NOT NULL;
-
-CREATE INDEX idx_process_created_at
-    ON process (process_created_at DESC);
-
-CREATE INDEX idx_process_completed_at
-    ON process (process_completed_at ASC)
-    WHERE process_completed_at IS NOT NULL;
-
 CREATE INDEX idx_process_definition_id
     ON process (process_definition_id);
 
 CREATE INDEX idx_process_definition_key
     ON process (process_definition_key);
+
+CREATE INDEX idx_process_state
+    ON process (process_state);
+
+CREATE INDEX idx_process_created_at
+    ON process (process_created_at);
+
+CREATE INDEX idx_process_completed_at
+    ON process (process_completed_at);
+
+CREATE INDEX idx_process_eligible
+    ON process (process_state, root_process_id)
+    WHERE process_state IN ('COMPLETED', 'TERMINATED', 'DELETED');
+
+CREATE INDEX idx_process_parent_id
+    ON process (process_parent_id);
 
 -- ============================
 -- Table: activity
@@ -113,16 +112,19 @@ CREATE TABLE activity
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)
 );
 
-CREATE INDEX idx_activity_scheduled
-    ON activity (activity_topic, process_definition_key, activity_created_at, process_id)
+CREATE INDEX idx_activity_process_def_state
+    ON activity (process_id, activity_definition_id, activity_state);
+
+CREATE INDEX idx_activity_process_state
+    ON activity (process_id, activity_state);
+
+CREATE INDEX idx_activity_topic_process_key_state
+    ON activity (activity_topic, process_definition_key, activity_state)
     WHERE activity_state = 'SCHEDULED';
 
-CREATE INDEX idx_activity_timeout_active
+CREATE INDEX idx_activity_timeout_state
     ON activity (activity_timeout)
-    WHERE activity_state IN ('ACTIVE', 'SCHEDULED') AND activity_timeout IS NOT NULL;
-
-CREATE INDEX idx_activity_process_lookup
-    ON activity (process_id, activity_state, activity_completed_at, activity_definition_id);
+    WHERE activity_state IN ('ACTIVE', 'SCHEDULED');
 
 -- ============================
 -- Table: variable
@@ -180,6 +182,27 @@ CREATE TABLE shedlock
     locked_by  VARCHAR(255) NOT NULL,
 
     CONSTRAINT pk_name PRIMARY KEY (name)
+);
+
+-- ============================
+-- Table: job
+-- ============================
+CREATE TABLE job
+(
+    job_id             TEXT      NOT NULL,
+    job_type           TEXT      NOT NULL,
+    job_state          TEXT      NOT NULL,
+    job_input          JSONB,
+    job_output         JSONB,
+    job_retries        INTEGER   NOT NULL DEFAULT 0,
+    job_failure_reason TEXT,
+    job_failure_trace  TEXT,
+    job_created_at     TIMESTAMP NOT NULL,
+    job_updated_at     TIMESTAMP,
+    job_started_at     TIMESTAMP,
+    job_completed_at   TIMESTAMP,
+
+    CONSTRAINT pk_job PRIMARY KEY (job_id)
 );
 
 -- End of changeset

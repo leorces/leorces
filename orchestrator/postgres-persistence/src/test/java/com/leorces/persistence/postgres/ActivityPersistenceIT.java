@@ -33,6 +33,39 @@ class ActivityPersistenceIT extends RepositoryIT {
     }
 
     @Test
+    @DisplayName("Should terminate activity successfully")
+    void terminate() {
+        // Given
+        var process = runOrderSubmittedProcess();
+        var activity = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
+
+        // When
+        var result = activityPersistence.terminate(activity);
+
+        // Then
+        assertThat(result.state()).isEqualTo(ActivityState.TERMINATED);
+        var found = activityPersistence.findById(activity.id());
+        assertThat(found).isPresent();
+        assertThat(found.get().state()).isEqualTo(ActivityState.TERMINATED);
+    }
+
+    @Test
+    @DisplayName("Should delete activity successfully")
+    void delete() {
+        // Given
+        var process = runOrderSubmittedProcess();
+        var activity = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
+
+        // When
+        var result = activityPersistence.delete(activity);
+
+        // Then
+        assertThat(result.state()).isEqualTo(ActivityState.DELETED);
+        var found = activityPersistence.findById(activity.id());
+        assertThat(found).isEmpty();
+    }
+
+    @Test
     @DisplayName("Should find activity by ID and return empty for non-existent ID")
     void findById() {
         // Given

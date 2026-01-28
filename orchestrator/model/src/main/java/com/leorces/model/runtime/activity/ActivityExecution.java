@@ -150,8 +150,14 @@ public record ActivityExecution(
         return ActivityState.FAILED.equals(state());
     }
 
+    public boolean isDeleted() {
+        return ActivityState.DELETED.equals(state());
+    }
+
     public boolean isInTerminalState() {
-        return state == ActivityState.TERMINATED || state == ActivityState.COMPLETED;
+        return state == ActivityState.TERMINATED
+                || state == ActivityState.COMPLETED
+                || state == ActivityState.DELETED;
     }
 
 }

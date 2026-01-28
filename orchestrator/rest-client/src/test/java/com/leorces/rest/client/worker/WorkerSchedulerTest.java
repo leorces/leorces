@@ -1,10 +1,10 @@
 package com.leorces.rest.client.worker;
 
+import com.leorces.rest.client.ExternalTaskService;
 import com.leorces.rest.client.handler.ExternalTaskHandler;
 import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
-import com.leorces.rest.client.service.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

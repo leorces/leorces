@@ -14,6 +14,7 @@ public abstract class ActivityStateTransition {
             case COMPLETED -> new CompletedTransition();
             case TERMINATED -> new TerminatedTransition();
             case FAILED -> new FailedTransition();
+            case DELETED -> new DeletedTransition();
         };
     }
 
@@ -87,6 +88,20 @@ public abstract class ActivityStateTransition {
                     .createdAt(activity.createdAt() != null ? activity.createdAt() : now)
                     .updatedAt(now)
                     .startedAt(activity.startedAt() != null ? activity.startedAt() : now)
+                    .build();
+        }
+
+    }
+
+    private static class DeletedTransition extends ActivityStateTransition {
+
+        @Override
+        public ActivityExecution apply(ActivityExecution activity) {
+            var now = LocalDateTime.now();
+            return activity.toBuilder()
+                    .state(ActivityState.DELETED)
+                    .updatedAt(now)
+                    .completedAt(now)
                     .build();
         }
 

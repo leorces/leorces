@@ -60,6 +60,12 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
+    public ActivityExecution delete(ActivityExecution activity) {
+        log.debug("Delete activity: {} for process: {}", activity.definitionId(), activity.processId());
+        return save(activity, ActivityState.DELETED);
+    }
+
+    @Override
     public ActivityExecution fail(ActivityExecution activity) {
         log.debug("Fail activity: {} for process: {}", activity.definitionId(), activity.processId());
         return save(activity, ActivityState.FAILED);

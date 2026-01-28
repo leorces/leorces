@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.leorces.persistence.postgres.repository.query.ProcessQueries.RUN;
+import static com.leorces.persistence.postgres.repository.query.process.RUN.RUN_QUERY;
 
 @Slf4j
 @Service
@@ -56,6 +56,12 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     public void terminate(String processId) {
         log.debug("Terminate process: {}", processId);
         processRepository.terminate(processId);
+    }
+
+    @Override
+    public void delete(String processId) {
+        log.debug("Delete process: {}", processId);
+        processRepository.delete(processId);
     }
 
     @Override
@@ -116,8 +122,16 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     @Override
     public Optional<ProcessExecution> findExecutionById(String processId) {
         log.debug("Finding process execution by id: {}", processId);
-        return processRepository.findByIdWithActivities(processId)
+        return processRepository.findExecutionById(processId)
                 .map(processMapper::toExecution);
+    }
+
+    @Override
+    public List<ProcessExecution> findExecutionsForUpdate(String definitionId, int limit) {
+        log.debug("Finding process executions for update by definition id: {}", definitionId);
+        return processRepository.findExecutionsForUpdate(definitionId, limit).stream()
+                .map(processMapper::toExecution)
+                .toList();
     }
 
     @Override
@@ -141,18 +155,23 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    public List<ProcessExecution> findAllFullyCompleted(int limit) {
-        log.debug("Finding all fully completed processes with limit: {}", limit);
-        return processRepository.findAllFullyCompleted(limit).stream()
-                .map(processMapper::toExecution)
-                .toList();
-    }
-
     public List<ProcessExecution> findAllFullyCompletedForUpdate(int limit) {
         log.debug("Finding all fully completed processes with limit: {} for update", limit);
         return processRepository.findAllFullyCompletedForUpdate(limit).stream()
                 .map(processMapper::toExecution)
                 .toList();
+    }
+
+    @Override
+    public int updateDefinitionId(String fromDefinitionId, String toDefinitionId, int batchSize) {
+        log.debug("Updating definition id from: {} to: {} with batch size: {}", fromDefinitionId, toDefinitionId, batchSize);
+        return processRepository.updateDefinitionId(fromDefinitionId, toDefinitionId, batchSize).size();
+    }
+
+    @Override
+    public int updateDefinitionId(String toDefinitionId, List<String> processIds) {
+        log.debug("Updating definition id to: {} for processes: {}", toDefinitionId, processIds);
+        return processRepository.updateDefinitionId(toDefinitionId, processIds.toArray(String[]::new)).size();
     }
 
     @Override
@@ -164,7 +183,7 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
 
     private Process saveNewProcess(Process process) {
         return jdbcTemplate.queryForObject(
-                RUN,
+                RUN_QUERY,
                 new MapSqlParameterSource()
                         .addValue("processId", process.id() == null ? IdGenerator.getNewId() : process.id())
                         .addValue("businessKey", process.businessKey() != null ? process.businessKey() : IdGenerator.getNewId())

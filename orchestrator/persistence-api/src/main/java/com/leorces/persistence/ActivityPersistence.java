@@ -46,6 +46,14 @@ public interface ActivityPersistence {
     ActivityExecution terminate(ActivityExecution activity);
 
     /**
+     * Delete an activity.
+     *
+     * @param activity the activity to delete
+     * @return the deleted activity
+     */
+    ActivityExecution delete(ActivityExecution activity);
+
+    /**
      * Marks an activity as failed.
      *
      * @param activity the activity to mark as failed

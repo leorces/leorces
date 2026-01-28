@@ -5,9 +5,6 @@ public enum ActivityState {
     ACTIVE,
     COMPLETED,
     TERMINATED,
-    FAILED;
-
-    public boolean isTerminal() {
-        return this == TERMINATED || this == COMPLETED;
-    }
+    FAILED,
+    DELETED
 }

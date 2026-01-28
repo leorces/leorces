@@ -1,7 +1,9 @@
 package com.leorces.persistence;
 
+import java.util.function.Supplier;
+
 public interface AdminPersistence {
 
-    int doCompaction(int batchSize);
+    <T> T execute(Supplier<T> action);
 
 }

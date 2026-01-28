@@ -38,7 +38,7 @@ public class TerminateAllActivitiesCommandHandler implements CommandHandler<Term
     }
 
     private CompletableFuture<Void> terminateAsync(ActivityExecution activity) {
-        return taskExecutor.submit(() -> behaviorResolver.resolveBehavior(activity.type()).terminate(activity, true));
+        return taskExecutor.runAsync(() -> behaviorResolver.resolveBehavior(activity.type()).terminate(activity, true));
     }
 
 }

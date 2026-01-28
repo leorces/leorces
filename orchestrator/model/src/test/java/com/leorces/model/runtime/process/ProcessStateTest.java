@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Process State Tests")
 class ProcessStateTest {
 
-    private static final int EXPECTED_ENUM_COUNT = 4;
+    private static final int EXPECTED_ENUM_COUNT = 5;
 
     @Test
     @DisplayName("Should contain all expected process states")
@@ -24,6 +24,7 @@ class ProcessStateTest {
         assertTrue(contains(processStates, ProcessState.COMPLETED));
         assertTrue(contains(processStates, ProcessState.TERMINATED));
         assertTrue(contains(processStates, ProcessState.INCIDENT));
+        assertTrue(contains(processStates, ProcessState.DELETED));
     }
 
     @ParameterizedTest

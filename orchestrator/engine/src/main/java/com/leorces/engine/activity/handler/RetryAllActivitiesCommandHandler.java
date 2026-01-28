@@ -41,7 +41,7 @@ public class RetryAllActivitiesCommandHandler implements CommandHandler<RetryAll
     }
 
     private CompletableFuture<Void> retryAsync(ActivityExecution activity) {
-        return taskExecutor.submit(() -> behaviorResolver.resolveBehavior(activity.type()).retry(activity));
+        return taskExecutor.runAsync(() -> behaviorResolver.resolveBehavior(activity.type()).retry(activity));
     }
 
     private List<ActivityExecution> getActivitiesToRetry(RetryAllActivitiesCommand command) {

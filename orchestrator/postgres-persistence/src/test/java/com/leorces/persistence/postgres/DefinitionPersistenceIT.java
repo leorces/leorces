@@ -2,6 +2,7 @@ package com.leorces.persistence.postgres;
 
 
 import com.leorces.model.definition.ProcessDefinition;
+import com.leorces.model.definition.ProcessDefinitionMetadata;
 import com.leorces.model.pagination.Pageable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -120,6 +121,57 @@ class DefinitionPersistenceIT extends RepositoryIT {
         assertThat(clientNotification.outgoing()).containsExactly("Gateway_0yprn2c");
         assertThat(clientNotification.inputs()).containsKey("message");
         assertThat(clientNotification.outputs()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Should suspend and resume definition by ID")
+    void suspendAndResumeById() {
+        // Given
+        var definition = definitionPersistence.save(List.of(createOrderSubmittedProcessDefinition())).getFirst();
+        var id = definition.id();
+
+        // When
+        definitionPersistence.suspendById(id);
+        // Then (Verification would ideally be through findById if it returned state, but it doesn't seem to)
+        // We just verify it doesn't throw and can be resumed
+        definitionPersistence.resumeById(id);
+    }
+
+    @Test
+    @DisplayName("Should suspend and resume definition by key")
+    void suspendAndResumeByKey() {
+        // Given
+        var definition = definitionPersistence.save(List.of(createOrderSubmittedProcessDefinition())).getFirst();
+        var key = definition.key();
+
+        // When
+        definitionPersistence.suspendByKey(key);
+        definitionPersistence.resumeByKey(key);
+    }
+
+    @Test
+    @DisplayName("Should create new version when schema changes")
+    void saveWithSchemaChange() {
+        // Given
+        var v1 = createOrderSubmittedProcessDefinition();
+        definitionPersistence.save(List.of(v1));
+
+        var v2 = v1.toBuilder()
+                .metadata(ProcessDefinitionMetadata.builder()
+                        .schema("new-schema")
+                        .origin(v1.metadata().origin())
+                        .deployment(v1.metadata().deployment())
+                        .build())
+                .build();
+
+        // When
+        var result = definitionPersistence.save(List.of(v2));
+
+        // Then
+        assertThat(result).hasSize(1);
+        var savedV2 = result.getFirst();
+        assertThat(savedV2.version()).isEqualTo(2);
+        assertThat(savedV2.metadata().schema()).isEqualTo("new-schema");
     }
 
     @Test

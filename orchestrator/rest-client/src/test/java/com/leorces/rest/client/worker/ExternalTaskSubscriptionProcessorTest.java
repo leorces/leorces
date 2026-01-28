@@ -2,12 +2,12 @@ package com.leorces.rest.client.worker;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.common.mapper.VariablesMapper;
+import com.leorces.rest.client.ExternalTaskService;
 import com.leorces.rest.client.client.TaskRestClient;
 import com.leorces.rest.client.handler.ExternalTaskHandler;
 import com.leorces.rest.client.model.ExternalTask;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import com.leorces.rest.client.model.worker.WorkerMetadata;
-import com.leorces.rest.client.service.ExternalTaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
