@@ -30,7 +30,7 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
     @Override
     public void run(ActivityExecution callActivity) {
         var newCallActivity = activityPersistence.run(callActivity);
-        dispatcher.dispatch(RunProcessCommand.of(newCallActivity));
+        dispatcher.dispatch(RunProcessCommand.byCallActivity(newCallActivity));
     }
 
     @Override

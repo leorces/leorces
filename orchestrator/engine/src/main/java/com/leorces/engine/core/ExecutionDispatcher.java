@@ -2,6 +2,7 @@ package com.leorces.engine.core;
 
 import com.leorces.api.exception.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,11 @@ import java.util.Objects;
 public class ExecutionDispatcher {
 
     private final Map<Class<?>, CommandHandler<?>> handlers = new HashMap<>();
+    private final ObjectProvider<List<CommandHandler<?>>> handlersProvider;
+    private boolean initialized = false;
 
-    public ExecutionDispatcher(List<CommandHandler<?>> commandHandlers) {
-        registerHandlers(commandHandlers);
+    public ExecutionDispatcher(ObjectProvider<List<CommandHandler<?>>> handlersProvider) {
+        this.handlersProvider = handlersProvider;
     }
 
     /**
@@ -72,12 +75,20 @@ public class ExecutionDispatcher {
 
     @SuppressWarnings("unchecked")
     private <T extends ExecutionCommand> CommandHandler<T> getHandler(T command) {
+        ensureHandlersInitialized();
         var handler = (CommandHandler<T>) handlers.get(command.getClass());
         if (handler == null) {
             log.error("No handler found for command type: {}", command.getClass().getSimpleName());
             throw ExecutionException.of("No handler found for command type: %s".formatted(command.getClass().getSimpleName()));
         }
         return handler;
+    }
+
+    private synchronized void ensureHandlersInitialized() {
+        if (!initialized) {
+            handlersProvider.ifAvailable(this::registerHandlers);
+            initialized = true;
+        }
     }
 
     private void registerHandlers(List<CommandHandler<?>> commandHandlers) {

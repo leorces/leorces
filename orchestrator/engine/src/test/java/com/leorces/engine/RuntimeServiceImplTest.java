@@ -3,11 +3,7 @@ package com.leorces.engine;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
-import com.leorces.engine.process.command.MoveExecutionCommand;
-import com.leorces.engine.process.command.ResumeProcessCommand;
-import com.leorces.engine.process.command.SuspendProcessCommand;
-import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.engine.service.process.ProcessRuntimeService;
+import com.leorces.engine.process.command.*;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.search.ProcessFilter;
@@ -29,50 +25,45 @@ import static org.mockito.Mockito.*;
 class RuntimeServiceImplTest {
 
     @Mock
-    private ProcessRuntimeService processRuntimeService;
-
-    @Mock
     private CommandDispatcher dispatcher;
 
     @InjectMocks
     private RuntimeServiceImpl service;
 
     @Test
-    @DisplayName("startProcessById delegates to ProcessRuntimeService")
+    @DisplayName("startProcessById delegates to dispatcher")
     void startProcessByIdDelegates() {
         // Given
         var definitionId = "def1";
         var businessKey = "bk1";
         Map<String, Object> vars = Map.of("a", 1);
         var process = mock(Process.class);
-        when(processRuntimeService.startByDefinitionId(definitionId, businessKey, vars)).thenReturn(process);
+        when(dispatcher.execute(any(RunProcessCommand.class))).thenReturn(process);
 
         // When
         var result = service.startProcessById(definitionId, businessKey, vars);
 
         // Then
         assertThat(result).isEqualTo(process);
-        verify(processRuntimeService).startByDefinitionId(definitionId, businessKey, vars);
-        verifyNoMoreInteractions(processRuntimeService);
+        verify(dispatcher).execute(RunProcessCommand.byDefinitionId(definitionId, businessKey, vars));
     }
 
     @Test
-    @DisplayName("startProcessByKey delegates to ProcessRuntimeService")
+    @DisplayName("startProcessByKey delegates to dispatcher")
     void startProcessByKeyDelegates() {
         // Given
         var key = "key1";
         var businessKey = "bk1";
         Map<String, Object> vars = Map.of("a", 1);
         var process = mock(Process.class);
-        when(processRuntimeService.startByDefinitionKey(key, businessKey, vars)).thenReturn(process);
+        when(dispatcher.execute(any(RunProcessCommand.class))).thenReturn(process);
 
         // When
         var result = service.startProcessByKey(key, businessKey, vars);
 
         // Then
         assertThat(result).isEqualTo(process);
-        verify(processRuntimeService).startByDefinitionKey(key, businessKey, vars);
-        verifyNoMoreInteractions(processRuntimeService);
+        verify(dispatcher).execute(RunProcessCommand.byDefinitionKey(key, businessKey, vars));
     }
 
     @Test
@@ -255,17 +246,20 @@ class RuntimeServiceImplTest {
     }
 
     @Test
-    @DisplayName("findProcess delegates to ProcessRuntimeService")
+    @DisplayName("findProcess delegates to dispatcher")
     void findProcessDelegates() {
+        // Given
         var filter = mock(ProcessFilter.class);
         var process = mock(Process.class);
-        when(processRuntimeService.find(filter)).thenReturn(process);
+        var command = new FindProcessByFilterCommand(filter);
+        when(dispatcher.execute(command)).thenReturn(process);
 
+        // When
         var result = service.findProcess(filter);
 
+        // Then
         assertThat(result).isEqualTo(process);
-        verify(processRuntimeService).find(filter);
-        verifyNoMoreInteractions(processRuntimeService);
+        verify(dispatcher).execute(command);
     }
 
     @Test

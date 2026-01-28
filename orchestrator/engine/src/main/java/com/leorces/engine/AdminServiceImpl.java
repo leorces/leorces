@@ -1,10 +1,8 @@
 package com.leorces.engine;
 
 import com.leorces.api.AdminService;
-import com.leorces.engine.admin.common.model.JobType;
-import com.leorces.engine.admin.compaction.command.CompactionCommand;
+import com.leorces.engine.admin.common.command.RunJobCommand;
 import com.leorces.engine.admin.migration.command.GenerateProcessMigrationPlanCommand;
-import com.leorces.engine.admin.migration.command.ProcessMigrationCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.job.Job;
 import com.leorces.model.job.migration.ProcessMigrationPlan;
@@ -29,14 +27,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void runJob(String jobType, Map<String, Object> input) {
         log.debug("Running job: {} with input: {}", jobType, input);
-        switch (JobType.valueOf(jobType)) {
-            case COMPACTION:
-                dispatcher.dispatchAsync(CompactionCommand.manual());
-                break;
-            case PROCESS_MIGRATION:
-                dispatcher.dispatch(new ProcessMigrationCommand(input));
-                break;
-        }
+        dispatcher.dispatch(RunJobCommand.of(jobType, input));
     }
 
     @Override

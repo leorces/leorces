@@ -1,8 +1,7 @@
 package com.leorces.engine;
 
-import com.leorces.engine.admin.compaction.command.CompactionCommand;
+import com.leorces.engine.admin.common.command.RunJobCommand;
 import com.leorces.engine.admin.migration.command.GenerateProcessMigrationPlanCommand;
-import com.leorces.engine.admin.migration.command.ProcessMigrationCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.job.Job;
 import com.leorces.model.job.migration.ProcessMigrationPlan;
@@ -38,31 +37,17 @@ class AdminServiceImplTest {
     private AdminServiceImpl adminService;
 
     @Test
-    @DisplayName("Should dispatch CompactionCommand.manual() when jobType is COMPACTION")
-    void runJobCompaction() {
+    @DisplayName("Should dispatch RunJobCommand when runJob is called")
+    void runJob() {
         // Given
         var jobType = "COMPACTION";
-        var input = Map.<String, Object>of();
-
-        // When
-        adminService.runJob(jobType, input);
-
-        // Then
-        verify(dispatcher).dispatchAsync(any(CompactionCommand.class));
-    }
-
-    @Test
-    @DisplayName("Should dispatch ProcessMigrationCommand when jobType is PROCESS_MIGRATION")
-    void runJobProcessMigration() {
-        // Given
-        var jobType = "PROCESS_MIGRATION";
         var input = Map.<String, Object>of("key", "value");
 
         // When
         adminService.runJob(jobType, input);
 
         // Then
-        verify(dispatcher).dispatch(any(ProcessMigrationCommand.class));
+        verify(dispatcher).dispatch(any(RunJobCommand.class));
     }
 
     @Test

@@ -4,11 +4,7 @@ import com.leorces.api.RuntimeService;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.correlation.command.CorrelateMessageCommand;
-import com.leorces.engine.process.command.MoveExecutionCommand;
-import com.leorces.engine.process.command.ResumeProcessCommand;
-import com.leorces.engine.process.command.SuspendProcessCommand;
-import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.engine.service.process.ProcessRuntimeService;
+import com.leorces.engine.process.command.*;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.search.ProcessFilter;
@@ -24,7 +20,6 @@ import java.util.Map;
 @Service("leorcesRuntimeService")
 public class RuntimeServiceImpl implements RuntimeService {
 
-    private final ProcessRuntimeService processRuntimeService;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -49,7 +44,7 @@ public class RuntimeServiceImpl implements RuntimeService {
                                     String businessKey,
                                     Map<String, Object> variables) {
         log.debug("Start process by definition id: {} with business key: {} and variables: {}", definitionId, businessKey, variables);
-        return processRuntimeService.startByDefinitionId(definitionId, businessKey, variables);
+        return dispatcher.execute(RunProcessCommand.byDefinitionId(definitionId, businessKey, variables));
     }
 
     @Override
@@ -74,7 +69,7 @@ public class RuntimeServiceImpl implements RuntimeService {
                                      String businessKey,
                                      Map<String, Object> variables) {
         log.debug("Start process by key: {} with business key: {} and variables: {}", key, businessKey, variables);
-        return processRuntimeService.startByDefinitionKey(key, businessKey, variables);
+        return dispatcher.execute(RunProcessCommand.byDefinitionKey(key, businessKey, variables));
     }
 
     @Override
@@ -128,7 +123,7 @@ public class RuntimeServiceImpl implements RuntimeService {
     @Override
     public Process findProcess(ProcessFilter filter) {
         log.debug("Find process by filter: {}", filter);
-        return processRuntimeService.find(filter);
+        return dispatcher.execute(new FindProcessByFilterCommand(filter));
     }
 
     @Override

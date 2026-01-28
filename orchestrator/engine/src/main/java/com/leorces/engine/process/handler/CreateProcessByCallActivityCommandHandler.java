@@ -1,6 +1,8 @@
-package com.leorces.engine.service.process;
+package com.leorces.engine.process.handler;
 
 import com.leorces.api.exception.ExecutionException;
+import com.leorces.engine.core.ResultCommandHandler;
+import com.leorces.engine.process.command.CreateProcessByCallActivityCommand;
 import com.leorces.engine.service.activity.CallActivityService;
 import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
@@ -10,41 +12,36 @@ import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.DefinitionPersistence;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Optional;
 
-@Service
+@Slf4j
+@Component
 @RequiredArgsConstructor
-public class ProcessFactory {
+public class CreateProcessByCallActivityCommandHandler implements ResultCommandHandler<CreateProcessByCallActivityCommand, Process> {
 
-    private final DefinitionPersistence definitionPersistence;
-    private final VariablesService variablesService;
-    private final ExpressionEvaluator expressionEvaluator;
     private final CallActivityService callActivityService;
+    private final VariablesService variablesService;
+    private final DefinitionPersistence definitionPersistence;
+    private final ExpressionEvaluator expressionEvaluator;
 
-    public Process createByDefinitionId(String definitionId,
-                                        String businessKey,
-                                        Map<String, Object> variables) {
-        var definition = findDefinitionById(definitionId);
-        return buildProcess(definition, businessKey, variables);
-    }
-
-    public Process createByDefinitionKey(String definitionKey,
-                                         String businessKey,
-                                         Map<String, Object> variables) {
-        var definition = findLatestDefinition(definitionKey);
-        return buildProcess(definition, businessKey, variables);
-    }
-
-    public Process createByCallActivity(ActivityExecution activity) {
+    @Override
+    public Process execute(CreateProcessByCallActivityCommand command) {
+        var activity = command.callActivity();
         var callActivity = (CallActivity) activity.definition();
         var scopedVariables = resolveScopedVariables(activity, callActivity);
         var inputMappings = callActivityService.getInputMappings(activity, scopedVariables);
         var definition = resolveDefinition(callActivity, scopedVariables);
 
         return buildProcessFromActivity(activity, definition, inputMappings);
+    }
+
+    @Override
+    public Class<CreateProcessByCallActivityCommand> getCommandType() {
+        return CreateProcessByCallActivityCommand.class;
     }
 
     private Map<String, Object> resolveScopedVariables(ActivityExecution activity, CallActivity callActivity) {
@@ -74,14 +71,6 @@ public class ProcessFactory {
                 .build();
     }
 
-    private Process buildProcess(ProcessDefinition definition, String businessKey, Map<String, Object> variables) {
-        return Process.builder()
-                .businessKey(businessKey)
-                .variables(variablesService.toList(variables))
-                .definition(definition)
-                .build();
-    }
-
     private String resolveRootProcessId(Process parentProcess) {
         return parentProcess.rootProcessId() == null
                 ? parentProcess.id()
@@ -92,11 +81,6 @@ public class ProcessFactory {
         return version == null
                 ? findLatestDefinition(definitionKey)
                 : findDefinitionByVersion(definitionKey, version);
-    }
-
-    private ProcessDefinition findDefinitionById(String definitionId) {
-        return definitionPersistence.findById(definitionId)
-                .orElseThrow(() -> ExecutionException.of("Process definition not found", "Process definition not found by id: %s".formatted(definitionId)));
     }
 
     private ProcessDefinition findLatestDefinition(String definitionKey) {
