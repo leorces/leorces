@@ -1,8 +1,8 @@
 package com.leorces.engine.process.handler;
 
 import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ActivityPersistence;
@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static com.leorces.engine.constants.MetricConstants.PROCESS_TERMINATED;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -32,9 +33,6 @@ class TerminateProcessCommandHandlerTest {
 
     @Mock
     private ActivityPersistence activityPersistence;
-
-    @Mock
-    private ProcessMetrics processMetrics;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -73,7 +71,7 @@ class TerminateProcessCommandHandlerTest {
 
         // Then
         verify(processPersistence).terminate(activeProcess.id());
-        verify(processMetrics).recordProcessTerminatedMetric(activeProcess);
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_TERMINATED, activeProcess));
         verify(dispatcher).dispatch(any());
     }
 
@@ -88,7 +86,7 @@ class TerminateProcessCommandHandlerTest {
         handler.handle(command);
 
         // Then
-        verifyNoInteractions(activityPersistence, processMetrics, dispatcher);
+        verifyNoInteractions(activityPersistence, dispatcher);
         verify(processPersistence, never()).terminate(terminatedProcess.id());
     }
 
@@ -105,7 +103,7 @@ class TerminateProcessCommandHandlerTest {
                 () -> handler.handle(command)
         );
 
-        verifyNoInteractions(activityPersistence, processMetrics, dispatcher);
+        verifyNoInteractions(activityPersistence, dispatcher);
     }
 
 }

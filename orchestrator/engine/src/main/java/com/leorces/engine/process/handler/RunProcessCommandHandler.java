@@ -5,13 +5,15 @@ import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.ResultCommandHandler;
 import com.leorces.engine.process.command.CreateProcessCommand;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.engine.process.command.RunProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static com.leorces.engine.constants.MetricConstants.PROCESS_STARTED;
 
 @Slf4j
 @Component
@@ -19,7 +21,6 @@ import org.springframework.stereotype.Component;
 public class RunProcessCommandHandler implements ResultCommandHandler<RunProcessCommand, Process> {
 
     private final ProcessPersistence processPersistence;
-    private final ProcessMetrics processMetrics;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -28,7 +29,7 @@ public class RunProcessCommandHandler implements ResultCommandHandler<RunProcess
 
         log.debug("Run process with definitionId: {}, definitionKey: {} and definition version: {}", process.definitionId(), process.definitionKey(), process.definition().version());
         var newProcess = processPersistence.run(process);
-        processMetrics.recordProcessStartedMetric(process);
+        dispatcher.dispatchAsync(RecordProcessMetricCommand.of(PROCESS_STARTED, newProcess));
         startInitialActivity(newProcess);
         return newProcess;
     }

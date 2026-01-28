@@ -2,8 +2,8 @@ package com.leorces.engine.process.handler;
 
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.CreateProcessCommand;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.engine.process.command.RunProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -24,6 +24,7 @@ import org.mockito.quality.Strictness;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.leorces.engine.constants.MetricConstants.PROCESS_STARTED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -38,9 +39,6 @@ class RunProcessCommandHandlerTest {
 
     @Mock
     private ProcessPersistence processPersistence;
-
-    @Mock
-    private ProcessMetrics processMetrics;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -96,6 +94,7 @@ class RunProcessCommandHandlerTest {
         // Then
         verify(dispatcher).execute(any(CreateProcessCommand.class));
         verify(processPersistence).run(process);
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_STARTED, process));
     }
 
     @Test
@@ -120,6 +119,8 @@ class RunProcessCommandHandlerTest {
         verify(dispatcher, times(2)).execute(any(CreateProcessCommand.class));
         verify(processPersistence).run(process);
         verify(processPersistence).run(process2);
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_STARTED, process));
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_STARTED, process2));
     }
 
 }

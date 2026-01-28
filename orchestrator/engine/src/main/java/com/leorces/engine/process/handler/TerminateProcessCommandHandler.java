@@ -5,14 +5,16 @@ import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.activity.command.TerminateAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.ActivityPersistence;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static com.leorces.engine.constants.MetricConstants.PROCESS_TERMINATED;
 
 @Slf4j
 @Component
@@ -21,7 +23,6 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
 
     private final ActivityPersistence activityPersistence;
     private final ProcessPersistence processPersistence;
-    private final ProcessMetrics processMetrics;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -46,7 +47,7 @@ public class TerminateProcessCommandHandler implements CommandHandler<TerminateP
 
     private void terminateProcess(Process process, boolean terminateCallActivity) {
         processPersistence.terminate(process.id());
-        processMetrics.recordProcessTerminatedMetric(process);
+        dispatcher.dispatchAsync(RecordProcessMetricCommand.of(PROCESS_TERMINATED, process));
         if (process.isCallActivity() && terminateCallActivity) {
             dispatcher.dispatch(TerminateActivityCommand.of(process.id()));
         }
