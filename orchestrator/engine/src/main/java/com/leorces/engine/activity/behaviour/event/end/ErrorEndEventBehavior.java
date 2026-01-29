@@ -2,7 +2,7 @@ package com.leorces.engine.activity.behaviour.event.end;
 
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
-import com.leorces.engine.activity.command.ExecutionResultCommand;
+import com.leorces.engine.activity.command.FindActivityHandlerCommand;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
@@ -101,8 +101,7 @@ public class ErrorEndEventBehavior extends AbstractActivityBehavior {
     }
 
     private boolean correlateInScope(String errorCode, String scopeId, Process process) {
-        var command = ExecutionResultCommand.error(errorCode, scopeId, process);
-        var handlerOpt = dispatcher.execute(command);
+        var handlerOpt = dispatcher.execute(FindActivityHandlerCommand.error(errorCode, scopeId, process));
         if (handlerOpt.isEmpty()) {
             return false;
         }

@@ -1,5 +1,6 @@
 package com.leorces.engine.activity.command;
 
+import com.leorces.engine.core.ExecutionResultCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.runtime.process.Process;
 import lombok.Builder;
@@ -7,15 +8,15 @@ import lombok.Builder;
 import java.util.Optional;
 
 @Builder
-public record ExecutionResultCommand(
+public record FindActivityHandlerCommand(
         String code,
         String scope,
         Process process,
         ExecutionResultType type
-) implements com.leorces.engine.core.ExecutionResultCommand<Optional<ActivityDefinition>> {
+) implements ExecutionResultCommand<Optional<ActivityDefinition>> {
 
-    public static ExecutionResultCommand error(String code, String scope, Process process) {
-        return ExecutionResultCommand.builder()
+    public static FindActivityHandlerCommand error(String code, String scope, Process process) {
+        return FindActivityHandlerCommand.builder()
                 .code(code)
                 .scope(scope)
                 .process(process)
@@ -23,8 +24,8 @@ public record ExecutionResultCommand(
                 .build();
     }
 
-    public static ExecutionResultCommand escalation(String code, String scope, Process process) {
-        return ExecutionResultCommand.builder()
+    public static FindActivityHandlerCommand escalation(String code, String scope, Process process) {
+        return FindActivityHandlerCommand.builder()
                 .code(code)
                 .scope(scope)
                 .process(process)

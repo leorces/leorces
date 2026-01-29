@@ -1,7 +1,7 @@
 package com.leorces.engine.activity.behaviour;
 
 import com.leorces.api.exception.ExecutionException;
-import com.leorces.engine.activity.command.ExecutionResultCommand;
+import com.leorces.engine.activity.command.FindActivityHandlerCommand;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
@@ -76,8 +76,7 @@ public abstract class AbstractThrowEscalationBehavior extends AbstractActivityBe
                                                            ActivityExecution activity,
                                                            Process process) {
         for (var scope : activity.scope()) {
-            var command = ExecutionResultCommand.escalation(code, scope, process);
-            var handler = dispatcher.execute(command);
+            var handler = dispatcher.execute(FindActivityHandlerCommand.escalation(code, scope, process));
             if (handler.isPresent()) {
                 return (EscalationActivityDefinition) handler.get();
             }

@@ -1,8 +1,8 @@
 package com.leorces.engine.activity.handler;
 
 import com.leorces.api.exception.ExecutionException;
-import com.leorces.engine.activity.command.ExecutionResultCommand;
-import com.leorces.engine.activity.command.ExecutionResultCommand.ExecutionResultType;
+import com.leorces.engine.activity.command.FindActivityHandlerCommand;
+import com.leorces.engine.activity.command.FindActivityHandlerCommand.ExecutionResultType;
 import com.leorces.engine.core.ResultCommandHandler;
 import com.leorces.model.definition.activity.*;
 import com.leorces.model.runtime.process.Process;
@@ -15,10 +15,10 @@ import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
-public class ExecutionResultCommandHandler implements ResultCommandHandler<ExecutionResultCommand, Optional<ActivityDefinition>> {
+public class FindActivityHandlerCommandHandler implements ResultCommandHandler<FindActivityHandlerCommand, Optional<ActivityDefinition>> {
 
     @Override
-    public Optional<ActivityDefinition> execute(ExecutionResultCommand command) {
+    public Optional<ActivityDefinition> execute(FindActivityHandlerCommand command) {
         if (isProcessLevelScope(command.scope(), command.process())) {
             return findProcessLevelHandler(command);
         }
@@ -26,26 +26,26 @@ public class ExecutionResultCommandHandler implements ResultCommandHandler<Execu
     }
 
     @Override
-    public Class<ExecutionResultCommand> getCommandType() {
-        return ExecutionResultCommand.class;
+    public Class<FindActivityHandlerCommand> getCommandType() {
+        return FindActivityHandlerCommand.class;
     }
 
-    private Optional<ActivityDefinition> findProcessLevelHandler(ExecutionResultCommand command) {
+    private Optional<ActivityDefinition> findProcessLevelHandler(FindActivityHandlerCommand command) {
         return findProcessLevelStartEvent(command.code(), command.process(), command.type())
                 .or(() -> findProcessLevelStartEvent(null, command.process(), command.type()));
     }
 
-    private Optional<ActivityDefinition> findScopedHandler(ExecutionResultCommand command) {
+    private Optional<ActivityDefinition> findScopedHandler(FindActivityHandlerCommand command) {
         return findSpecificHandler(command)
                 .or(() -> findCommonHandler(command));
     }
 
-    private Optional<ActivityDefinition> findSpecificHandler(ExecutionResultCommand command) {
+    private Optional<ActivityDefinition> findSpecificHandler(FindActivityHandlerCommand command) {
         return findBoundaryEventInScope(command.code(), command.scope(), command.process(), command.type())
                 .or(() -> findStartEventInScope(command.code(), command.scope(), command.process(), command.type()));
     }
 
-    private Optional<ActivityDefinition> findCommonHandler(ExecutionResultCommand command) {
+    private Optional<ActivityDefinition> findCommonHandler(FindActivityHandlerCommand command) {
         return findBoundaryEventInScope(null, command.scope(), command.process(), command.type())
                 .or(() -> findStartEventInScope(null, command.scope(), command.process(), command.type()));
     }
