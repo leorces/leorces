@@ -10,6 +10,7 @@ public final class FIND_BY_KEY_AND_VERSION {
             """;
 
     private FIND_BY_KEY_AND_VERSION() {
+        // Index: uq_definition_key_version
     }
 
 }

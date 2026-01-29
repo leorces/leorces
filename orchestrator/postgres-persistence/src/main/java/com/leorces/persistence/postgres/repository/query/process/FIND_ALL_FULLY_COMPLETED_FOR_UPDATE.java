@@ -112,6 +112,7 @@ public class FIND_ALL_FULLY_COMPLETED_FOR_UPDATE {
             """;
 
     private FIND_ALL_FULLY_COMPLETED_FOR_UPDATE() {
+        // Index: idx_process_eligible
     }
 
 }

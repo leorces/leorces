@@ -39,6 +39,7 @@ public class FIND_ALL_FAILED_BY_PROCESS_ID {
             """;
 
     private FIND_ALL_FAILED_BY_PROCESS_ID() {
+        // Index: idx_activity_process_state
     }
 
 }

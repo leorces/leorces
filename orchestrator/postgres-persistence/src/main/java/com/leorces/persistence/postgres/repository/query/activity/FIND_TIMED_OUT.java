@@ -41,6 +41,7 @@ public class FIND_TIMED_OUT {
             """;
 
     private FIND_TIMED_OUT() {
+        // Index: idx_activity_timeout_state
     }
 
 }

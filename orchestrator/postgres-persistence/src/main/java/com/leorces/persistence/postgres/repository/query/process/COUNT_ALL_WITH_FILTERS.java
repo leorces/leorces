@@ -15,6 +15,7 @@ public class COUNT_ALL_WITH_FILTERS {
             """;
 
     private COUNT_ALL_WITH_FILTERS() {
+        // Index: pk_process, idx_process_definition_key, idx_process_business_key
     }
 
 }

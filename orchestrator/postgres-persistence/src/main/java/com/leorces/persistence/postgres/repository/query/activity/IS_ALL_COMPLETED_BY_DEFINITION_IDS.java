@@ -12,6 +12,7 @@ public class IS_ALL_COMPLETED_BY_DEFINITION_IDS {
             """;
 
     private IS_ALL_COMPLETED_BY_DEFINITION_IDS() {
+        // Index: idx_activity_process_def_state
     }
 
 }

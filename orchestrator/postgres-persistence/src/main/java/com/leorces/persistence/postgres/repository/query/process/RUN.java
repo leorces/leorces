@@ -35,6 +35,7 @@ public class RUN {
             """;
 
     private RUN() {
+        // Index: pk_definition_suspended
     }
 
 }

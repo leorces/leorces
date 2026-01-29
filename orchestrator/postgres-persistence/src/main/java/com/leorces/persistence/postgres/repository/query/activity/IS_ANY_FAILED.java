@@ -10,6 +10,7 @@ public class IS_ANY_FAILED {
             """;
 
     private IS_ANY_FAILED() {
+        // Index: idx_activity_process_state
     }
 
 }

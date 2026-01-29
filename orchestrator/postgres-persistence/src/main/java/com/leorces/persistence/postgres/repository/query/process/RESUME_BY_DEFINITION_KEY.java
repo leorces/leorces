@@ -22,6 +22,7 @@ public class RESUME_BY_DEFINITION_KEY {
             """;
 
     private RESUME_BY_DEFINITION_KEY() {
+        // Index: idx_process_definition_key, idx_process_parent_id
     }
 
 }

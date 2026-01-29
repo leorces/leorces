@@ -12,6 +12,7 @@ public class DELETE {
             """;
 
     private DELETE() {
+        // Index: pk_process
     }
 
 }

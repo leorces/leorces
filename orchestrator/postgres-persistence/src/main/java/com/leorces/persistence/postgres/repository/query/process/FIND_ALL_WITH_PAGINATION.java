@@ -37,6 +37,7 @@ public class FIND_ALL_WITH_PAGINATION {
             """;
 
     private FIND_ALL_WITH_PAGINATION() {
+        // Index: idx_process_created_at, pk_process, idx_process_definition_key, idx_process_business_key
     }
 
 }

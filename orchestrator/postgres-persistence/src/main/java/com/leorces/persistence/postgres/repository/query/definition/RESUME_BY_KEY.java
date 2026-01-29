@@ -13,6 +13,7 @@ public final class RESUME_BY_KEY {
             """;
 
     private RESUME_BY_KEY() {
+        // Index: uq_definition_key_version, pk_definition_suspended
     }
 
 }

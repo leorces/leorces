@@ -10,6 +10,7 @@ public final class FIND_ALL_WITH_PAGINATION {
             """;
 
     private FIND_ALL_WITH_PAGINATION() {
+        // Index: idx_history_created_at
     }
 
 }

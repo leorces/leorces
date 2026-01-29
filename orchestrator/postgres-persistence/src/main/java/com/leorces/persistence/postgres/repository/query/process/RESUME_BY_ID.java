@@ -22,6 +22,7 @@ public class RESUME_BY_ID {
             """;
 
     private RESUME_BY_ID() {
+        // Index: pk_process, idx_process_parent_id
     }
 
 }

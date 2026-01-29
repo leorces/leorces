@@ -11,6 +11,7 @@ public final class SUSPEND_BY_ID {
             """;
 
     private SUSPEND_BY_ID() {
+        // Index: pk_definition_suspended
     }
 
 }

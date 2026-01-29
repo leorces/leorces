@@ -11,6 +11,7 @@ public final class RESUME_BY_ID {
             """;
 
     private RESUME_BY_ID() {
+        // Index: pk_definition_suspended
     }
 
 }

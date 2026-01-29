@@ -10,6 +10,7 @@ public class CHANGE_STATE {
             """;
 
     private CHANGE_STATE() {
+        // Index: pk_activity
     }
 
 }

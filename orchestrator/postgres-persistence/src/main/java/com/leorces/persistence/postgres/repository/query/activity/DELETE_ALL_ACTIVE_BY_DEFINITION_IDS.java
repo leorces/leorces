@@ -12,6 +12,7 @@ public class DELETE_ALL_ACTIVE_BY_DEFINITION_IDS {
             """;
 
     private DELETE_ALL_ACTIVE_BY_DEFINITION_IDS() {
+        // Index: idx_activity_process_def_state
     }
 
 }

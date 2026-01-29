@@ -60,6 +60,7 @@ public class FIND_ALL_BY_FILTERS {
             """;
 
     private FIND_ALL_BY_FILTERS() {
+        // Index: pk_process, idx_process_definition_key, idx_process_definition_id, idx_process_business_key
     }
 
 }

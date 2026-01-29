@@ -10,6 +10,7 @@ public final class COUNT_ALL_WITH_FILTERS {
             """;
 
     private COUNT_ALL_WITH_FILTERS() {
+        // Index: idx_definition_search_trgm
     }
 
 }

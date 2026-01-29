@@ -11,6 +11,7 @@ public final class FIND_LATEST_BY_KEY {
             """;
 
     private FIND_LATEST_BY_KEY() {
+        // Index: uq_definition_key_version
     }
 
 }
