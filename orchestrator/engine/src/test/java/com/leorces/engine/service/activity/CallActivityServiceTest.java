@@ -1,6 +1,7 @@
 package com.leorces.engine.service.activity;
 
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.variables.command.GetProcessVariablesCommand;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.*;
 class CallActivityServiceTest {
 
     @Mock
-    private VariablesService variablesService;
+    private CommandDispatcher dispatcher;
 
     @Mock
     private ExpressionEvaluator expressionEvaluator;
@@ -118,7 +119,7 @@ class CallActivityServiceTest {
 
         when(callActivity.outputMappings()).thenReturn(List.of(mapping));
         when(callActivity.shouldProcessAllOutputMappings()).thenReturn(false);
-        when(variablesService.getProcessVariables("exec1")).thenReturn(processVariables);
+        when(dispatcher.execute(GetProcessVariablesCommand.of("exec1"))).thenReturn(processVariables);
         when(activity.id()).thenReturn("exec1");
 
         // when
@@ -136,7 +137,7 @@ class CallActivityServiceTest {
         var result = callActivityService.getInputMappings(activity, Map.of());
 
         assertThat(result).isEmpty();
-        verifyNoInteractions(variablesService);
+        verifyNoInteractions(dispatcher);
     }
 
     @Test
@@ -147,7 +148,7 @@ class CallActivityServiceTest {
         var result = callActivityService.getOutputMappings(activity);
 
         assertThat(result).isEmpty();
-        verifyNoInteractions(variablesService);
+        verifyNoInteractions(dispatcher);
     }
 
     @Test

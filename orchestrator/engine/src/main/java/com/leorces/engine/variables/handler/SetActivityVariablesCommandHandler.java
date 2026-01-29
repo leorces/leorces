@@ -1,8 +1,9 @@
 package com.leorces.engine.variables.handler;
 
+import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.EvaluateVariablesCommand;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SetActivityVariablesCommandHandler implements CommandHandler<SetActivityVariablesCommand> {
 
-    private final VariablesService variablesService;
+    private final VariablesMapper variablesMapper;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -25,8 +26,8 @@ public class SetActivityVariablesCommandHandler implements CommandHandler<SetAct
         var activity = command.activity();
         var variables = command.variables();
 
-        var outputVariables = variablesService.evaluate(activity, activity.outputs());
-        var outputVariablesMap = variablesService.toMap(outputVariables);
+        var outputVariables = dispatcher.execute(EvaluateVariablesCommand.of(activity, activity.outputs()));
+        var outputVariablesMap = variablesMapper.toMap(outputVariables);
         var combinedVariables = combineVariables(variables, outputVariablesMap);
         dispatcher.dispatch(SetVariablesCommand.of(activity.process(), combinedVariables));
     }

@@ -6,7 +6,7 @@ import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.service.activity.ActivityFactory;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.EvaluateVariablesCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -38,9 +38,6 @@ class RunActivityCommandHandlerTest {
 
     private static final String DEF_ID = "def-1";
     private static final String PROC_ID = "proc-1";
-
-    @Mock
-    private VariablesService variablesService;
 
     @Mock
     private ActivityBehaviorResolver behaviorResolver;
@@ -82,7 +79,7 @@ class RunActivityCommandHandlerTest {
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK))
                 .thenReturn(activityBehavior);
 
-        when(variablesService.evaluate(any(ActivityExecution.class), any(Map.class)))
+        when(dispatcher.execute(any(EvaluateVariablesCommand.class)))
                 .thenReturn(List.<Variable>of());
     }
 
@@ -102,9 +99,8 @@ class RunActivityCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(variablesService).evaluate(activityExecution, activityExecution.inputs());
+        verify(dispatcher).execute(any(EvaluateVariablesCommand.class));
         verify(activityBehavior).run(any(ActivityExecution.class));
-        verifyNoInteractions(dispatcher);
     }
 
     @Test
@@ -145,10 +141,8 @@ class RunActivityCommandHandlerTest {
         handler.handle(command);
 
         verifyNoInteractions(
-                variablesService,
                 behaviorResolver,
-                activityBehavior,
-                dispatcher
+                activityBehavior
         );
     }
 

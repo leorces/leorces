@@ -1,10 +1,12 @@
 package com.leorces.engine.process.handler;
 
 import com.leorces.api.exception.ExecutionException;
+import com.leorces.common.mapper.VariablesMapper;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.ResultCommandHandler;
 import com.leorces.engine.process.command.CreateProcessByCallActivityCommand;
 import com.leorces.engine.service.activity.CallActivityService;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.GetScopedVariablesCommand;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
@@ -24,9 +26,10 @@ import java.util.Optional;
 public class CreateProcessByCallActivityCommandHandler implements ResultCommandHandler<CreateProcessByCallActivityCommand, Process> {
 
     private final CallActivityService callActivityService;
-    private final VariablesService variablesService;
+    private final VariablesMapper variablesMapper;
     private final DefinitionPersistence definitionPersistence;
     private final ExpressionEvaluator expressionEvaluator;
+    private final CommandDispatcher dispatcher;
 
     @Override
     public Process execute(CreateProcessByCallActivityCommand command) {
@@ -46,7 +49,7 @@ public class CreateProcessByCallActivityCommandHandler implements ResultCommandH
 
     private Map<String, Object> resolveScopedVariables(ActivityExecution activity, CallActivity callActivity) {
         return shouldFetchScopedVariables(callActivity)
-                ? variablesService.getScopedVariables(activity)
+                ? dispatcher.execute(GetScopedVariablesCommand.of(activity))
                 : Map.of();
     }
 
@@ -66,7 +69,7 @@ public class CreateProcessByCallActivityCommandHandler implements ResultCommandH
                 .rootProcessId(resolveRootProcessId(parentProcess))
                 .businessKey(parentProcess.businessKey())
                 .definition(definition)
-                .variables(variablesService.toList(inputMappings))
+                .variables(variablesMapper.map(inputMappings))
                 .suspended(parentProcess.suspended())
                 .build();
     }

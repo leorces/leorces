@@ -1,9 +1,11 @@
 package com.leorces.engine.process.handler;
 
 import com.leorces.api.exception.ExecutionException;
+import com.leorces.common.mapper.VariablesMapper;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.CreateProcessByCallActivityCommand;
 import com.leorces.engine.service.activity.CallActivityService;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.GetScopedVariablesCommand;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
@@ -40,11 +42,13 @@ class CreateProcessByCallActivityCommandHandlerTest {
     @Mock
     private CallActivityService callActivityService;
     @Mock
-    private VariablesService variablesService;
+    private VariablesMapper variablesMapper;
     @Mock
     private DefinitionPersistence definitionPersistence;
     @Mock
     private ExpressionEvaluator expressionEvaluator;
+    @Mock
+    private CommandDispatcher dispatcher;
 
     @InjectMocks
     private CreateProcessByCallActivityCommandHandler handler;
@@ -91,7 +95,7 @@ class CreateProcessByCallActivityCommandHandlerTest {
         when(expressionEvaluator.isExpression(CALLED_ELEMENT)).thenReturn(false);
         when(definitionPersistence.findLatestByKey(CALLED_ELEMENT)).thenReturn(Optional.of(subProcessDefinition));
         when(callActivityService.getInputMappings(eq(activity), any())).thenReturn(inputMappings);
-        when(variablesService.toList(inputMappings)).thenReturn(List.of());
+        when(variablesMapper.map(inputMappings)).thenReturn(List.of());
 
         // When
         var result = handler.execute(command);
@@ -132,7 +136,7 @@ class CreateProcessByCallActivityCommandHandlerTest {
 
     private void mockExpressionEvaluation(String expression, String resolvedKey, Map<String, Object> scopedVariables, ActivityExecution activityWithExpression) {
         when(expressionEvaluator.isExpression(expression)).thenReturn(true);
-        when(variablesService.getScopedVariables(activityWithExpression)).thenReturn(scopedVariables);
+        when(dispatcher.execute(GetScopedVariablesCommand.of(activityWithExpression))).thenReturn(scopedVariables);
         when(expressionEvaluator.evaluateString(expression, scopedVariables)).thenReturn(resolvedKey);
     }
 

@@ -1,10 +1,10 @@
 package com.leorces.engine.correlation.handler;
 
+import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.correlation.command.CorrelateVariablesCommand;
-import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ConditionalActivityDefinition;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CorrelateVariablesCommandHandler implements CommandHandler<CorrelateVariablesCommand> {
 
-    private final VariablesService variablesService;
+    private final VariablesMapper variablesMapper;
     private final ExpressionEvaluator expressionEvaluator;
     private final CommandDispatcher dispatcher;
 
@@ -63,7 +63,7 @@ public class CorrelateVariablesCommandHandler implements CommandHandler<Correlat
                 .flatMap(id -> variablesByExecutionId.getOrDefault(id, List.of()).stream())
                 .toList();
 
-        var variablesMap = variablesService.toMap(variablesInScope);
+        var variablesMap = variablesMapper.toMap(variablesInScope);
         return expressionEvaluator.evaluateBoolean(condition, variablesMap);
     }
 

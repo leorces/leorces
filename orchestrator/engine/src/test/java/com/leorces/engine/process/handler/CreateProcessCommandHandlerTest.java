@@ -1,10 +1,10 @@
 package com.leorces.engine.process.handler;
 
 import com.leorces.api.exception.ExecutionException;
+import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.CreateProcessByCallActivityCommand;
 import com.leorces.engine.process.command.CreateProcessCommand;
-import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
@@ -34,7 +34,7 @@ class CreateProcessCommandHandlerTest {
     private static final String BUSINESS_KEY = "business-key";
 
     @Mock
-    private VariablesService variablesService;
+    private VariablesMapper variablesMapper;
     @Mock
     private DefinitionPersistence definitionPersistence;
     @Mock
@@ -69,7 +69,7 @@ class CreateProcessCommandHandlerTest {
         var definition = ProcessDefinition.builder().id(DEFINITION_ID).build();
 
         when(definitionPersistence.findById(DEFINITION_ID)).thenReturn(Optional.of(definition));
-        when(variablesService.toList(variables)).thenReturn(List.of());
+        when(variablesMapper.map(variables)).thenReturn(List.of());
 
         // When
         var result = handler.execute(command);
@@ -88,7 +88,7 @@ class CreateProcessCommandHandlerTest {
         var definition = ProcessDefinition.builder().key(DEFINITION_KEY).build();
 
         when(definitionPersistence.findLatestByKey(DEFINITION_KEY)).thenReturn(Optional.of(definition));
-        when(variablesService.toList(variables)).thenReturn(List.of());
+        when(variablesMapper.map(variables)).thenReturn(List.of());
 
         // When
         var result = handler.execute(command);

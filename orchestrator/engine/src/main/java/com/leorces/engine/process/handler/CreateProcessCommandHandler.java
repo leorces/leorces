@@ -1,11 +1,11 @@
 package com.leorces.engine.process.handler;
 
 import com.leorces.api.exception.ExecutionException;
+import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.ResultCommandHandler;
 import com.leorces.engine.process.command.CreateProcessByCallActivityCommand;
 import com.leorces.engine.process.command.CreateProcessCommand;
-import com.leorces.engine.service.variable.VariablesService;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.DefinitionPersistence;
@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CreateProcessCommandHandler implements ResultCommandHandler<CreateProcessCommand, Process> {
 
-    private final VariablesService variablesService;
+    private final VariablesMapper variablesMapper;
     private final DefinitionPersistence definitionPersistence;
     private final CommandDispatcher dispatcher;
 
@@ -67,7 +67,7 @@ public class CreateProcessCommandHandler implements ResultCommandHandler<CreateP
     private Process buildProcess(ProcessDefinition definition, String businessKey, Map<String, Object> variables) {
         return Process.builder()
                 .businessKey(businessKey)
-                .variables(variablesService.toList(variables))
+                .variables(variablesMapper.map(variables))
                 .definition(definition)
                 .build();
     }

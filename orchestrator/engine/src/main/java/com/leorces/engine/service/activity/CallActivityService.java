@@ -1,6 +1,7 @@
 package com.leorces.engine.service.activity;
 
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.variables.command.GetProcessVariablesCommand;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
@@ -16,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CallActivityService {
 
-    private final VariablesService variablesService;
+    private final CommandDispatcher dispatcher;
     private final ExpressionEvaluator expressionEvaluator;
 
     public Map<String, Object> getInputMappings(ActivityExecution activity, Map<String, Object> variables) {
@@ -33,7 +34,7 @@ public class CallActivityService {
         if (mappings == null) {
             return Map.of();
         }
-        var processVariables = variablesService.getProcessVariables(activity.id());
+        var processVariables = dispatcher.execute(GetProcessVariablesCommand.of(activity.id()));
         return resolveMappings(mappings, processVariables, callActivity.shouldProcessAllOutputMappings());
     }
 
