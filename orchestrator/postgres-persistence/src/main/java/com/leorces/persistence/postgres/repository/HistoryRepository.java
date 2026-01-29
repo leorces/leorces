@@ -10,12 +10,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.leorces.persistence.postgres.repository.query.HistoryQueries.FIND_ALL_WITH_PAGINATION;
+import static com.leorces.persistence.postgres.repository.query.history.FIND_ALL_WITH_PAGINATION.FIND_ALL_WITH_PAGINATION_QUERY;
 
 @Repository
 public interface HistoryRepository extends CrudRepository<HistoryEntity, String> {
 
-    @Query(FIND_ALL_WITH_PAGINATION)
+    @Query(FIND_ALL_WITH_PAGINATION_QUERY)
     List<HistoryEntity> findAllWithPagination(@Param("offset") long offset,
                                               @Param("limit") int limit);
 

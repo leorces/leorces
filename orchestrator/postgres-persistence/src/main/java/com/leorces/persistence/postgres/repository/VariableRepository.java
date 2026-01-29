@@ -8,17 +8,17 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.leorces.persistence.postgres.repository.query.VariableQueries.FIND_ALL_PROCESS_VARIABLES;
-import static com.leorces.persistence.postgres.repository.query.VariableQueries.FIND_ALL_VARIABLES_WITHIN_SCOPE;
+import static com.leorces.persistence.postgres.repository.query.variable.FIND_ALL_PROCESS_VARIABLES.FIND_ALL_PROCESS_VARIABLES_QUERY;
+import static com.leorces.persistence.postgres.repository.query.variable.FIND_ALL_VARIABLES_WITHIN_SCOPE.FIND_ALL_VARIABLES_WITHIN_SCOPE_QUERY;
 
 @Repository
 public interface VariableRepository extends CrudRepository<VariableEntity, String> {
 
-    @Query(FIND_ALL_VARIABLES_WITHIN_SCOPE)
+    @Query(FIND_ALL_VARIABLES_WITHIN_SCOPE_QUERY)
     List<VariableEntity> findInScope(@Param("processId") String processId,
                                      @Param("scope") String[] scope);
 
-    @Query(FIND_ALL_PROCESS_VARIABLES)
+    @Query(FIND_ALL_PROCESS_VARIABLES_QUERY)
     List<VariableEntity> findInProcess(@Param("processId") String processId);
 
 }
