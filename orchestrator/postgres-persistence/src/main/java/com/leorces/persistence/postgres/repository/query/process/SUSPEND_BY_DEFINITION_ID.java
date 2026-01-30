@@ -22,6 +22,7 @@ public class SUSPEND_BY_DEFINITION_ID {
             """;
 
     private SUSPEND_BY_DEFINITION_ID() {
+        // Index: idx_process_definition_id, idx_process_parent_id
     }
 
 }

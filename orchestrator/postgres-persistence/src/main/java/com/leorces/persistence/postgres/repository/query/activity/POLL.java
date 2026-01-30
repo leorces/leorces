@@ -44,6 +44,7 @@ public class POLL {
             """;
 
     private POLL() {
+        // Index: idx_activity_topic_process_key_state
     }
 
 }

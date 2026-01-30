@@ -2,8 +2,9 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
-import com.leorces.engine.service.activity.ActivityFactory;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
@@ -33,7 +34,7 @@ class TerminateActivityCommandHandlerTest {
     private ActivityBehaviorResolver behaviorResolver;
 
     @Mock
-    private ActivityFactory activityFactory;
+    private CommandDispatcher dispatcher;
 
     @Mock
     private ActivityBehavior activityBehavior;
@@ -99,14 +100,14 @@ class TerminateActivityCommandHandlerTest {
     @DisplayName("Should fetch activity by ID when only activityId provided")
     void shouldFetchActivityByIdWhenOnlyActivityIdProvided() {
         // given
-        when(activityFactory.getById(ACTIVITY_ID)).thenReturn(activityExecution);
+        when(dispatcher.execute(FindActivityCommand.byId(ACTIVITY_ID))).thenReturn(activityExecution);
         var command = TerminateActivityCommand.of(ACTIVITY_ID, false);
 
         // when
         handler.handle(command);
 
         // then
-        verify(activityFactory).getById(ACTIVITY_ID);
+        verify(dispatcher).execute(FindActivityCommand.byId(ACTIVITY_ID));
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
         verify(activityBehavior).terminate(activityExecution, false);
     }
@@ -115,14 +116,14 @@ class TerminateActivityCommandHandlerTest {
     @DisplayName("Should fetch activity by definitionId and processId if no ID or activity provided")
     void shouldFetchByDefinitionIdAndProcessIdIfNoIdOrActivityProvided() {
         // given
-        when(activityFactory.getByDefinitionId(DEFINITION_ID, PROCESS_ID)).thenReturn(activityExecution);
+        when(dispatcher.execute(FindActivityCommand.byDefinitionId(PROCESS_ID, DEFINITION_ID))).thenReturn(activityExecution);
         var command = TerminateActivityCommand.of(PROCESS_ID, DEFINITION_ID, false);
 
         // when
         handler.handle(command);
 
         // then
-        verify(activityFactory).getByDefinitionId(DEFINITION_ID, PROCESS_ID);
+        verify(dispatcher).execute(FindActivityCommand.byDefinitionId(PROCESS_ID, DEFINITION_ID));
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
         verify(activityBehavior).terminate(activityExecution, false);
     }

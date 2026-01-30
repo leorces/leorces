@@ -1,12 +1,12 @@
 package com.leorces.engine.activity.behaviour.subprocess;
 
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.command.GetCallActivityMappingsCommand;
 import com.leorces.engine.activity.command.RetryAllActivitiesCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.DeleteProcessCommand;
 import com.leorces.engine.process.command.RunProcessCommand;
 import com.leorces.engine.process.command.TerminateProcessCommand;
-import com.leorces.engine.service.activity.CallActivityService;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.persistence.ActivityPersistence;
@@ -18,26 +18,22 @@ import java.util.Map;
 @Component
 public class CallActivityBehavior extends AbstractActivityBehavior {
 
-    private final CallActivityService callActivityService;
-
     protected CallActivityBehavior(ActivityPersistence activityPersistence,
-                                   CommandDispatcher dispatcher,
-                                   CallActivityService callActivityService) {
+                                   CommandDispatcher dispatcher) {
         super(activityPersistence, dispatcher);
-        this.callActivityService = callActivityService;
     }
 
     @Override
     public void run(ActivityExecution callActivity) {
         var newCallActivity = activityPersistence.run(callActivity);
-        dispatcher.dispatch(RunProcessCommand.of(newCallActivity));
+        dispatcher.dispatch(RunProcessCommand.byCallActivity(newCallActivity));
     }
 
     @Override
     public void complete(ActivityExecution activity, Map<String, Object> variables) {
         var completedCallActivity = activityPersistence.complete(activity);
         var outputVariables = combineVariables(
-                callActivityService.getOutputMappings(activity),
+                dispatcher.execute(GetCallActivityMappingsCommand.output(activity)),
                 variables
         );
         postComplete(completedCallActivity, outputVariables);

@@ -3,7 +3,7 @@ package com.leorces.engine.activity.behaviour.gateway;
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractConditionalGatewayBehavior;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.GetScopedVariablesCommand;
 import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
@@ -18,14 +18,10 @@ import java.util.Map;
 @Component
 public class ExclusiveGatewayBehavior extends AbstractConditionalGatewayBehavior {
 
-    private final VariablesService variablesService;
-
     protected ExclusiveGatewayBehavior(ExpressionEvaluator expressionEvaluator,
-                                       VariablesService variablesService,
                                        ActivityPersistence activityPersistence,
                                        CommandDispatcher dispatcher) {
         super(activityPersistence, expressionEvaluator, dispatcher);
-        this.variablesService = variablesService;
     }
 
     @Override
@@ -42,7 +38,7 @@ public class ExclusiveGatewayBehavior extends AbstractConditionalGatewayBehavior
 
     @Override
     public List<ActivityDefinition> getNextActivities(ActivityExecution exclusiveGateway) {
-        var variables = variablesService.getScopedVariables(exclusiveGateway);
+        var variables = dispatcher.execute(GetScopedVariablesCommand.of(exclusiveGateway));
         var condition = ((ExclusiveGateway) exclusiveGateway.definition()).condition();
         var nextActivityIds = evaluateExclusiveConditions(condition, variables);
         return getNextActivities(exclusiveGateway.processDefinition(), nextActivityIds);

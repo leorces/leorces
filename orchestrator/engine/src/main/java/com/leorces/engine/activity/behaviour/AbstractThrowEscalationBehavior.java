@@ -1,9 +1,9 @@
 package com.leorces.engine.activity.behaviour;
 
 import com.leorces.api.exception.ExecutionException;
+import com.leorces.engine.activity.command.FindActivityHandlerCommand;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.service.resolver.EscalationHandlerResolver;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.model.definition.activity.EscalationActivityDefinition;
 import com.leorces.model.definition.activity.event.boundary.EscalationBoundaryEvent;
@@ -17,13 +17,9 @@ import java.util.Map;
 
 public abstract class AbstractThrowEscalationBehavior extends AbstractActivityBehavior {
 
-    private final EscalationHandlerResolver escalationHandlerResolver;
-
     protected AbstractThrowEscalationBehavior(ActivityPersistence activityPersistence,
-                                              CommandDispatcher dispatcher,
-                                              EscalationHandlerResolver escalationHandlerResolver) {
+                                              CommandDispatcher dispatcher) {
         super(activityPersistence, dispatcher);
-        this.escalationHandlerResolver = escalationHandlerResolver;
     }
 
     @Override
@@ -80,9 +76,9 @@ public abstract class AbstractThrowEscalationBehavior extends AbstractActivityBe
                                                            ActivityExecution activity,
                                                            Process process) {
         for (var scope : activity.scope()) {
-            var handler = escalationHandlerResolver.resolve(code, scope, process);
+            var handler = dispatcher.execute(FindActivityHandlerCommand.escalation(code, scope, process));
             if (handler.isPresent()) {
-                return handler.get();
+                return (EscalationActivityDefinition) handler.get();
             }
         }
         return null;

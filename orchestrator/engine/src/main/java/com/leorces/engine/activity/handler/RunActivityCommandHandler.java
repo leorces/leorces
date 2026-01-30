@@ -1,12 +1,12 @@
 package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.command.CreateActivityCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
-import com.leorces.engine.service.activity.ActivityFactory;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.EvaluateVariablesCommand;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RunActivityCommandHandler implements CommandHandler<RunActivityCommand> {
 
-    private final VariablesService variablesService;
     private final ActivityBehaviorResolver behaviorResolver;
-    private final ActivityFactory activityFactory;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -44,7 +42,7 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
     }
 
     private ActivityExecution processInputVariables(ActivityExecution activity) {
-        var variables = variablesService.evaluate(activity, activity.inputs());
+        var variables = dispatcher.execute(EvaluateVariablesCommand.of(activity, activity.inputs()));
         return activity.toBuilder().variables(variables).build();
     }
 
@@ -59,11 +57,12 @@ public class RunActivityCommandHandler implements CommandHandler<RunActivityComm
             return command.activity();
         }
 
-        if (command.definitionId() != null) {
-            return activityFactory.getNewByDefinitionId(command.definitionId(), command.processId());
-        }
-
-        return activityFactory.createActivity(command.definition(), command.process());
+        return dispatcher.execute(CreateActivityCommand.of(
+                command.definition(),
+                command.process(),
+                command.definitionId(),
+                command.processId()
+        ));
     }
 
     private boolean canHandle(ActivityExecution activity) {

@@ -103,6 +103,7 @@ public class FIND_EXECUTIONS_FOR_UPDATE {
             """;
 
     private FIND_EXECUTIONS_FOR_UPDATE() {
+        // Index: idx_process_definition_id
     }
 
 }

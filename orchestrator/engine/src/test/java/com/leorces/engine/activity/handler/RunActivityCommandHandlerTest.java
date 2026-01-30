@@ -2,11 +2,11 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.command.CreateActivityCommand;
 import com.leorces.engine.activity.command.RunActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.service.activity.ActivityFactory;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.EvaluateVariablesCommand;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -25,7 +25,6 @@ import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,13 +39,7 @@ class RunActivityCommandHandlerTest {
     private static final String PROC_ID = "proc-1";
 
     @Mock
-    private VariablesService variablesService;
-
-    @Mock
     private ActivityBehaviorResolver behaviorResolver;
-
-    @Mock
-    private ActivityFactory activityFactory;
 
     @Mock
     private ActivityBehavior activityBehavior;
@@ -82,7 +75,7 @@ class RunActivityCommandHandlerTest {
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK))
                 .thenReturn(activityBehavior);
 
-        when(variablesService.evaluate(any(ActivityExecution.class), any(Map.class)))
+        when(dispatcher.execute(any(EvaluateVariablesCommand.class)))
                 .thenReturn(List.<Variable>of());
     }
 
@@ -102,36 +95,35 @@ class RunActivityCommandHandlerTest {
 
         handler.handle(command);
 
-        verify(variablesService).evaluate(activityExecution, activityExecution.inputs());
+        verify(dispatcher).execute(any(EvaluateVariablesCommand.class));
         verify(activityBehavior).run(any(ActivityExecution.class));
-        verifyNoInteractions(dispatcher);
     }
 
     @Test
     @DisplayName("should run activity from definitionId")
     void shouldRunFromDefinitionId() {
-        when(activityFactory.getNewByDefinitionId(DEF_ID, PROC_ID))
+        when(dispatcher.execute(CreateActivityCommand.of(DEF_ID, PROC_ID)))
                 .thenReturn(activityExecution);
 
         var command = RunActivityCommand.of(DEF_ID, PROC_ID);
 
         handler.handle(command);
 
-        verify(activityFactory).getNewByDefinitionId(DEF_ID, PROC_ID);
+        verify(dispatcher).execute(CreateActivityCommand.of(DEF_ID, PROC_ID));
         verify(activityBehavior).run(any(ActivityExecution.class));
     }
 
     @Test
     @DisplayName("should run activity from definition + process")
     void shouldRunFromDefinitionAndProcess() {
-        when(activityFactory.createActivity(activityDefinition, process))
+        when(dispatcher.execute(CreateActivityCommand.of(activityDefinition, process)))
                 .thenReturn(activityExecution);
 
         var command = RunActivityCommand.of(process, activityDefinition);
 
         handler.handle(command);
 
-        verify(activityFactory).createActivity(activityDefinition, process);
+        verify(dispatcher).execute(CreateActivityCommand.of(activityDefinition, process));
         verify(activityBehavior).run(any(ActivityExecution.class));
     }
 
@@ -145,10 +137,8 @@ class RunActivityCommandHandlerTest {
         handler.handle(command);
 
         verifyNoInteractions(
-                variablesService,
                 behaviorResolver,
-                activityBehavior,
-                dispatcher
+                activityBehavior
         );
     }
 

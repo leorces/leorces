@@ -2,7 +2,6 @@ package com.leorces.engine.activity.behaviour.event.end;
 
 import com.leorces.engine.activity.behaviour.AbstractThrowEscalationBehavior;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.service.resolver.EscalationHandlerResolver;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -15,9 +14,8 @@ import java.util.List;
 public class EscalationEndEventBehavior extends AbstractThrowEscalationBehavior {
 
     protected EscalationEndEventBehavior(ActivityPersistence activityPersistence,
-                                         CommandDispatcher dispatcher,
-                                         EscalationHandlerResolver escalationHandlerResolver) {
-        super(activityPersistence, dispatcher, escalationHandlerResolver);
+                                         CommandDispatcher dispatcher) {
+        super(activityPersistence, dispatcher);
     }
 
     @Override

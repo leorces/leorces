@@ -1,9 +1,10 @@
 package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class TerminateActivityCommandHandler implements CommandHandler<TerminateActivityCommand> {
 
     private final ActivityBehaviorResolver behaviorResolver;
-    private final ActivityFactory activityFactory;
+    private final CommandDispatcher dispatcher;
 
     @Override
     public void handle(TerminateActivityCommand command) {
@@ -40,11 +41,11 @@ public class TerminateActivityCommandHandler implements CommandHandler<Terminate
             return command.activity();
         }
 
-        if (command.activityId() != null) {
-            return activityFactory.getById(command.activityId());
-        }
-
-        return activityFactory.getByDefinitionId(command.definitionId(), command.processId());
+        return dispatcher.execute(FindActivityCommand.of(
+                command.activityId(),
+                command.processId(),
+                command.definitionId()
+        ));
     }
 
     private boolean canHandle(ActivityExecution activity) {

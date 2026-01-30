@@ -4,7 +4,7 @@ import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.FailActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.IncidentProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ProcessPersistence;
@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static com.leorces.engine.constants.MetricConstants.PROCESS_INCIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -30,9 +31,6 @@ class IncidentProcessCommandHandlerTest {
 
     @Mock
     private ProcessPersistence processPersistence;
-
-    @Mock
-    private ProcessMetrics processMetrics;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -62,8 +60,7 @@ class IncidentProcessCommandHandlerTest {
         handler.handle(command);
 
         verify(processPersistence).incident(process.id());
-        verify(processMetrics).recordProcessIncidentMetric(process);
-        verify(dispatcher, never()).dispatchAsync(any());
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_INCIDENT, process));
     }
 
     @Test
@@ -84,7 +81,7 @@ class IncidentProcessCommandHandlerTest {
         handler.handle(command);
 
         verify(processPersistence).incident(process.id());
-        verify(processMetrics).recordProcessIncidentMetric(process);
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_INCIDENT, process));
 
         ArgumentCaptor<FailActivityCommand> captor = ArgumentCaptor.forClass(FailActivityCommand.class);
         verify(dispatcher).dispatchAsync(captor.capture());
@@ -108,7 +105,7 @@ class IncidentProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verifyNoInteractions(processMetrics, dispatcher);
+        verifyNoInteractions(dispatcher);
         verify(processPersistence, never()).incident(process.id());
     }
 
@@ -121,7 +118,7 @@ class IncidentProcessCommandHandlerTest {
         assertThatThrownBy(() -> handler.handle(command))
                 .isInstanceOf(ExecutionException.class);
 
-        verifyNoInteractions(processMetrics, dispatcher);
+        verifyNoInteractions(dispatcher);
     }
 
 }

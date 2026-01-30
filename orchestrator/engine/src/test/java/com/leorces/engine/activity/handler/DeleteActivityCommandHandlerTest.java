@@ -3,7 +3,8 @@ package com.leorces.engine.activity.handler;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.DeleteActivityCommand;
-import com.leorces.engine.service.activity.ActivityFactory;
+import com.leorces.engine.activity.command.FindActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
@@ -24,7 +25,7 @@ class DeleteActivityCommandHandlerTest {
     private ActivityBehaviorResolver behaviorResolver;
 
     @Mock
-    private ActivityFactory activityFactory;
+    private CommandDispatcher dispatcher;
 
     @InjectMocks
     private DeleteActivityCommandHandler handler;
@@ -49,7 +50,7 @@ class DeleteActivityCommandHandlerTest {
         var process = mock(Process.class);
         var behavior = mock(ActivityBehavior.class);
 
-        when(activityFactory.getById(activityId)).thenReturn(activity);
+        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
         when(activity.isInTerminalState()).thenReturn(false);
         when(activity.process()).thenReturn(process);
         when(process.isInTerminalState()).thenReturn(false);
@@ -73,7 +74,7 @@ class DeleteActivityCommandHandlerTest {
         var process = mock(Process.class);
         var behavior = mock(ActivityBehavior.class);
 
-        when(activityFactory.getById(activityId)).thenReturn(activity);
+        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
         when(activity.isInTerminalState()).thenReturn(false);
         when(activity.process()).thenReturn(process);
         when(process.isInTerminalState()).thenReturn(true);
@@ -96,7 +97,7 @@ class DeleteActivityCommandHandlerTest {
         var command = DeleteActivityCommand.of(activityId);
         var activity = mock(ActivityExecution.class);
 
-        when(activityFactory.getById(activityId)).thenReturn(activity);
+        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
         when(activity.isInTerminalState()).thenReturn(true);
 
         // When
@@ -115,7 +116,7 @@ class DeleteActivityCommandHandlerTest {
         var activity = mock(ActivityExecution.class);
         var process = mock(Process.class);
 
-        when(activityFactory.getById(activityId)).thenReturn(activity);
+        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
         when(activity.isInTerminalState()).thenReturn(false);
         when(activity.process()).thenReturn(process);
         when(process.isInTerminalState()).thenReturn(true);

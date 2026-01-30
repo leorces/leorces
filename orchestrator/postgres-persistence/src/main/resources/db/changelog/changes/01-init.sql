@@ -29,7 +29,7 @@ CREATE INDEX IF NOT EXISTS idx_definition_created
 
 CREATE INDEX IF NOT EXISTS idx_definition_search_trgm
     ON definition
-        USING GIN ((definition_id::TEXT || ' ' || definition_key || ' ' || definition_name) gin_trgm_ops);
+        USING GIN ((definition_id || ' ' || definition_key || ' ' || definition_name) gin_trgm_ops);
 
 -- ============================
 -- Table: definition_suspended
@@ -78,8 +78,11 @@ CREATE INDEX IF NOT EXISTS idx_process_created_at
 CREATE INDEX IF NOT EXISTS idx_process_completed_at
     ON process (process_completed_at);
 
+CREATE INDEX IF NOT EXISTS idx_process_business_key
+    ON process (process_business_key);
+
 CREATE INDEX IF NOT EXISTS idx_process_eligible
-    ON process (process_state, root_process_id)
+    ON process (process_state, process_completed_at)
     WHERE process_state IN ('COMPLETED', 'TERMINATED', 'DELETED');
 
 CREATE INDEX IF NOT EXISTS idx_process_parent_id
@@ -119,7 +122,7 @@ CREATE INDEX IF NOT EXISTS idx_activity_process_state
     ON activity (process_id, activity_state);
 
 CREATE INDEX IF NOT EXISTS idx_activity_topic_process_key_state
-    ON activity (activity_topic, process_definition_key, activity_state)
+    ON activity (activity_topic, process_definition_key, activity_created_at)
     WHERE activity_state = 'SCHEDULED';
 
 CREATE INDEX IF NOT EXISTS idx_activity_timeout_state
@@ -171,6 +174,9 @@ CREATE TABLE IF NOT EXISTS history
 CREATE INDEX IF NOT EXISTS idx_history_created_at
     ON history (process_created_at DESC);
 
+CREATE INDEX IF NOT EXISTS idx_history_business_key
+    ON history (process_business_key);
+
 -- ============================
 -- Table: shedlock
 -- ============================
@@ -204,5 +210,11 @@ CREATE TABLE IF NOT EXISTS job
 
     CONSTRAINT pk_job PRIMARY KEY (job_id)
 );
+
+CREATE INDEX IF NOT EXISTS idx_job_state
+    ON job (job_state);
+
+CREATE INDEX IF NOT EXISTS idx_job_created_at
+    ON job (job_created_at DESC);
 
 -- End of changeset

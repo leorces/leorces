@@ -96,7 +96,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
         log.debug("Finding activity by definition id: {} for process: {}", definitionId, processId);
         return activityRepository.findByDefinitionId(processId, definitionId).stream()
                 .map(activityMapper::toExecution)
-                .filter(activity -> !activity.isInTerminalState())
                 .findFirst();
     }
 

@@ -3,8 +3,8 @@ package com.leorces.engine.process.handler;
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import static com.leorces.engine.constants.MetricConstants.PROCESS_RECOVERED;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -22,8 +24,7 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
 
     private final ProcessPersistence processPersistence;
     private final ActivityPersistence activityPersistence;
-    private final CommandDispatcher commandDispatcher;
-    private final ProcessMetrics processMetrics;
+    private final CommandDispatcher dispatcher;
 
     @Override
     public void handle(ResolveProcessIncidentCommand command) {
@@ -48,11 +49,11 @@ public class ResolveProcessIncidentCommandHandler implements CommandHandler<Reso
 
     private void resolveProcessIncident(Process process) {
         processPersistence.changeState(process.id(), ProcessState.ACTIVE);
-        processMetrics.recordProcessRecoveredMetrics(process);
+        dispatcher.dispatchAsync(RecordProcessMetricCommand.of(PROCESS_RECOVERED, process));
         if (process.isCallActivity()) {
             var callActivity = getCallActivity(process.id());
             activityPersistence.changeState(callActivity.id(), ActivityState.ACTIVE);
-            commandDispatcher.dispatch(ResolveProcessIncidentCommand.of(callActivity.processId()));
+            dispatcher.dispatch(ResolveProcessIncidentCommand.of(callActivity.processId()));
         }
     }
 

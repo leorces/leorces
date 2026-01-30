@@ -4,9 +4,9 @@ import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.FailActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.IncidentProcessCommand;
-import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,9 +31,6 @@ class FailActivityCommandHandlerTest {
     private static final String ACTIVITY_ID = "activity-id";
     private static final String PROCESS_ID = "process-id";
     private static final String DEFINITION_ID = "definition-id";
-
-    @Mock
-    private ActivityFactory activityFactory;
 
     @Mock
     private ActivityBehaviorResolver behaviorResolver;
@@ -111,14 +108,15 @@ class FailActivityCommandHandlerTest {
     void shouldThrowExecutionExceptionWhenActivityNotFound() {
         var command = FailActivityCommand.of(ACTIVITY_ID);
 
-        when(activityFactory.getById(ACTIVITY_ID)).thenThrow(ExecutionException.of("Activity not found: " + ACTIVITY_ID));
+        when(dispatcher.execute(FindActivityCommand.byId(ACTIVITY_ID)))
+                .thenThrow(ExecutionException.of("Activity not found: " + ACTIVITY_ID));
 
         assertThatThrownBy(() -> handler.handle(command))
                 .isInstanceOf(ExecutionException.class)
                 .hasMessage("Activity not found: " + ACTIVITY_ID);
 
-        verify(activityFactory).getById(ACTIVITY_ID);
-        verifyNoInteractions(dispatcher, behaviorResolver, activityBehavior);
+        verify(dispatcher).execute(FindActivityCommand.byId(ACTIVITY_ID));
+        verifyNoInteractions(behaviorResolver, activityBehavior);
     }
 
     @Test

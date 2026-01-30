@@ -2,8 +2,9 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.DeleteActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class DeleteActivityCommandHandler implements CommandHandler<DeleteActivityCommand> {
 
     private final ActivityBehaviorResolver behaviorResolver;
-    private final ActivityFactory activityFactory;
+    private final CommandDispatcher dispatcher;
 
     @Override
     public void handle(DeleteActivityCommand command) {
@@ -36,7 +37,7 @@ public class DeleteActivityCommandHandler implements CommandHandler<DeleteActivi
     }
 
     private ActivityExecution getActivity(DeleteActivityCommand command) {
-        return activityFactory.getById(command.activityId());
+        return dispatcher.execute(FindActivityCommand.byId(command.activityId()));
     }
 
     private boolean canHandle(ActivityExecution activity) {

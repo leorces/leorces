@@ -2,8 +2,9 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.activity.command.RetryActivityCommand;
-import com.leorces.engine.service.activity.ActivityFactory;
+import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
@@ -33,7 +34,7 @@ class RetryActivityCommandHandlerTest {
     private ActivityBehaviorResolver behaviorResolver;
 
     @Mock
-    private ActivityFactory activityFactory;
+    private CommandDispatcher dispatcher;
 
     @Mock
     private ActivityBehavior activityBehavior;
@@ -88,12 +89,12 @@ class RetryActivityCommandHandlerTest {
         when(process.isInTerminalState()).thenReturn(false);
         when(activityFromFactory.process()).thenReturn(process);
 
-        when(activityFactory.getById(ACTIVITY_ID)).thenReturn(activityFromFactory);
+        when(dispatcher.execute(FindActivityCommand.byId(ACTIVITY_ID))).thenReturn(activityFromFactory);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(activityBehavior);
 
         handler.handle(command);
 
-        verify(activityFactory).getById(ACTIVITY_ID);
+        verify(dispatcher).execute(FindActivityCommand.byId(ACTIVITY_ID));
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
         verify(activityBehavior).retry(activityFromFactory);
     }

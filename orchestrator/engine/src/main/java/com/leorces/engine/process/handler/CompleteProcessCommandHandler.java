@@ -5,13 +5,15 @@ import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.process.command.CompleteProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.persistence.ActivityPersistence;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static com.leorces.engine.constants.MetricConstants.PROCESS_COMPLETED;
 
 @Slf4j
 @Component
@@ -20,7 +22,6 @@ public class CompleteProcessCommandHandler implements CommandHandler<CompletePro
 
     private final ProcessPersistence processPersistence;
     private final ActivityPersistence activityPersistence;
-    private final ProcessMetrics processMetrics;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -44,7 +45,7 @@ public class CompleteProcessCommandHandler implements CommandHandler<CompletePro
 
     private void completeProcess(Process process) {
         processPersistence.complete(process.id());
-        processMetrics.recordProcessCompletedMetric(process);
+        dispatcher.dispatchAsync(RecordProcessMetricCommand.of(PROCESS_COMPLETED, process));
         if (process.isCallActivity()) {
             dispatcher.dispatchAsync(CompleteActivityCommand.of(process.id()));
         }

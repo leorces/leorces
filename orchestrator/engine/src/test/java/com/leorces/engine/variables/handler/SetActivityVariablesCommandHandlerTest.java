@@ -1,7 +1,8 @@
 package com.leorces.engine.variables.handler;
 
+import com.leorces.common.mapper.VariablesMapper;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.service.variable.VariablesService;
+import com.leorces.engine.variables.command.EvaluateVariablesCommand;
 import com.leorces.engine.variables.command.SetActivityVariablesCommand;
 import com.leorces.engine.variables.command.SetVariablesCommand;
 import com.leorces.model.runtime.activity.ActivityExecution;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 class SetActivityVariablesCommandHandlerTest {
 
     @Mock
-    private VariablesService variablesService;
+    private VariablesMapper variablesMapper;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -54,14 +55,14 @@ class SetActivityVariablesCommandHandlerTest {
         // Given
         when(activity.process()).thenReturn(process);
 
-        Map<String, Object> inputs = Map.of("x", 1, "same", "in");
-        Map<String, Object> outputsTemplate = Map.of("y", "${x}");
+        var inputs = Map.<String, Object>of("x", 1, "same", "in");
+        var outputsTemplate = Map.<String, Object>of("y", "${x}");
         when(activity.outputs()).thenReturn(outputsTemplate);
 
         var evaluated = List.<Variable>of();
-        when(variablesService.evaluate(eq(activity), any(Map.class))).thenReturn(evaluated);
-        Map<String, Object> outputs = Map.of("y", 2, "same", "out");
-        when(variablesService.toMap(evaluated)).thenReturn(outputs);
+        when(dispatcher.execute(any(EvaluateVariablesCommand.class))).thenReturn(evaluated);
+        var outputs = Map.<String, Object>of("y", 2, "same", "out");
+        when(variablesMapper.toMap(evaluated)).thenReturn(outputs);
 
         var command = SetActivityVariablesCommand.of(activity, inputs);
 
@@ -80,8 +81,8 @@ class SetActivityVariablesCommandHandlerTest {
                 .containsEntry("y", 2)
                 .containsEntry("same", "out"); // outputs override inputs
 
-        verify(variablesService).evaluate(activity, outputsTemplate);
-        verify(variablesService).toMap(evaluated);
+        verify(dispatcher).execute(any(EvaluateVariablesCommand.class));
+        verify(variablesMapper).toMap(evaluated);
     }
 
 }

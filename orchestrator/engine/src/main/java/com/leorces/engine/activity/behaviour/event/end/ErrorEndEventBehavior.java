@@ -2,11 +2,11 @@ package com.leorces.engine.activity.behaviour.event.end;
 
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.AbstractActivityBehavior;
+import com.leorces.engine.activity.command.FindActivityHandlerCommand;
 import com.leorces.engine.activity.command.TerminateActivityCommand;
 import com.leorces.engine.activity.command.TriggerActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.IncidentProcessCommand;
-import com.leorces.engine.service.resolver.ErrorHandlerResolver;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.definition.activity.event.end.ErrorEndEvent;
@@ -22,13 +22,9 @@ import java.util.Objects;
 @Component
 public class ErrorEndEventBehavior extends AbstractActivityBehavior {
 
-    private final ErrorHandlerResolver errorHandlerResolver;
-
     protected ErrorEndEventBehavior(ActivityPersistence activityPersistence,
-                                    CommandDispatcher dispatcher,
-                                    ErrorHandlerResolver errorHandlerResolver) {
+                                    CommandDispatcher dispatcher) {
         super(activityPersistence, dispatcher);
-        this.errorHandlerResolver = errorHandlerResolver;
     }
 
     @Override
@@ -105,7 +101,7 @@ public class ErrorEndEventBehavior extends AbstractActivityBehavior {
     }
 
     private boolean correlateInScope(String errorCode, String scopeId, Process process) {
-        var handlerOpt = errorHandlerResolver.resolve(errorCode, scopeId, process);
+        var handlerOpt = dispatcher.execute(FindActivityHandlerCommand.error(errorCode, scopeId, process));
         if (handlerOpt.isEmpty()) {
             return false;
         }

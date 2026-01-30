@@ -2,8 +2,8 @@ package com.leorces.engine.process.handler;
 
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.engine.process.command.ResolveProcessIncidentCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
 import com.leorces.model.runtime.process.Process;
@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static com.leorces.engine.constants.MetricConstants.PROCESS_RECOVERED;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -38,9 +39,6 @@ class ResolveProcessIncidentCommandHandlerTest {
 
     @Mock
     private CommandDispatcher dispatcher;
-
-    @Mock
-    private ProcessMetrics processMetrics;
 
     @InjectMocks
     private ResolveProcessIncidentCommandHandler handler;
@@ -88,7 +86,7 @@ class ResolveProcessIncidentCommandHandlerTest {
 
         // Then
         verify(processPersistence).changeState(PROCESS_ID, ProcessState.ACTIVE);
-        verify(processMetrics).recordProcessRecoveredMetrics(incidentProcess);
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_RECOVERED, incidentProcess));
         verify(activityPersistence).changeState(PROCESS_ID, ActivityState.ACTIVE);
 
         verify(dispatcher).dispatch(argThat(cmd ->
@@ -108,7 +106,7 @@ class ResolveProcessIncidentCommandHandlerTest {
         handler.handle(command);
 
         // Then
-        verifyNoInteractions(processMetrics, activityPersistence);
+        verifyNoInteractions(activityPersistence);
         verify(processPersistence, never()).changeState(PROCESS_ID, ProcessState.ACTIVE);
     }
 
@@ -124,7 +122,6 @@ class ResolveProcessIncidentCommandHandlerTest {
         handler.handle(command);
 
         // Then
-        verifyNoInteractions(processMetrics);
         verify(processPersistence, never()).changeState(PROCESS_ID, ProcessState.ACTIVE);
         verify(activityPersistence, never()).changeState(anyString(), any());
     }

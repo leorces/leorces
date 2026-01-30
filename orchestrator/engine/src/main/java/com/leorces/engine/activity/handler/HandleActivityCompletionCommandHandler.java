@@ -1,13 +1,12 @@
 package com.leorces.engine.activity.handler;
 
-import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.process.command.CompleteProcessCommand;
 import com.leorces.model.runtime.activity.ActivityExecution;
-import com.leorces.persistence.ActivityPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 public class HandleActivityCompletionCommandHandler
         implements CommandHandler<HandleActivityCompletionCommand> {
 
-    private final ActivityPersistence activityPersistence;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -56,8 +54,7 @@ public class HandleActivityCompletionCommandHandler
         var processId = activity.processId();
         var parentDefinitionId = activity.parentDefinitionId();
 
-        return activityPersistence.findByDefinitionId(processId, parentDefinitionId)
-                .orElseThrow(() -> ExecutionException.of("Parent activity not found", "Parent activity with definitionId: %s not found".formatted(parentDefinitionId), activity));
+        return dispatcher.execute(FindActivityCommand.byDefinitionId(processId, parentDefinitionId));
     }
 
 }

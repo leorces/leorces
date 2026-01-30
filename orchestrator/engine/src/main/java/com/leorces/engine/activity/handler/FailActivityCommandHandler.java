@@ -2,10 +2,10 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.FailActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.process.command.IncidentProcessCommand;
-import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 public class FailActivityCommandHandler implements CommandHandler<FailActivityCommand> {
 
     private final ActivityBehaviorResolver behaviorResolver;
-    private final ActivityFactory activityFactory;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -45,7 +44,7 @@ public class FailActivityCommandHandler implements CommandHandler<FailActivityCo
 
     private ActivityExecution getActivity(FailActivityCommand command) {
         return command.activity() == null
-                ? activityFactory.getById(command.activityId())
+                ? dispatcher.execute(FindActivityCommand.byId(command.activityId()))
                 : command.activity();
     }
 

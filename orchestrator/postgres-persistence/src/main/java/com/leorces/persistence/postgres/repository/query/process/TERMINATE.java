@@ -12,6 +12,7 @@ public class TERMINATE {
             """;
 
     private TERMINATE() {
+        // Index: pk_process
     }
 
 }

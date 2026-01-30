@@ -4,9 +4,9 @@ import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
-import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityFailure;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 public class CompleteActivityCommandHandler implements CommandHandler<CompleteActivityCommand> {
 
     private final ActivityBehaviorResolver behaviorResolver;
-    private final ActivityFactory activityFactory;
     private final CommandDispatcher dispatcher;
 
     @Override
@@ -47,7 +46,7 @@ public class CompleteActivityCommandHandler implements CommandHandler<CompleteAc
 
     private ActivityExecution getActivity(CompleteActivityCommand command) {
         return command.activity() == null
-                ? activityFactory.getById(command.activityId())
+                ? dispatcher.execute(FindActivityCommand.byId(command.activityId()))
                 : command.activity();
     }
 

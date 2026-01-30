@@ -11,6 +11,7 @@ public class UPDATE_DEFINITION_ID {
             """;
 
     private UPDATE_DEFINITION_ID() {
+        // Index: pk_process
     }
 
 }

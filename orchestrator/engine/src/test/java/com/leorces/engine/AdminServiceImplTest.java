@@ -1,9 +1,8 @@
 package com.leorces.engine;
 
+import com.leorces.engine.admin.common.command.RunJobCommand;
+import com.leorces.engine.admin.migration.command.GenerateProcessMigrationPlanCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.job.compaction.command.CompactionCommand;
-import com.leorces.engine.job.migration.command.ProcessMigrationCommand;
-import com.leorces.engine.service.process.ProcessMigrationService;
 import com.leorces.model.job.Job;
 import com.leorces.model.job.migration.ProcessMigrationPlan;
 import com.leorces.model.pagination.Pageable;
@@ -29,9 +28,6 @@ import static org.mockito.Mockito.*;
 class AdminServiceImplTest {
 
     @Mock
-    private ProcessMigrationService migrationService;
-
-    @Mock
     private JobPersistence jobPersistence;
 
     @Mock
@@ -41,31 +37,17 @@ class AdminServiceImplTest {
     private AdminServiceImpl adminService;
 
     @Test
-    @DisplayName("Should dispatch CompactionCommand.manual() when jobType is COMPACTION")
-    void runJobCompaction() {
+    @DisplayName("Should dispatch RunJobCommand when runJob is called")
+    void runJob() {
         // Given
         var jobType = "COMPACTION";
-        var input = Map.<String, Object>of();
-
-        // When
-        adminService.runJob(jobType, input);
-
-        // Then
-        verify(dispatcher).dispatchAsync(any(CompactionCommand.class));
-    }
-
-    @Test
-    @DisplayName("Should dispatch ProcessMigrationCommand when jobType is PROCESS_MIGRATION")
-    void runJobProcessMigration() {
-        // Given
-        var jobType = "PROCESS_MIGRATION";
         var input = Map.<String, Object>of("key", "value");
 
         // When
         adminService.runJob(jobType, input);
 
         // Then
-        verify(dispatcher).dispatch(any(ProcessMigrationCommand.class));
+        verify(dispatcher).dispatch(any(RunJobCommand.class));
     }
 
     @Test
@@ -106,13 +88,13 @@ class AdminServiceImplTest {
         // Given
         var migrationPlan = ProcessMigrationPlan.builder().build();
         var expectedPlan = ProcessMigrationPlan.builder().build();
-        when(migrationService.generateMigrationPlan(migrationPlan)).thenReturn(expectedPlan);
+        when(dispatcher.execute(any(GenerateProcessMigrationPlanCommand.class))).thenReturn(expectedPlan);
 
         // When
         var result = adminService.generateMigrationPlan(migrationPlan);
 
         // Then
         assertThat(result).isEqualTo(expectedPlan);
-        verify(migrationService).generateMigrationPlan(migrationPlan);
+        verify(dispatcher).execute(any(GenerateProcessMigrationPlanCommand.class));
     }
 }

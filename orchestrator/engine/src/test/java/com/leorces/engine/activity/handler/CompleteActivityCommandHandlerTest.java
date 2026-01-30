@@ -5,8 +5,8 @@ import com.leorces.engine.activity.behaviour.ActivityBehavior;
 import com.leorces.engine.activity.behaviour.ActivityBehaviorResolver;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.activity.command.FailActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
-import com.leorces.engine.service.activity.ActivityFactory;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.activity.ActivityState;
@@ -39,9 +39,6 @@ class CompleteActivityCommandHandlerTest {
 
     @Mock
     private ActivityBehaviorResolver behaviorResolver;
-
-    @Mock
-    private ActivityFactory activityFactory;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -92,12 +89,12 @@ class CompleteActivityCommandHandlerTest {
     @Test
     @DisplayName("Should complete activity successfully when retrieved by ID")
     void shouldCompleteActivitySuccessfullyWhenRetrievedById() {
-        when(activityFactory.getById(ACTIVITY_ID)).thenReturn(activityExecution);
+        when(dispatcher.execute(FindActivityCommand.byId(ACTIVITY_ID))).thenReturn(activityExecution);
         var command = CompleteActivityCommand.of(ACTIVITY_ID, VARIABLES);
 
         handler.handle(command);
 
-        verify(activityFactory).getById(ACTIVITY_ID);
+        verify(dispatcher).execute(FindActivityCommand.byId(ACTIVITY_ID));
         verify(behaviorResolver).resolveBehavior(ActivityType.EXTERNAL_TASK);
         verify(activityBehavior).complete(activityExecution, VARIABLES);
         verify(dispatcher, never()).dispatch(isA(FailActivityCommand.class));

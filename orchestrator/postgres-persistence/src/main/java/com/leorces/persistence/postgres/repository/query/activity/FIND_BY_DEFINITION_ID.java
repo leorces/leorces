@@ -57,6 +57,7 @@ public class FIND_BY_DEFINITION_ID {
             """;
 
     private FIND_BY_DEFINITION_ID() {
+        // Index: idx_activity_process_def_state
     }
 
 }

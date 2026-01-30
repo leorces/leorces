@@ -17,6 +17,7 @@ public class BATCH_UPDATE_DEFINITION_ID {
             """;
 
     private BATCH_UPDATE_DEFINITION_ID() {
+        // Index: idx_process_definition_id
     }
 
 }

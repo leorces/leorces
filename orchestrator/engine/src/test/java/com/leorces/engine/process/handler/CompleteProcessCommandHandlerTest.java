@@ -4,7 +4,7 @@ import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.CompleteProcessCommand;
-import com.leorces.engine.service.process.ProcessMetrics;
+import com.leorces.engine.process.command.RecordProcessMetricCommand;
 import com.leorces.model.runtime.process.Process;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.persistence.ActivityPersistence;
@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static com.leorces.engine.constants.MetricConstants.PROCESS_COMPLETED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -34,9 +35,6 @@ class CompleteProcessCommandHandlerTest {
 
     @Mock
     private ActivityPersistence activityPersistence;
-
-    @Mock
-    private ProcessMetrics processMetrics;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -67,8 +65,7 @@ class CompleteProcessCommandHandlerTest {
         handler.handle(command);
 
         verify(processPersistence).complete(process.id());
-        verify(processMetrics).recordProcessCompletedMetric(process);
-        verify(dispatcher, never()).dispatchAsync(any());
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_COMPLETED, process));
     }
 
     @Test
@@ -90,7 +87,7 @@ class CompleteProcessCommandHandlerTest {
         handler.handle(command);
 
         verify(processPersistence).complete(process.id());
-        verify(processMetrics).recordProcessCompletedMetric(process);
+        verify(dispatcher).dispatchAsync(RecordProcessMetricCommand.of(PROCESS_COMPLETED, process));
 
         ArgumentCaptor<CompleteActivityCommand> captor = ArgumentCaptor.forClass(CompleteActivityCommand.class);
         verify(dispatcher).dispatchAsync(captor.capture());
@@ -115,7 +112,7 @@ class CompleteProcessCommandHandlerTest {
 
         handler.handle(command);
 
-        verifyNoInteractions(activityPersistence, processMetrics, dispatcher);
+        verifyNoInteractions(activityPersistence, dispatcher);
         verify(processPersistence, never()).complete(process.id());
     }
 
@@ -129,7 +126,6 @@ class CompleteProcessCommandHandlerTest {
         handler.handle(command);
 
         verify(processPersistence, never()).complete(process.id());
-        verify(processMetrics, never()).recordProcessCompletedMetric(process);
         verify(dispatcher, never()).dispatchAsync(any());
     }
 
@@ -142,7 +138,7 @@ class CompleteProcessCommandHandlerTest {
         assertThatThrownBy(() -> handler.handle(command))
                 .isInstanceOf(ExecutionException.class);
 
-        verifyNoInteractions(activityPersistence, processMetrics, dispatcher);
+        verifyNoInteractions(activityPersistence, dispatcher);
     }
 
 }

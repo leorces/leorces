@@ -11,6 +11,7 @@ public class IS_ALL_COMPLETED_BY_PROCESS_ID {
             """;
 
     private IS_ALL_COMPLETED_BY_PROCESS_ID() {
+        // Index: idx_activity_process_state
     }
 
 }

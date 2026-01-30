@@ -11,8 +11,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
-import static com.leorces.persistence.postgres.repository.query.ShedlockQueries.RELEASE_LOCK_QUERY;
-import static com.leorces.persistence.postgres.repository.query.ShedlockQueries.TRY_ACQUIRE_LOCK_QUERY;
+import static com.leorces.persistence.postgres.repository.query.shedlock.RELEASE_LOCK.RELEASE_LOCK_QUERY;
+import static com.leorces.persistence.postgres.repository.query.shedlock.TRY_ACQUIRE_LOCK.TRY_ACQUIRE_LOCK_QUERY;
 
 @Repository
 public interface ShedlockRepository extends CrudRepository<ShedlockEntity, String> {

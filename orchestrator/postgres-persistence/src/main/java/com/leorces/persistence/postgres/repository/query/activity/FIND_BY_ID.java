@@ -56,6 +56,7 @@ public class FIND_BY_ID {
             """;
 
     private FIND_BY_ID() {
+        // Index: pk_activity
     }
 
 }

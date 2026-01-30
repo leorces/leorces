@@ -2,13 +2,13 @@ package com.leorces.engine.activity.handler;
 
 import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.activity.command.CompleteActivityCommand;
+import com.leorces.engine.activity.command.FindActivityCommand;
 import com.leorces.engine.activity.command.HandleActivityCompletionCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.process.command.CompleteProcessCommand;
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
-import com.leorces.persistence.ActivityPersistence;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +29,6 @@ import static org.mockito.Mockito.*;
 @MockitoSettings(strictness = Strictness.LENIENT)
 @DisplayName("HandleActivityCompletionCommandHandler Tests")
 class HandleActivityCompletionCommandHandlerTest {
-
-    @Mock
-    private ActivityPersistence activityPersistence;
 
     @Mock
     private CommandDispatcher dispatcher;
@@ -73,14 +70,15 @@ class HandleActivityCompletionCommandHandlerTest {
     void shouldCompleteRegularParentActivity() {
         when(activity.hasParent()).thenReturn(true);
         when(activity.parentDefinitionId()).thenReturn("parent-def-id");
-        when(activityPersistence.findByDefinitionId("process-id", "parent-def-id"))
-                .thenReturn(Optional.of(parentActivity));
+        when(dispatcher.execute(FindActivityCommand.byDefinitionId("process-id", "parent-def-id")))
+                .thenReturn(parentActivity);
         when(parentActivity.type()).thenReturn(ActivityType.SUBPROCESS);
 
         var command = HandleActivityCompletionCommand.of(activity);
 
         handler.handle(command);
 
+        verify(dispatcher).execute(FindActivityCommand.byDefinitionId("process-id", "parent-def-id"));
         verify(dispatcher).dispatch(CompleteActivityCommand.of(parentActivity));
         verifyNoMoreInteractions(dispatcher);
     }
@@ -90,8 +88,8 @@ class HandleActivityCompletionCommandHandlerTest {
     void shouldCompleteEventSubprocessWithoutParent() {
         when(activity.hasParent()).thenReturn(true);
         when(activity.parentDefinitionId()).thenReturn("parent-def-id");
-        when(activityPersistence.findByDefinitionId("process-id", "parent-def-id"))
-                .thenReturn(Optional.of(parentActivity));
+        when(dispatcher.execute(FindActivityCommand.byDefinitionId("process-id", "parent-def-id")))
+                .thenReturn(parentActivity);
         when(parentActivity.type()).thenReturn(ActivityType.EVENT_SUBPROCESS);
         when(parentActivity.hasParent()).thenReturn(false);
         when(process.id()).thenReturn("process-id");
@@ -100,6 +98,7 @@ class HandleActivityCompletionCommandHandlerTest {
 
         handler.handle(command);
 
+        verify(dispatcher).execute(FindActivityCommand.byDefinitionId("process-id", "parent-def-id"));
         verify(dispatcher).dispatch(CompleteActivityCommand.of(parentActivity));
         verifyNoMoreInteractions(dispatcher);
     }
@@ -107,22 +106,19 @@ class HandleActivityCompletionCommandHandlerTest {
     @Test
     @DisplayName("Complete event subprocess with parent")
     void shouldCompleteEventSubprocessWithParent() {
-        var grandParent = mock(ActivityExecution.class);
-
         when(activity.hasParent()).thenReturn(true);
         when(activity.parentDefinitionId()).thenReturn("parent-def-id");
-        when(activityPersistence.findByDefinitionId("process-id", "parent-def-id"))
-                .thenReturn(Optional.of(parentActivity));
+        when(dispatcher.execute(FindActivityCommand.byDefinitionId("process-id", "parent-def-id")))
+                .thenReturn(parentActivity);
         when(parentActivity.type()).thenReturn(ActivityType.EVENT_SUBPROCESS);
         when(parentActivity.hasParent()).thenReturn(true);
-        when(activityPersistence.findByDefinitionId("process-id", "parent-grandparent"))
-                .thenReturn(Optional.of(grandParent));
         when(parentActivity.parentDefinitionId()).thenReturn("parent-grandparent");
 
         var command = HandleActivityCompletionCommand.of(activity);
 
         handler.handle(command);
 
+        verify(dispatcher).execute(FindActivityCommand.byDefinitionId("process-id", "parent-def-id"));
         verify(dispatcher).dispatch(CompleteActivityCommand.of(parentActivity));
         verifyNoMoreInteractions(dispatcher);
     }
@@ -132,8 +128,8 @@ class HandleActivityCompletionCommandHandlerTest {
     void shouldThrowWhenParentNotFound() {
         when(activity.hasParent()).thenReturn(true);
         when(activity.parentDefinitionId()).thenReturn("missing-def-id");
-        when(activityPersistence.findByDefinitionId("process-id", "missing-def-id"))
-                .thenReturn(Optional.empty());
+        when(dispatcher.execute(FindActivityCommand.byDefinitionId("process-id", "missing-def-id")))
+                .thenThrow(ExecutionException.of("Parent activity not found", "error"));
 
         var command = HandleActivityCompletionCommand.of(activity);
 
@@ -141,6 +137,7 @@ class HandleActivityCompletionCommandHandlerTest {
                 .isInstanceOf(ExecutionException.class)
                 .hasMessage("Parent activity not found");
 
+        verify(dispatcher).execute(FindActivityCommand.byDefinitionId("process-id", "missing-def-id"));
         verify(dispatcher, never()).dispatch(any());
     }
 
