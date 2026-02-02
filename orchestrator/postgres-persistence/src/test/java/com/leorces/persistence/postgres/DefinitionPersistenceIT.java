@@ -4,8 +4,10 @@ package com.leorces.persistence.postgres;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.ProcessDefinitionMetadata;
 import com.leorces.model.pagination.Pageable;
+import com.leorces.persistence.postgres.cache.DefinitionCache;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -19,6 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Definition Persistence Integration Tests")
 class DefinitionPersistenceIT extends RepositoryIT {
+
+    @Autowired
+    private DefinitionCache cache;
 
     @Test
     @DisplayName("Should save multiple process definitions with generated IDs and timestamps")
@@ -131,6 +136,7 @@ class DefinitionPersistenceIT extends RepositoryIT {
         var id = definition.id();
 
         // When
+        cache.invalidateAll();
         definitionPersistence.suspendById(id);
         var suspendedDefinition = definitionPersistence.findById(id).orElseThrow();
 
@@ -139,6 +145,7 @@ class DefinitionPersistenceIT extends RepositoryIT {
 
         // When
         definitionPersistence.resumeById(id);
+        cache.invalidateAll();
         var resumedDefinition = definitionPersistence.findById(id).orElseThrow();
 
         // Then
@@ -154,6 +161,7 @@ class DefinitionPersistenceIT extends RepositoryIT {
         var id = definition.id();
 
         // When
+        cache.invalidateAll();
         definitionPersistence.suspendByKey(key);
         var suspendedDefinition = definitionPersistence.findById(id).orElseThrow();
 
@@ -162,6 +170,7 @@ class DefinitionPersistenceIT extends RepositoryIT {
 
         // When
         definitionPersistence.resumeByKey(key);
+        cache.invalidateAll();
         var resumedDefinition = definitionPersistence.findById(id).orElseThrow();
 
         // Then
