@@ -7,7 +7,6 @@ public class FIND_ALL_FAILED_BY_PROCESS_ID {
                    activity.process_id,
                    activity.activity_definition_id,
                    activity.activity_parent_definition_id,
-                   activity.process_definition_id,
                    activity.process_definition_key,
                    activity.activity_type,
                    activity.activity_state,
@@ -30,10 +29,11 @@ public class FIND_ALL_FAILED_BY_PROCESS_ID {
                    definition.definition_id,
                    definition.definition_key,
                    definition.definition_version,
+                   definition.definition_suspended,
                    definition.definition_data
             FROM activity
                      LEFT JOIN process ON activity.process_id = process.process_id
-                     LEFT JOIN definition ON activity.process_definition_id = definition.definition_id
+                     LEFT JOIN definition ON process.process_definition_id = definition.definition_id
             WHERE activity.process_id = :processId
               AND activity.activity_state = 'FAILED'
             """;

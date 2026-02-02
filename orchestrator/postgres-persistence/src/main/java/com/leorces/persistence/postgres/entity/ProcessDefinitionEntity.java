@@ -48,6 +48,9 @@ public class ProcessDefinitionEntity implements Persistable<String> {
     @Column("definition_updated_at")
     private LocalDateTime updatedAt;
 
+    @Column("definition_suspended")
+    private boolean suspended;
+
     @Column("definition_data")
     private PGobject data;
 

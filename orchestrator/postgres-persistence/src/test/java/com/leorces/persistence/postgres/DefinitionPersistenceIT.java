@@ -132,9 +132,17 @@ class DefinitionPersistenceIT extends RepositoryIT {
 
         // When
         definitionPersistence.suspendById(id);
-        // Then (Verification would ideally be through findById if it returned state, but it doesn't seem to)
-        // We just verify it doesn't throw and can be resumed
+        var suspendedDefinition = definitionPersistence.findById(id).orElseThrow();
+
+        // Then
+        assertThat(suspendedDefinition.suspended()).isTrue();
+
+        // When
         definitionPersistence.resumeById(id);
+        var resumedDefinition = definitionPersistence.findById(id).orElseThrow();
+
+        // Then
+        assertThat(resumedDefinition.suspended()).isFalse();
     }
 
     @Test
@@ -143,10 +151,21 @@ class DefinitionPersistenceIT extends RepositoryIT {
         // Given
         var definition = definitionPersistence.save(List.of(createOrderSubmittedProcessDefinition())).getFirst();
         var key = definition.key();
+        var id = definition.id();
 
         // When
         definitionPersistence.suspendByKey(key);
+        var suspendedDefinition = definitionPersistence.findById(id).orElseThrow();
+
+        // Then
+        assertThat(suspendedDefinition.suspended()).isTrue();
+
+        // When
         definitionPersistence.resumeByKey(key);
+        var resumedDefinition = definitionPersistence.findById(id).orElseThrow();
+
+        // Then
+        assertThat(resumedDefinition.suspended()).isFalse();
     }
 
     @Test

@@ -23,19 +23,19 @@ public class RUN {
                    'ACTIVE',
                    CASE
                        WHEN :suspended = TRUE THEN TRUE
-                       ELSE COALESCE(ds.definition_suspended, FALSE)
+                       ELSE COALESCE(d.definition_suspended, FALSE)
                        END,
                    NOW(),
                    NOW(),
                    NOW()
             FROM (SELECT 1) v
-                     LEFT JOIN definition_suspended ds
-                               ON ds.definition_id = :definitionId
+                     LEFT JOIN definition d
+                               ON d.definition_id = :definitionId
             RETURNING *;
             """;
 
     private RUN() {
-        // Index: pk_definition_suspended
+        // Index: pk_definition
     }
 
 }

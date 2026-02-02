@@ -89,6 +89,9 @@ public class ProcessEntity implements Persistable<String> {
     private LocalDateTime definitionUpdatedAt;
 
     @ReadOnlyProperty
+    private boolean definitionSuspended;
+
+    @ReadOnlyProperty
     private PGobject definitionData;
 
     @Transient

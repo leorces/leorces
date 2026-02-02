@@ -92,6 +92,9 @@ public class ProcessExecutionEntity {
     private LocalDateTime definitionUpdatedAt;
 
     @ReadOnlyProperty
+    private boolean definitionSuspended;
+
+    @ReadOnlyProperty
     private PGobject definitionData;
 
 }

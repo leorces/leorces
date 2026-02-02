@@ -17,7 +17,7 @@ public class DefinitionCache {
 
     private final Cache<String, ProcessDefinition> cache = CacheBuilder.newBuilder()
             .maximumSize(1000)
-            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
 
     public Optional<ProcessDefinition> findById(String definitionId) {

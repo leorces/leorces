@@ -42,7 +42,6 @@ public class ActivityMapper {
                 .processId(activity.processId())
                 .activityDefinitionId(activity.definitionId())
                 .parentActivityDefinitionId(activity.parentDefinitionId())
-                .processDefinitionId(activity.processDefinitionId())
                 .processDefinitionKey(activity.processDefinitionKey())
                 .type(activity.type().name())
                 .state(activity.state().name())

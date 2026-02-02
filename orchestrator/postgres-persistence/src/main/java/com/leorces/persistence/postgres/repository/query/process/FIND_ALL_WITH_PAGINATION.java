@@ -20,6 +20,7 @@ public class FIND_ALL_WITH_PAGINATION {
                    definition_key,
                    definition_name,
                    definition_version,
+                   definition_suspended,
                    definition_data
             FROM process
                      LEFT JOIN definition ON process_definition_id = definition_id

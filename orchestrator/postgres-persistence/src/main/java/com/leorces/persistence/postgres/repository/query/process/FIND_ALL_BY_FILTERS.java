@@ -20,6 +20,7 @@ public class FIND_ALL_BY_FILTERS {
                    definition.definition_key,
                    definition.definition_name,
                    definition.definition_version,
+                   definition.definition_suspended,
                    definition.definition_data,
             
                    COALESCE(variables.variables_json, '[]'::json) AS variables_json

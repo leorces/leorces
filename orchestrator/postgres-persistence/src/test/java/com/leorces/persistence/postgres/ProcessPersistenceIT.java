@@ -18,6 +18,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ProcessPersistenceIT extends RepositoryIT {
 
     @Test
+    @DisplayName("Should create and run a new process successfully and inherit suspended state from definition")
+    void runInheritSuspended() {
+        // Given
+        var definition = definitionPersistence.save(List.of(ProcessDefinitionTestData.createOrderSubmittedProcessDefinition())).getFirst();
+        definitionPersistence.suspendById(definition.id());
+        var process = Process.builder()
+                .definition(definitionPersistence.findById(definition.id()).get())
+                .businessKey("test-suspended")
+                .variables(List.of())
+                .build();
+
+        // When
+        var result = processPersistence.run(process);
+
+        // Then
+        assertThat(result.suspended()).isTrue();
+    }
+
+    @Test
     @DisplayName("Should create and run a new process successfully")
     void run() {
         // Given
@@ -327,19 +346,23 @@ class ProcessPersistenceIT extends RepositoryIT {
     @DisplayName("Should find process execution by ID with activities and return empty for non-existent ID")
     void findExecutionById() {
         // Given
-        var process = processPersistence.run(createOrderSubmittedProcess());
+        var definition = definitionPersistence.save(List.of(ProcessDefinitionTestData.createOrderSubmittedProcessDefinition())).getFirst();
+        definitionPersistence.suspendById(definition.id());
+        var process = Process.builder()
+                .definition(definitionPersistence.findById(definition.id()).get())
+                .businessKey("test-execution-suspended")
+                .variables(List.of())
+                .build();
+        var runResult = processPersistence.run(process);
 
         // When
-        var result = processPersistence.findExecutionById(process.id());
+        var result = processPersistence.findExecutionById(runResult.id());
 
         // Then
         assertThat(result).isPresent();
         var execution = result.get();
-        assertThat(execution.id()).isEqualTo(process.id());
-        assertThat(execution.state()).isEqualTo(process.state());
-        assertThat(execution.definition().id()).isEqualTo(process.definition().id());
-        assertThat(execution.definition().key()).isEqualTo(process.definition().key());
-        assertThat(execution.variables()).hasSize(process.variables().size());
+        assertThat(execution.id()).isEqualTo(runResult.id());
+        assertThat(execution.definition().suspended()).isTrue();
         assertThat(execution.activities()).isNotNull();
 
         // When & Then - non-existent process

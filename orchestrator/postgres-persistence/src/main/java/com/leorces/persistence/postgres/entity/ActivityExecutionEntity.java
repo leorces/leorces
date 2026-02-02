@@ -34,9 +34,6 @@ public class ActivityExecutionEntity implements Persistable<String> {
     @Column("activity_parent_definition_id")
     private String parentActivityDefinitionId;
 
-    @Column("process_definition_id")
-    private String processDefinitionId;
-
     @Column("process_definition_key")
     private String processDefinitionKey;
 
@@ -137,6 +134,9 @@ public class ActivityExecutionEntity implements Persistable<String> {
 
     @ReadOnlyProperty
     private LocalDateTime definitionUpdatedAt;
+
+    @ReadOnlyProperty
+    private boolean definitionSuspended;
 
     @ReadOnlyProperty
     private PGobject definitionData;

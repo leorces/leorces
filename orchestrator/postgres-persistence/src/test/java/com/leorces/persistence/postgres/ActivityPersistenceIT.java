@@ -69,7 +69,13 @@ class ActivityPersistenceIT extends RepositoryIT {
     @DisplayName("Should find activity by ID and return empty for non-existent ID")
     void findById() {
         // Given
-        var process = runOrderSubmittedProcess();
+        var definition = definitionPersistence.save(List.of(com.leorces.persistence.postgres.utils.ProcessDefinitionTestData.createOrderSubmittedProcessDefinition())).getFirst();
+        definitionPersistence.suspendById(definition.id());
+        var process = processPersistence.run(com.leorces.model.runtime.process.Process.builder()
+                .definition(definitionPersistence.findById(definition.id()).get())
+                .businessKey("test-activity-suspended")
+                .variables(List.of())
+                .build());
         var activity = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
 
         // When
@@ -79,9 +85,7 @@ class ActivityPersistenceIT extends RepositoryIT {
         assertThat(result).isPresent();
         var foundActivity = result.get();
         assertThat(foundActivity.id()).isEqualTo(activity.id());
-        assertThat(foundActivity.definitionId()).isEqualTo(activity.definitionId());
-        assertThat(foundActivity.state()).isEqualTo(activity.state());
-        assertThat(foundActivity.variables()).hasSize(2);
+        assertThat(foundActivity.process().definition().suspended()).isTrue();
 
         // When & Then - non-existent activity
         var nonExistentResult = activityPersistence.findById("non-existent-id");

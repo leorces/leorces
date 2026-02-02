@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS definition
     definition_deployment TEXT      NOT NULL,
     definition_created_at TIMESTAMP NOT NULL,
     definition_updated_at TIMESTAMP NOT NULL,
+    definition_suspended  BOOLEAN   NOT NULL DEFAULT FALSE,
     definition_data       JSONB     NOT NULL,
 
     CONSTRAINT pk_definition PRIMARY KEY (definition_id),
@@ -30,17 +31,6 @@ CREATE INDEX IF NOT EXISTS idx_definition_created
 CREATE INDEX IF NOT EXISTS idx_definition_search_trgm
     ON definition
         USING GIN ((definition_id || ' ' || definition_key || ' ' || definition_name) gin_trgm_ops);
-
--- ============================
--- Table: definition_suspended
--- ============================
-CREATE TABLE IF NOT EXISTS definition_suspended
-(
-    definition_id        TEXT    NOT NULL,
-    definition_suspended BOOLEAN NOT NULL DEFAULT FALSE,
-
-    CONSTRAINT pk_definition_suspended PRIMARY KEY (definition_id)
-);
 
 -- ============================
 -- Table: process
@@ -109,7 +99,6 @@ CREATE TABLE IF NOT EXISTS activity
     activity_failure_trace        TEXT,
     activity_async                BOOLEAN   NOT NULL DEFAULT FALSE,
     process_id                    TEXT      NOT NULL,
-    process_definition_id         TEXT      NOT NULL,
     process_definition_key        TEXT      NOT NULL,
 
     CONSTRAINT pk_activity PRIMARY KEY (activity_id)

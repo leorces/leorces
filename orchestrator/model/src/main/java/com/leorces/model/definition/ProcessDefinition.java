@@ -23,6 +23,7 @@ public record ProcessDefinition(
         List<String> messages,
         List<ErrorItem> errors,
         ProcessDefinitionMetadata metadata,
+        boolean suspended,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

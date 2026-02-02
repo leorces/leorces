@@ -7,7 +7,6 @@ public class FIND_BY_ID {
                    activity.process_id,
                    activity.activity_definition_id,
                    activity.activity_parent_definition_id,
-                   activity.process_definition_id,
                    activity.process_definition_key,
                    activity.activity_type,
                    activity.activity_state,
@@ -30,12 +29,13 @@ public class FIND_BY_ID {
                    definition.definition_id,
                    definition.definition_key,
                    definition.definition_version,
+                   definition.definition_suspended,
                    definition.definition_data,
             
                    COALESCE(variables.variables_json, '[]'::json) AS variables_json
             FROM activity
                      LEFT JOIN process ON activity.process_id = process.process_id
-                     LEFT JOIN definition ON activity.process_definition_id = definition.definition_id
+                     LEFT JOIN definition ON process.process_definition_id = definition.definition_id
                      LEFT JOIN LATERAL (
                 SELECT json_agg(
                                jsonb_build_object(
