@@ -41,6 +41,7 @@ public class FIND_BY_ID {
                        ) AS variables_json
                 FROM variable v
                 WHERE v.execution_id = process.process_id
+                  AND v.execution_definition_id = process.process_definition_id
                 ) AS variables ON TRUE
             WHERE process.process_id = :processId
             """;

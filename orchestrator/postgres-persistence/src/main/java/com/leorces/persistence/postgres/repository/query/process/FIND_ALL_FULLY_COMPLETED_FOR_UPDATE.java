@@ -64,6 +64,7 @@ public class FIND_ALL_FULLY_COMPLETED_FOR_UPDATE {
                        ) AS variables_json
                 FROM variable
                 WHERE variable.execution_id = eligible_processes.process_id
+                  AND variable.execution_definition_id = eligible_processes.process_definition_id
                 ) process_variables ON TRUE
                      LEFT JOIN LATERAL (
                 SELECT json_agg(
@@ -104,6 +105,7 @@ public class FIND_ALL_FULLY_COMPLETED_FOR_UPDATE {
                            ) AS variables_json
                     FROM variable
                     WHERE variable.execution_id = activity.activity_id
+                      AND variable.execution_definition_id = activity.activity_definition_id
                     ) activity_variables ON TRUE
                 WHERE activity.process_id = eligible_processes.process_id
                 ) activity_aggregates ON TRUE

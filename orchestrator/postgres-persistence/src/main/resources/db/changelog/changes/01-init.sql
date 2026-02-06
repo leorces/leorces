@@ -139,8 +139,8 @@ CREATE TABLE IF NOT EXISTS variable
 CREATE INDEX IF NOT EXISTS idx_variable_execution_lookup
     ON variable (execution_id, variable_key, variable_value);
 
-CREATE INDEX IF NOT EXISTS idx_variable_process_def
-    ON variable (process_id, execution_definition_id);
+CREATE INDEX IF NOT EXISTS idx_variable_execution_definition_id
+    ON variable (execution_id, execution_definition_id);
 
 -- ============================
 -- Table: history

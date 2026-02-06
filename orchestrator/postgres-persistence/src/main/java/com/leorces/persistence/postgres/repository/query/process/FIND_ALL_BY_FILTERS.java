@@ -40,6 +40,7 @@ public class FIND_ALL_BY_FILTERS {
                        ) AS variables_json
                 FROM variable v
                 WHERE v.execution_id = process.process_id
+                  AND v.execution_definition_id = process.process_definition_id
                 ) AS variables ON TRUE
             WHERE (:processDefinitionKey IS NULL OR :processDefinitionKey = '' OR
                    process.process_definition_key = :processDefinitionKey)
@@ -52,6 +53,7 @@ public class FIND_ALL_BY_FILTERS {
                     OR process.process_id IN (SELECT v.execution_id
                                               FROM variable v
                                               WHERE v.execution_id = process.process_id
+                                                AND v.execution_definition_id = process.process_definition_id
                                                 AND v.variable_key = ANY (:variableKeys)
                                                 AND v.variable_value = ANY (:variableValues)
                                               GROUP BY v.execution_id

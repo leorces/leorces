@@ -50,6 +50,7 @@ public class FIND_EXECUTION_BY_ID {
                        ) AS variables_json
                 FROM variable v
                 WHERE v.execution_id = process.process_id
+                  AND v.execution_definition_id = process.process_definition_id
                 ) AS proc_vars ON TRUE
             
                      LEFT JOIN LATERAL (
@@ -91,6 +92,7 @@ public class FIND_EXECUTION_BY_ID {
                            ) AS variables_json
                     FROM variable av
                     WHERE av.execution_id = a.activity_id
+                      AND av.execution_definition_id = a.activity_definition_id
                     ) AS act_vars ON TRUE
                 WHERE a.process_id = process.process_id
                   AND a.activity_state != 'DELETED'
