@@ -194,4 +194,5 @@ class CompactionCommandHandlerTest {
         // Then
         verify(jobPersistence).fail(argThat(j -> "Test error".equals(j.failureReason())));
     }
+
 }

@@ -57,7 +57,7 @@ class CreateProcessCommandHandlerTest {
 
         // Then
         assertEquals(expectedProcess, result);
-        verify(dispatcher).execute(new CreateProcessByCallActivityCommand(callActivity));
+        verify(dispatcher).execute(CreateProcessByCallActivityCommand.of(callActivity));
     }
 
     @Test

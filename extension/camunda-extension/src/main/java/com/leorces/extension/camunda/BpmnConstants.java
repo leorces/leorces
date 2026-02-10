@@ -27,8 +27,9 @@ public final class BpmnConstants {
     public static final String START_EVENT = "startEvent";
     public static final String INTERMEDIATE_CATCH_EVENT = "intermediateCatchEvent";
     public static final String TERMINATE_EVENT_DEFINITION = "terminateEventDefinition";
-
+    // =====================
     // Gateways
+    // =====================
     public static final String EVENT_BASED_GATEWAY = "eventBasedGateway";
     public static final String EXCLUSIVE_GATEWAY = "exclusiveGateway";
     public static final String INCLUSIVE_GATEWAY = "inclusiveGateway";
@@ -42,8 +43,9 @@ public final class BpmnConstants {
     public static final String ERROR_EVENT_DEFINITION = "errorEventDefinition";
     public static final String ESCALATION_EVENT_DEFINITION = "escalationEventDefinition";
     public static final String SIGNAL_EVENT_DEFINITION = "signalEventDefinition";
-
+    // =====================
     // Event-specific elements
+    // =====================
     public static final String CONDITION = "condition";
     public static final String CONDITION_EXPRESSION = "conditionExpression";
     public static final String MESSAGE = "message";
@@ -74,6 +76,10 @@ public final class BpmnConstants {
     public static final String ATTRIBUTE_TRIGGERED_BY_EVENT = "triggeredByEvent";
     public static final String ATTRIBUTE_CALLED_ELEMENT = "calledElement";
     public static final String ATTRIBUTE_CALLED_ELEMENT_VERSION = "calledElementVersion";
+    public static final String ATTRIBUTE_MULTI_INSTANCE_LOOP_CHARACTERISTICS = "multiInstanceLoopCharacteristics";
+    public static final String ATTRIBUTE_COLLECTION = "collection";
+    public static final String ATTRIBUTE_ELEMENT_VARIABLE = "elementVariable";
+    public static final String ATTRIBUTE_IS_SEQUENTIAL = "isSequential";
     public static final String ATTRIBUTE_SOURCE = "source";
     public static final String ATTRIBUTE_TARGET = "target";
     public static final String ATTRIBUTE_SOURCE_EXPRESSION = "sourceExpression";

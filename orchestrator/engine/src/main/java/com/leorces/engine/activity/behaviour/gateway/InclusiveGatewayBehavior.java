@@ -38,7 +38,9 @@ public class InclusiveGatewayBehavior extends AbstractConditionalGatewayBehavior
 
     @Override
     public List<ActivityDefinition> getNextActivities(ActivityExecution inclusiveGateway) {
-        var variables = dispatcher.execute(GetScopedVariablesCommand.of(inclusiveGateway));
+        var variables = inclusiveGateway.getScopedVariables(
+                () -> dispatcher.execute(GetScopedVariablesCommand.of(inclusiveGateway))
+        );
         var condition = ((InclusiveGateway) inclusiveGateway.definition()).condition();
         var nextActivityIds = evaluateInclusiveConditions(condition, variables);
         return getNextActivities(inclusiveGateway.processDefinition(), nextActivityIds);

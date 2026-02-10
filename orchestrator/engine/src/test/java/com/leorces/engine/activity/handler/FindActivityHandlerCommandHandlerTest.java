@@ -1,12 +1,8 @@
 package com.leorces.engine.activity.handler;
 
 import com.leorces.engine.activity.command.FindActivityHandlerCommand;
-import com.leorces.model.definition.activity.ActivityDefinition;
-import com.leorces.model.definition.activity.ActivityType;
-import com.leorces.model.definition.activity.BoundaryEventDefinition;
-import com.leorces.model.definition.activity.ErrorActivityDefinition;
-import com.leorces.model.definition.activity.EscalationActivityDefinition;
 import com.leorces.model.definition.ProcessDefinition;
+import com.leorces.model.definition.activity.*;
 import com.leorces.model.runtime.process.Process;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -160,7 +156,13 @@ class FindActivityHandlerCommandHandlerTest {
     }
 
     // Helper interfaces for mocking multiple types
-    interface TestErrorBoundaryEvent extends ActivityDefinition, BoundaryEventDefinition, ErrorActivityDefinition {}
-    interface TestEscalationBoundaryEvent extends ActivityDefinition, BoundaryEventDefinition, EscalationActivityDefinition {}
-    interface TestErrorStartEvent extends ActivityDefinition, ErrorActivityDefinition {}
+    interface TestErrorBoundaryEvent extends ActivityDefinition, BoundaryEventDefinition, ErrorActivityDefinition {
+    }
+
+    interface TestEscalationBoundaryEvent extends ActivityDefinition, BoundaryEventDefinition, EscalationActivityDefinition {
+    }
+
+    interface TestErrorStartEvent extends ActivityDefinition, ErrorActivityDefinition {
+    }
+
 }

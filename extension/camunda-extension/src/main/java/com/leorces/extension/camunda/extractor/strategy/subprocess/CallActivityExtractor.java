@@ -5,6 +5,7 @@ import com.leorces.extension.camunda.extractor.strategy.ActivityExtractionStrate
 import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
+import com.leorces.model.definition.attribute.MultiInstanceLoopCharacteristics;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
@@ -44,6 +45,7 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
                 .outputs(helper.extractOutputParameters(element))
                 .inputMappings(extractInputMappings(element))
                 .outputMappings(extractOutputMappings(element))
+                .multiInstanceLoopCharacteristics(extractMultiInstanceLoopCharacteristics(element))
                 .build();
     }
 
@@ -75,6 +77,20 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
         }
 
         return mappings;
+    }
+
+    private MultiInstanceLoopCharacteristics extractMultiInstanceLoopCharacteristics(Element element) {
+        var loopCharacteristicsElements = element.getElementsByTagNameNS(BPMN_NAMESPACE, ATTRIBUTE_MULTI_INSTANCE_LOOP_CHARACTERISTICS);
+        if (loopCharacteristicsElements.getLength() == 0) {
+            return null;
+        }
+
+        var loopCharacteristics = (Element) loopCharacteristicsElements.item(0);
+        return MultiInstanceLoopCharacteristics.builder()
+                .collection(getStringOrNull(loopCharacteristics.getAttributeNS(CAMUNDA_NAMESPACE, ATTRIBUTE_COLLECTION)))
+                .elementVariable(getStringOrNull(loopCharacteristics.getAttributeNS(CAMUNDA_NAMESPACE, ATTRIBUTE_ELEMENT_VARIABLE)))
+                .isSequential(Boolean.parseBoolean(loopCharacteristics.getAttribute(ATTRIBUTE_IS_SEQUENTIAL)))
+                .build();
     }
 
     private Element getExtensionElement(Element element) {

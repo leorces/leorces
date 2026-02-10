@@ -9,12 +9,19 @@ import java.util.Map;
 
 @Builder
 public record RunProcessCommand(
+        Process process,
         ActivityExecution callActivity,
         String definitionId,
         String definitionKey,
         String businessKey,
         Map<String, Object> variables
 ) implements ExecutionResultCommand<Process> {
+
+    public static RunProcessCommand of(Process process) {
+        return RunProcessCommand.builder()
+                .process(process)
+                .build();
+    }
 
     public static RunProcessCommand byCallActivity(ActivityExecution callActivity) {
         return RunProcessCommand.builder()

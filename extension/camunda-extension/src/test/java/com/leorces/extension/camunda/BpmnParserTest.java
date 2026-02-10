@@ -1,6 +1,5 @@
 package com.leorces.extension.camunda;
 
-
 import com.leorces.model.definition.activity.ActivityType;
 import com.leorces.model.definition.activity.ConditionalActivityDefinition;
 import com.leorces.model.definition.activity.MessageActivityDefinition;
@@ -13,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 
 @DisplayName("BpmnParser Integration Tests")
 @SpringBootTest(classes = BpmnParserTestConfiguration.class)
@@ -944,6 +942,7 @@ class BpmnParserTest {
         assertThat(orderSubmittedProcess.get().outputs()).isEmpty();
         if (orderSubmittedProcess.get() instanceof CallActivity callActivity) {
             assertThat(callActivity.calledElement()).isEqualTo("OrderSubmittedProcess");
+            assertThat(callActivity.multiInstanceLoopCharacteristics()).isNull();
         }
 
         // Verify OrderPaymentProcess call activity
@@ -960,6 +959,10 @@ class BpmnParserTest {
         assertThat(orderPaymentProcess.get().outputs()).isEmpty();
         if (orderPaymentProcess.get() instanceof CallActivity callActivity) {
             assertThat(callActivity.calledElement()).isEqualTo("OrderPaymentProcess");
+            assertThat(callActivity.multiInstanceLoopCharacteristics()).isNotNull();
+            assertThat(callActivity.multiInstanceLoopCharacteristics().collection()).isEqualTo("${test}");
+            assertThat(callActivity.multiInstanceLoopCharacteristics().elementVariable()).isEqualTo("test");
+            assertThat(callActivity.multiInstanceLoopCharacteristics().isSequential()).isTrue();
         }
 
         // Verify main process end event

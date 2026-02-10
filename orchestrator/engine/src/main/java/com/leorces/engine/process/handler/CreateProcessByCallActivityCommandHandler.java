@@ -12,12 +12,16 @@ import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.subprocess.CallActivity;
 import com.leorces.model.runtime.activity.ActivityExecution;
 import com.leorces.model.runtime.process.Process;
+import com.leorces.model.runtime.variable.Variable;
 import com.leorces.persistence.DefinitionPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -32,13 +36,34 @@ public class CreateProcessByCallActivityCommandHandler implements ResultCommandH
 
     @Override
     public Process execute(CreateProcessByCallActivityCommand command) {
+        Objects.requireNonNull(command);
         var activity = command.callActivity();
         var callActivity = (CallActivity) activity.definition();
         var scopedVariables = resolveScopedVariables(activity, callActivity);
-        var inputMappings = dispatcher.execute(GetCallActivityMappingsCommand.input(activity, scopedVariables));
+        var inputMappings = resolveInputMappings(activity, scopedVariables);
         var definition = resolveDefinition(callActivity, scopedVariables);
+        return buildProcess(activity, definition, inputMappings, command.additionalVariables());
+    }
 
-        return buildProcessFromActivity(activity, definition, inputMappings);
+    private Process buildProcess(ActivityExecution activity,
+                                 ProcessDefinition definition,
+                                 Map<String, Object> inputMappings,
+                                 Map<String, Object> additionalVariables) {
+        var parentProcess = activity.process();
+        return Process.builder()
+                .id(activity.id())
+                .parentId(parentProcess.id())
+                .rootProcessId(resolveRootProcessId(parentProcess))
+                .businessKey(parentProcess.businessKey())
+                .definition(definition)
+                .variables(buildVariables(inputMappings, additionalVariables))
+                .suspended(parentProcess.suspended())
+                .build();
+    }
+
+    private Map<String, Object> resolveInputMappings(ActivityExecution activity, Map<String, Object> scopedVariables) {
+        var mappings = dispatcher.execute(GetCallActivityMappingsCommand.input(activity, scopedVariables));
+        return mappings != null ? mappings : Map.of();
     }
 
     @Override
@@ -48,29 +73,27 @@ public class CreateProcessByCallActivityCommandHandler implements ResultCommandH
 
     private Map<String, Object> resolveScopedVariables(ActivityExecution activity, CallActivity callActivity) {
         return shouldFetchScopedVariables(callActivity)
-                ? dispatcher.execute(GetScopedVariablesCommand.of(activity))
+                ? activity.getScopedVariables(() -> dispatcher.execute(GetScopedVariablesCommand.of(activity)))
                 : Map.of();
     }
 
     private ProcessDefinition resolveDefinition(CallActivity callActivity, Map<String, Object> variables) {
-        var calledElement = getCalledElement(callActivity, variables)
+        return getCalledElement(callActivity, variables)
+                .map(calledElement -> getDefinition(calledElement, callActivity.calledElementVersion()))
                 .orElseThrow(() -> ExecutionException.of("Process definition not found", "Called element is null"));
-        return getDefinition(calledElement, callActivity.calledElementVersion());
     }
 
-    private Process buildProcessFromActivity(ActivityExecution activity,
-                                             ProcessDefinition definition,
-                                             Map<String, Object> inputMappings) {
-        var parentProcess = activity.process();
-        return Process.builder()
-                .id(activity.id())
-                .parentId(parentProcess.id())
-                .rootProcessId(resolveRootProcessId(parentProcess))
-                .businessKey(parentProcess.businessKey())
-                .definition(definition)
-                .variables(variablesMapper.map(inputMappings))
-                .suspended(parentProcess.suspended())
-                .build();
+    private List<Variable> buildVariables(Map<String, Object> variables,
+                                          Map<String, Object> additionalVariables) {
+        var allVariables = new HashMap<>(variables);
+        if (additionalVariables != null) {
+            allVariables.putAll(additionalVariables);
+        }
+        return mapVariables(allVariables);
+    }
+
+    private List<Variable> mapVariables(Map<String, Object> variables) {
+        return variablesMapper.map(variables);
     }
 
     private String resolveRootProcessId(Process parentProcess) {

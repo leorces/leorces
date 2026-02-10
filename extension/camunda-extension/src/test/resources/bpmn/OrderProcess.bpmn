@@ -22,9 +22,11 @@
       <bpmn:extensionElements>
         <camunda:in source="order" target="order" />
         <camunda:in source="client" target="client" />
+        <camunda:in source="amount" target="amount" />
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0q3woxf</bpmn:incoming>
       <bpmn:outgoing>Flow_1b09jye</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="${test}" camunda:elementVariable="test" />
     </bpmn:callActivity>
     <bpmn:endEvent id="Event_1hvxg1f">
       <bpmn:incoming>Flow_1wtnxfo</bpmn:incoming>

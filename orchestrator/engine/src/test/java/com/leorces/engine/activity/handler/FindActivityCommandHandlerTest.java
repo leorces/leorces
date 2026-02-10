@@ -92,4 +92,5 @@ class FindActivityCommandHandlerTest {
                 .extracting("detailedMessage")
                 .isEqualTo("Activity not found for process: %s and definition: %s".formatted(PROCESS_ID, DEFINITION_ID));
     }
+
 }

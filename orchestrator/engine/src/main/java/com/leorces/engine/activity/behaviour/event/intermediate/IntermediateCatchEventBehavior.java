@@ -38,7 +38,9 @@ public class IntermediateCatchEventBehavior extends AbstractTriggerableCatchBeha
     }
 
     private boolean isConditionMatched(ActivityExecution intermediateCatchEvent) {
-        var variables = dispatcher.execute(GetScopedVariablesCommand.of(intermediateCatchEvent));
+        var variables = intermediateCatchEvent.getScopedVariables(
+                () -> dispatcher.execute(GetScopedVariablesCommand.of(intermediateCatchEvent))
+        );
         var definition = (IntermediateCatchEvent) intermediateCatchEvent.definition();
         return expressionEvaluator.evaluateBoolean(definition.condition(), variables);
     }

@@ -31,7 +31,7 @@ public class CreateProcessCommandHandler implements ResultCommandHandler<CreateP
         var definitionKey = command.definitionKey();
 
         if (callActivity != null) {
-            return dispatcher.execute(new CreateProcessByCallActivityCommand(callActivity));
+            return dispatcher.execute(CreateProcessByCallActivityCommand.of(callActivity));
         }
 
         ProcessDefinition definition = null;

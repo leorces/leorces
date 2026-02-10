@@ -11,7 +11,6 @@ import com.leorces.model.runtime.variable.Variable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class EvaluateVariablesCommandHandler implements ResultCommandHandler<Eva
     public List<Variable> execute(EvaluateVariablesCommand command) {
         var variables = command.variables();
         if (variables == null || variables.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         return hasExpression(variables)
                 ? evaluateWithExpressions(variables, command.activity())
@@ -40,7 +39,9 @@ public class EvaluateVariablesCommandHandler implements ResultCommandHandler<Eva
     }
 
     private List<Variable> evaluateWithExpressions(Map<String, Object> variablesMap, ActivityExecution activity) {
-        var variables = dispatcher.execute(GetScopedVariablesCommand.of(activity));
+        var variables = activity.getScopedVariables(
+                () -> dispatcher.execute(GetScopedVariablesCommand.of(activity))
+        );
         var evaluated = expressionEvaluator.evaluate(variablesMap, variables);
         return variablesMapper.map(evaluated);
     }

@@ -51,6 +51,9 @@ public class RunProcessCommandHandler implements ResultCommandHandler<RunProcess
     }
 
     private Process getProcess(RunProcessCommand command) {
+        if (command.process() != null) {
+            return command.process();
+        }
         return dispatcher.execute(CreateProcessCommand.of(
                 command.callActivity(),
                 command.definitionId(),

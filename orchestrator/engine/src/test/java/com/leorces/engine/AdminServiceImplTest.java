@@ -97,4 +97,5 @@ class AdminServiceImplTest {
         assertThat(result).isEqualTo(expectedPlan);
         verify(dispatcher).execute(any(GenerateProcessMigrationPlanCommand.class));
     }
+
 }

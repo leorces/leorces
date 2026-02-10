@@ -38,7 +38,9 @@ public class ExclusiveGatewayBehavior extends AbstractConditionalGatewayBehavior
 
     @Override
     public List<ActivityDefinition> getNextActivities(ActivityExecution exclusiveGateway) {
-        var variables = dispatcher.execute(GetScopedVariablesCommand.of(exclusiveGateway));
+        var variables = exclusiveGateway.getScopedVariables(
+                () -> dispatcher.execute(GetScopedVariablesCommand.of(exclusiveGateway))
+        );
         var condition = ((ExclusiveGateway) exclusiveGateway.definition()).condition();
         var nextActivityIds = evaluateExclusiveConditions(condition, variables);
         return getNextActivities(exclusiveGateway.processDefinition(), nextActivityIds);

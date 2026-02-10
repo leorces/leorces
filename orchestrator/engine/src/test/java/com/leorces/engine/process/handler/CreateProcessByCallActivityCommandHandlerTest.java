@@ -26,7 +26,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +37,14 @@ class CreateProcessByCallActivityCommandHandlerTest {
     private static final String BUSINESS_KEY = "business-key";
     private static final String PROCESS_ID = "process-id";
     private static final String ACTIVITY_ID = "activity-id";
+    private static final String SUB_DEF_ID = "sub-def-id";
+    private static final String PARENT_DEF_ID = "parent-def-id";
+    private static final String CALL_ACTIVITY_ID = "call-activity-id";
+    private static final String VAR_KEY = "var1";
+    private static final String VAR_VALUE = "val1";
+    private static final String RESOLVED_KEY = "resolved-key";
+    private static final String SUB_PROCESS_KEY = "subProcessKey";
+    private static final String EXPRESSION = "${subProcessKey}";
 
     @Mock
     private VariablesMapper variablesMapper;
@@ -59,12 +66,12 @@ class CreateProcessByCallActivityCommandHandlerTest {
     @BeforeEach
     void setUp() {
         callActivityDefinition = CallActivity.builder()
-                .id("call-activity-id")
+                .id(CALL_ACTIVITY_ID)
                 .calledElement(CALLED_ELEMENT)
                 .build();
 
         parentDefinition = ProcessDefinition.builder()
-                .id("parent-def-id")
+                .id(PARENT_DEF_ID)
                 .activities(List.of(callActivityDefinition))
                 .build();
 
@@ -86,9 +93,9 @@ class CreateProcessByCallActivityCommandHandlerTest {
     @DisplayName("Should create process with plain called element")
     void executeWithPlainCalledElement() {
         // Given
-        var command = new CreateProcessByCallActivityCommand(activity);
-        var subProcessDefinition = ProcessDefinition.builder().id("sub-def-id").key(CALLED_ELEMENT).build();
-        var inputMappings = Map.<String, Object>of("var1", "val1");
+        var command = CreateProcessByCallActivityCommand.of(activity);
+        var subProcessDefinition = ProcessDefinition.builder().id(SUB_DEF_ID).key(CALLED_ELEMENT).build();
+        var inputMappings = Map.<String, Object>of(VAR_KEY, VAR_VALUE);
 
         when(expressionEvaluator.isExpression(CALLED_ELEMENT)).thenReturn(false);
         when(definitionPersistence.findLatestByKey(CALLED_ELEMENT)).thenReturn(Optional.of(subProcessDefinition));
@@ -107,22 +114,22 @@ class CreateProcessByCallActivityCommandHandlerTest {
     @DisplayName("Should create process with expression called element")
     void executeWithExpressionCalledElement() {
         // Given
-        var expression = "${subProcessKey}";
-        var resolvedKey = "resolved-key";
-        var activityWithExpression = setupActivityWithExpression(expression);
-        var command = new CreateProcessByCallActivityCommand(activityWithExpression);
-        var subProcessDefinition = ProcessDefinition.builder().id("sub-def-id").key(resolvedKey).build();
-        var scopedVariables = Map.<String, Object>of("subProcessKey", resolvedKey);
+        var activityWithExpression = setupActivityWithExpression(EXPRESSION);
+        var command = CreateProcessByCallActivityCommand.of(activityWithExpression);
+        var subProcessDefinition = ProcessDefinition.builder().id(SUB_DEF_ID).key(RESOLVED_KEY).build();
+        var scopedVariables = Map.<String, Object>of(SUB_PROCESS_KEY, RESOLVED_KEY);
 
-        mockExpressionEvaluation(expression, resolvedKey, scopedVariables, activityWithExpression);
-        when(definitionPersistence.findLatestByKey(resolvedKey)).thenReturn(Optional.of(subProcessDefinition));
+        mockExpressionEvaluation(EXPRESSION, RESOLVED_KEY, scopedVariables, activityWithExpression);
+        when(definitionPersistence.findLatestByKey(RESOLVED_KEY)).thenReturn(Optional.of(subProcessDefinition));
+        when(dispatcher.execute(any(GetCallActivityMappingsCommand.class))).thenReturn(Map.of());
+        when(variablesMapper.map(any())).thenReturn(List.of());
 
         // When
         var result = handler.execute(command);
 
         // Then
         assertCreatedProcess(result, subProcessDefinition);
-        verify(expressionEvaluator).evaluateString(expression, scopedVariables);
+        verify(expressionEvaluator).evaluateString(EXPRESSION, scopedVariables);
     }
 
     private ActivityExecution setupActivityWithExpression(String expression) {
@@ -144,11 +151,13 @@ class CreateProcessByCallActivityCommandHandlerTest {
         // Given
         var version = 2;
         var activityWithVersion = setupActivityWithVersion(version);
-        var command = new CreateProcessByCallActivityCommand(activityWithVersion);
-        var subProcessDefinition = ProcessDefinition.builder().id("sub-def-id").key(CALLED_ELEMENT).version(version).build();
+        var command = CreateProcessByCallActivityCommand.of(activityWithVersion);
+        var subProcessDefinition = ProcessDefinition.builder().id(SUB_DEF_ID).key(CALLED_ELEMENT).version(version).build();
 
         when(expressionEvaluator.isExpression(CALLED_ELEMENT)).thenReturn(false);
         when(definitionPersistence.findByKeyAndVersion(CALLED_ELEMENT, version)).thenReturn(Optional.of(subProcessDefinition));
+        when(dispatcher.execute(any(GetCallActivityMappingsCommand.class))).thenReturn(Map.of());
+        when(variablesMapper.map(any())).thenReturn(List.of());
 
         // When
         var result = handler.execute(command);
@@ -170,7 +179,7 @@ class CreateProcessByCallActivityCommandHandlerTest {
     void executeWithNullCalledElement() {
         // Given
         var activityWithNull = setupActivityWithNull();
-        var command = new CreateProcessByCallActivityCommand(activityWithNull);
+        var command = CreateProcessByCallActivityCommand.of(activityWithNull);
 
         // When & Then
         assertThrows(ExecutionException.class, () -> handler.execute(command));
@@ -187,7 +196,7 @@ class CreateProcessByCallActivityCommandHandlerTest {
     @DisplayName("Should throw exception when definition not found")
     void executeWithNonExistentDefinition() {
         // Given
-        var command = new CreateProcessByCallActivityCommand(activity);
+        var command = CreateProcessByCallActivityCommand.of(activity);
         when(expressionEvaluator.isExpression(CALLED_ELEMENT)).thenReturn(false);
         when(definitionPersistence.findLatestByKey(CALLED_ELEMENT)).thenReturn(Optional.empty());
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.leorces.model.definition.VariableMapping;
 import com.leorces.model.definition.activity.ActivityDefinition;
 import com.leorces.model.definition.activity.ActivityType;
+import com.leorces.model.definition.attribute.MultiInstanceLoopCharacteristics;
 import lombok.Builder;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public record CallActivity(
         Map<String, Object> inputs,
         Map<String, Object> outputs,
         List<VariableMapping> inputMappings,
-        List<VariableMapping> outputMappings
+        List<VariableMapping> outputMappings,
+        MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics
 ) implements ActivityDefinition {
 
     @Override
@@ -40,9 +42,15 @@ public record CallActivity(
         return shouldProcessAllMappings(outputMappings);
     }
 
+    @JsonIgnore
+    public boolean isMultiInstance() {
+        return multiInstanceLoopCharacteristics() != null;
+    }
+
     private boolean shouldProcessAllMappings(List<VariableMapping> mappings) {
         return mappings.stream()
                 .anyMatch(mapping -> "all".equals(mapping.variables()));
     }
 
 }
+
