@@ -22,17 +22,15 @@ public class HandleActivityCompletionCommandHandler
     @Override
     public void handle(HandleActivityCompletionCommand command) {
         var activity = command.activity();
-
-        if (!activity.hasParent()) {
+        if (activity.hasParent()) {
+            log.debug("{} activity with definitionId: {} and id: {} parent activity. Completing parent activity: {} in process: {}",
+                    activity.type(), activity.definitionId(), activity.id(), activity.parentDefinitionId(), activity.processId());
+            completeParentActivity(activity);
+        } else {
             log.debug("{} activity with definitionId: {} and id: {} has no parent activity. Completing process: {}",
                     activity.type(), activity.definitionId(), activity.id(), activity.processId());
             completeProcess(activity.processId());
-            return;
         }
-
-        log.debug("{} activity with definitionId: {} and id: {} parent activity. Completing parent activity: {} in process: {}",
-                activity.type(), activity.definitionId(), activity.id(), activity.parentDefinitionId(), activity.processId());
-        completeParentActivity(activity);
     }
 
     @Override

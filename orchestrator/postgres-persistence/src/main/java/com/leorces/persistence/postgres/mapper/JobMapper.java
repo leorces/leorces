@@ -1,6 +1,7 @@
 package com.leorces.persistence.postgres.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leorces.model.job.Job;
 import com.leorces.model.job.JobState;
@@ -88,7 +89,8 @@ public class JobMapper {
         try {
             return objectMapper.readValue(
                     paramsJson.getValue(),
-                    Map.class
+                    new TypeReference<>() {
+                    }
             );
         } catch (JsonProcessingException e) {
             log.error("Failed to deserialize params from json: {}", paramsJson.getValue(), e);

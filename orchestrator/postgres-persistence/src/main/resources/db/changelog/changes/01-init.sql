@@ -142,6 +142,9 @@ CREATE INDEX IF NOT EXISTS idx_variable_execution_lookup
 CREATE INDEX IF NOT EXISTS idx_variable_execution_definition_id
     ON variable (execution_id, execution_definition_id);
 
+CREATE INDEX IF NOT EXISTS idx_variable_process_scope
+    ON variable (process_id, execution_definition_id);
+
 -- ============================
 -- Table: history
 -- ============================
