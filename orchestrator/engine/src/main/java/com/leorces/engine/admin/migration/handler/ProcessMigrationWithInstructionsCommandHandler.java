@@ -7,9 +7,9 @@ import com.leorces.engine.admin.migration.command.SingleProcessMigrationCommand;
 import com.leorces.engine.configuration.properties.job.ProcessMigrationProperties;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.service.TaskExecutorService;
+import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.job.Job;
 import com.leorces.model.job.migration.ProcessMigrationPlan;
-import com.leorces.model.runtime.process.ProcessExecution;
 import com.leorces.persistence.AdminPersistence;
 import com.leorces.persistence.JobPersistence;
 import com.leorces.persistence.ProcessPersistence;
@@ -50,10 +50,10 @@ public class ProcessMigrationWithInstructionsCommandHandler
 
     @Override
     protected Map<String, Object> execute(Job job, ProcessMigrationWithInstructionsCommand command) {
-        var fromDefinitionId = command.fromDefinition().id();
-        var toDefinitionId = command.toDefinition().id();
+        var fromDefinition = command.fromDefinition();
+        var toDefinition = command.toDefinition();
         var migration = command.migration();
-        long totalMigrated = migrateProcesses(fromDefinitionId, toDefinitionId, migration);
+        long totalMigrated = migrateProcesses(fromDefinition, toDefinition, migration);
         return Map.of(OUTPUT_TOTAL_MIGRATED_PROCESSES, totalMigrated);
     }
 
@@ -67,11 +67,11 @@ public class ProcessMigrationWithInstructionsCommandHandler
         return ProcessMigrationWithInstructionsCommand.class;
     }
 
-    private long migrateProcesses(String fromDefinitionId,
-                                  String toDefinitionId,
+    private long migrateProcesses(ProcessDefinition fromDefinition,
+                                  ProcessDefinition toDefinition,
                                   ProcessMigrationPlan migration) {
         var futures = IntStream.range(0, properties.maxJobs())
-                .mapToObj(i -> migrateJobBatchAsync(fromDefinitionId, toDefinitionId, migration))
+                .mapToObj(i -> migrateJobBatchAsync(fromDefinition, toDefinition, migration))
                 .toList();
 
         return futures.stream()
@@ -79,14 +79,14 @@ public class ProcessMigrationWithInstructionsCommandHandler
                 .sum();
     }
 
-    private CompletableFuture<Long> migrateJobBatchAsync(String fromDefinitionId,
-                                                         String toDefinitionId,
+    private CompletableFuture<Long> migrateJobBatchAsync(ProcessDefinition fromDefinition,
+                                                         ProcessDefinition toDefinition,
                                                          ProcessMigrationPlan migration) {
         return taskExecutor.supplyAsync(() -> {
             long migratedCount = 0;
             int batchSize;
             do {
-                batchSize = migrateBatch(fromDefinitionId, toDefinitionId, migration);
+                batchSize = migrateBatch(fromDefinition, toDefinition, migration);
                 migratedCount += batchSize;
                 log.info("Migrated {} processes in this batch", batchSize);
             } while (batchSize >= properties.batchSize());
@@ -94,24 +94,20 @@ public class ProcessMigrationWithInstructionsCommandHandler
         });
     }
 
-    private int migrateBatch(String fromDefinitionId,
-                             String toDefinitionId,
+    private int migrateBatch(ProcessDefinition fromDefinition,
+                             ProcessDefinition toDefinition,
                              ProcessMigrationPlan migration) {
         return adminPersistence.execute(() -> {
             var processes = processPersistence.findExecutionsForUpdate(
-                    fromDefinitionId,
+                    fromDefinition.id(),
                     properties.batchSize()
             );
 
             processes.forEach(process -> dispatcher.dispatch(
-                    SingleProcessMigrationCommand.of(process, migration)
+                    SingleProcessMigrationCommand.of(process, toDefinition, migration)
             ));
 
-            var processIds = processes.stream()
-                    .map(ProcessExecution::id)
-                    .toList();
-
-            return processPersistence.updateDefinitionId(toDefinitionId, processIds);
+            return processes.size();
         });
     }
 

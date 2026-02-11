@@ -4,6 +4,5 @@ public enum ProcessState {
     ACTIVE,
     COMPLETED,
     TERMINATED,
-    INCIDENT,
-    DELETED
+    INCIDENT
 }

@@ -53,4 +53,26 @@ public interface VariablePersistence {
      */
     List<Variable> findInProcess(String processId);
 
+    /**
+     * Updates the definition ID for variables associated with specified process IDs.
+     *
+     * @param definitionId the new definition identifier
+     * @param processIds   the list of process identifiers
+     */
+    void updateDefinitionId(String definitionId, List<String> processIds);
+
+    /**
+     * Deletes all variables associated with a specific execution.
+     *
+     * @param executionId the execution identifier
+     */
+    void deleteByExecutionId(String executionId);
+
+    /**
+     * Deletes all variables associated with multiple executions.
+     *
+     * @param executionIds the list of execution identifiers
+     */
+    void deleteByExecutionIds(List<String> executionIds);
+
 }

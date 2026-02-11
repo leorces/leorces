@@ -5,6 +5,5 @@ public enum ActivityState {
     ACTIVE,
     COMPLETED,
     TERMINATED,
-    FAILED,
-    DELETED
+    FAILED
 }

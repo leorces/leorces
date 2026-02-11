@@ -47,13 +47,9 @@ class DeleteActivityCommandHandlerTest {
         var activityId = "activity-1";
         var command = DeleteActivityCommand.of(activityId);
         var activity = mock(ActivityExecution.class);
-        var process = mock(Process.class);
         var behavior = mock(ActivityBehavior.class);
 
         when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
-        when(activity.isInTerminalState()).thenReturn(false);
-        when(activity.process()).thenReturn(process);
-        when(process.isInTerminalState()).thenReturn(false);
         when(activity.type()).thenReturn(ActivityType.EXTERNAL_TASK);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(behavior);
 
@@ -65,20 +61,13 @@ class DeleteActivityCommandHandlerTest {
     }
 
     @Test
-    @DisplayName("Should delete activity when it is not in terminal state and process is in terminal state but activity is async")
-    void handleDeleteAsyncActivityInTerminalProcess() {
+    @DisplayName("Should delete activity when it is passed in command")
+    void handleDeleteSuccessWithActivityInCommand() {
         // Given
-        var activityId = "activity-1";
-        var command = DeleteActivityCommand.of(activityId);
         var activity = mock(ActivityExecution.class);
-        var process = mock(Process.class);
+        var command = DeleteActivityCommand.of(activity);
         var behavior = mock(ActivityBehavior.class);
 
-        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
-        when(activity.isInTerminalState()).thenReturn(false);
-        when(activity.process()).thenReturn(process);
-        when(process.isInTerminalState()).thenReturn(true);
-        when(activity.isAsync()).thenReturn(true);
         when(activity.type()).thenReturn(ActivityType.EXTERNAL_TASK);
         when(behaviorResolver.resolveBehavior(ActivityType.EXTERNAL_TASK)).thenReturn(behavior);
 
@@ -87,46 +76,7 @@ class DeleteActivityCommandHandlerTest {
 
         // Then
         verify(behavior).delete(activity);
-    }
-
-    @Test
-    @DisplayName("Should not delete activity when it is in terminal state")
-    void handleActivityInTerminalState() {
-        // Given
-        var activityId = "activity-1";
-        var command = DeleteActivityCommand.of(activityId);
-        var activity = mock(ActivityExecution.class);
-
-        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
-        when(activity.isInTerminalState()).thenReturn(true);
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verifyNoInteractions(behaviorResolver);
-    }
-
-    @Test
-    @DisplayName("Should not delete activity when process is in terminal state and activity is not async")
-    void handleProcessInTerminalState() {
-        // Given
-        var activityId = "activity-1";
-        var command = DeleteActivityCommand.of(activityId);
-        var activity = mock(ActivityExecution.class);
-        var process = mock(Process.class);
-
-        when(dispatcher.execute(FindActivityCommand.byId(activityId))).thenReturn(activity);
-        when(activity.isInTerminalState()).thenReturn(false);
-        when(activity.process()).thenReturn(process);
-        when(process.isInTerminalState()).thenReturn(true);
-        when(activity.isAsync()).thenReturn(false);
-
-        // When
-        handler.handle(command);
-
-        // Then
-        verifyNoInteractions(behaviorResolver);
+        verifyNoInteractions(dispatcher);
     }
 
 }

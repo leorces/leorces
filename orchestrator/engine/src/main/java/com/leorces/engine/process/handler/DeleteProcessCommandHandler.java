@@ -24,16 +24,10 @@ public class DeleteProcessCommandHandler implements CommandHandler<DeleteProcess
 
     @Override
     public void handle(DeleteProcessCommand command) {
+        log.debug("Delete process with id: {}", command.processId());
         var process = getProcess(command);
-        var processId = process.id();
 
-        if (process.isInTerminalState()) {
-            log.debug("Process {} is already in terminal state: {}", processId, process.state());
-            return;
-        }
-
-        log.debug("Delete process: {}", processId);
-        deleteActivities(processId);
+        deleteActivities(process.id());
         deleteProcess(process, command.deleteCallActivity());
     }
 
@@ -50,8 +44,8 @@ public class DeleteProcessCommandHandler implements CommandHandler<DeleteProcess
     }
 
     private void deleteActivities(String processId) {
-        var activeActivities = activityPersistence.findActive(processId);
-        dispatcher.dispatch(DeleteAllActivitiesCommand.of(activeActivities));
+        var activities = activityPersistence.findAll(processId);
+        dispatcher.dispatch(DeleteAllActivitiesCommand.of(activities));
     }
 
     private Process getProcess(DeleteProcessCommand command) {

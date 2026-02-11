@@ -30,7 +30,7 @@ import static com.leorces.persistence.postgres.repository.query.process.RUN.RUN_
 @AllArgsConstructor
 public class ProcessPersistenceImpl implements ProcessPersistence {
 
-    private final VariablePersistence variablePersistence;
+    private final VariablePersistenceImpl variablePersistence;
     private final ProcessRepository processRepository;
     private final ProcessMapper processMapper;
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -59,9 +59,11 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
+    @Transactional
     public void delete(String processId) {
         log.debug("Delete process: {}", processId);
         processRepository.delete(processId);
+        variablePersistence.deleteByExecutionId(processId);
     }
 
     @Override
@@ -163,15 +165,21 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
+    @Transactional
     public int updateDefinitionId(String fromDefinitionId, String toDefinitionId, int batchSize) {
         log.debug("Updating definition id from: {} to: {} with batch size: {}", fromDefinitionId, toDefinitionId, batchSize);
-        return processRepository.updateDefinitionId(fromDefinitionId, toDefinitionId, batchSize).size();
+        var updatedProcessIds = processRepository.updateDefinitionId(fromDefinitionId, toDefinitionId, batchSize);
+        variablePersistence.updateDefinitionId(toDefinitionId, updatedProcessIds);
+        return updatedProcessIds.size();
     }
 
     @Override
+    @Transactional
     public int updateDefinitionId(String toDefinitionId, List<String> processIds) {
         log.debug("Updating definition id to: {} for processes: {}", toDefinitionId, processIds);
-        return processRepository.updateDefinitionId(toDefinitionId, processIds.toArray(String[]::new)).size();
+        var updatedProcessIds = processRepository.updateDefinitionId(toDefinitionId, processIds.toArray(String[]::new));
+        variablePersistence.updateDefinitionId(toDefinitionId, updatedProcessIds);
+        return updatedProcessIds.size();
     }
 
     @Override

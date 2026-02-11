@@ -58,4 +58,19 @@ public class VariablePersistenceImpl implements VariablePersistence {
         return variableMapper.toVariables(variableEntities);
     }
 
+    public void updateDefinitionId(String definitionId, List<String> processIds) {
+        log.debug("Updating definition id to: {} for {} processes", definitionId, processIds.size());
+        variableRepository.updateDefinitionId(definitionId, processIds.toArray(String[]::new));
+    }
+
+    public void deleteByExecutionId(String executionId) {
+        log.debug("Deleting variables by execution id: {}", executionId);
+        variableRepository.deleteByExecutionId(executionId);
+    }
+
+    public void deleteByExecutionIds(List<String> executionIds) {
+        log.debug("Deleting variables by execution ids: {}", executionIds);
+        variableRepository.deleteByExecutionIds(executionIds.toArray(String[]::new));
+    }
+
 }

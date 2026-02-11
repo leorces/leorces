@@ -14,6 +14,8 @@ import static com.leorces.persistence.postgres.repository.query.activity.CHANGE_
 import static com.leorces.persistence.postgres.repository.query.activity.DELETE_ALL_ACTIVE_BY_DEFINITION_IDS.DELETE_ALL_ACTIVE_BY_DEFINITION_IDS_QUERY;
 import static com.leorces.persistence.postgres.repository.query.activity.FIND_ALL_ACTIVE_BY_DEFINITION_IDS.FIND_ALL_ACTIVE_BY_DEFINITION_IDS_QUERY;
 import static com.leorces.persistence.postgres.repository.query.activity.FIND_ALL_ACTIVE_BY_PROCESS_ID.FIND_ALL_ACTIVE_BY_PROCESS_ID_QUERY;
+import static com.leorces.persistence.postgres.repository.query.activity.FIND_ALL_BY_IDS.FIND_ALL_BY_IDS_QUERY;
+import static com.leorces.persistence.postgres.repository.query.activity.FIND_ALL_BY_PROCESS_ID.FIND_ALL_BY_PROCESS_ID_QUERY;
 import static com.leorces.persistence.postgres.repository.query.activity.FIND_ALL_FAILED_BY_PROCESS_ID.FIND_ALL_FAILED_BY_PROCESS_ID_QUERY;
 import static com.leorces.persistence.postgres.repository.query.activity.FIND_BY_DEFINITION_ID.FIND_BY_DEFINITION_ID_QUERY;
 import static com.leorces.persistence.postgres.repository.query.activity.FIND_BY_ID.FIND_BY_ID_QUERY;
@@ -37,6 +39,12 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     List<ActivityExecutionEntity> poll(@Param("topic") String topic,
                                        @Param("processDefinitionKey") String processDefinitionKey,
                                        @Param("limit") int limit);
+
+    @Query(FIND_ALL_BY_IDS_QUERY)
+    List<ActivityExecutionEntity> findAllByIds(@Param("ids") String[] activityIds);
+
+    @Query(FIND_ALL_BY_PROCESS_ID_QUERY)
+    List<ActivityExecutionEntity> findAllByProcessId(@Param("processId") String processId);
 
     @Query(FIND_ALL_ACTIVE_BY_DEFINITION_IDS_QUERY)
     List<ActivityExecutionEntity> findActive(@Param("processId") String processId,
@@ -66,9 +74,8 @@ public interface ActivityRepository extends CrudRepository<ActivityExecutionEnti
     void changeState(@Param("activityId") String activityId,
                      @Param("state") String state);
 
-    @Modifying
     @Query(DELETE_ALL_ACTIVE_BY_DEFINITION_IDS_QUERY)
-    void deleteAllActive(@Param("processId") String activityId,
-                         @Param("definitionIds") String[] definitionIds);
+    List<String> deleteAllActive(@Param("processId") String activityId,
+                                 @Param("definitionIds") String[] definitionIds);
 
 }

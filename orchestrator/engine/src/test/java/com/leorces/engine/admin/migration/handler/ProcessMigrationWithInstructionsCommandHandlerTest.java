@@ -76,16 +76,13 @@ class ProcessMigrationWithInstructionsCommandHandlerTest {
         var fromDef = mock(ProcessDefinition.class);
         when(fromDef.id()).thenReturn(fromDefId);
         var toDef = mock(ProcessDefinition.class);
-        when(toDef.id()).thenReturn(toDefId);
 
         var migration = mock(ProcessMigrationPlan.class);
         var job = mock(Job.class);
         var command = ProcessMigrationWithInstructionsCommand.of(fromDef, toDef, migration, null);
 
         var process1 = mock(ProcessExecution.class);
-        when(process1.id()).thenReturn("p1");
         var process2 = mock(ProcessExecution.class);
-        when(process2.id()).thenReturn("p2");
 
         when(properties.batchSize()).thenReturn(batchSize);
         when(properties.maxJobs()).thenReturn(maxJobs);
@@ -103,15 +100,14 @@ class ProcessMigrationWithInstructionsCommandHandlerTest {
         // Loop runs once because batchSize = 2 and findExecutionsForUpdate returns 2, then next call returns 0
         when(processPersistence.findExecutionsForUpdate(fromDefId, batchSize))
                 .thenReturn(List.of(process1, process2), List.of());
-        when(processPersistence.updateDefinitionId(toDefId, List.of("p1", "p2"))).thenReturn(2);
 
         // When
         var result = handler.execute(job, command);
 
         // Then
         assertThat(result).containsEntry("Total migrated processes", 2L);
-        verify(dispatcher).dispatch(SingleProcessMigrationCommand.of(process1, migration));
-        verify(dispatcher).dispatch(SingleProcessMigrationCommand.of(process2, migration));
+        verify(dispatcher).dispatch(SingleProcessMigrationCommand.of(process1, toDef, migration));
+        verify(dispatcher).dispatch(SingleProcessMigrationCommand.of(process2, toDef, migration));
     }
 
 }

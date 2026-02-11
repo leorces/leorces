@@ -60,12 +60,6 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
-    public ActivityExecution delete(ActivityExecution activity) {
-        log.debug("Delete activity: {} for process: {}", activity.definitionId(), activity.processId());
-        return save(activity, ActivityState.DELETED);
-    }
-
-    @Override
     public ActivityExecution fail(ActivityExecution activity) {
         log.debug("Fail activity: {} for process: {}", activity.definitionId(), activity.processId());
         return save(activity, ActivityState.FAILED);
@@ -78,10 +72,18 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
     }
 
     @Override
+    public void delete(ActivityExecution activity) {
+        log.debug("Delete activity: {} for process: {}", activity.definitionId(), activity.processId());
+        activityRepository.deleteById(activity.id());
+        variablePersistence.deleteByExecutionId(activity.id());
+    }
+
+    @Override
     @Transactional
     public void deleteAllActive(String processId, List<String> definitionIds) {
         log.debug("Delete all active activities for process: {} and definition ids: {}", processId, definitionIds);
-        activityRepository.deleteAllActive(processId, definitionIds.toArray(String[]::new));
+        var deletedActivityIds = activityRepository.deleteAllActive(processId, definitionIds.toArray(String[]::new));
+        variablePersistence.deleteByExecutionIds(deletedActivityIds);
     }
 
     @Override
@@ -97,6 +99,22 @@ public class ActivityPersistenceImpl implements ActivityPersistence {
         return activityRepository.findByDefinitionId(processId, definitionId).stream()
                 .map(activityMapper::toExecution)
                 .findFirst();
+    }
+
+    @Override
+    public List<ActivityExecution> findAll(List<String> ids) {
+        log.debug("Finding all activities by ids: {}", ids);
+        return activityRepository.findAllByIds(ids.toArray(new String[0])).stream()
+                .map(activityMapper::toBaseExecution)
+                .toList();
+    }
+
+    @Override
+    public List<ActivityExecution> findAll(String processId) {
+        log.debug("Finding all activities for process: {}", processId);
+        return activityRepository.findAllByProcessId(processId).stream()
+                .map(activityMapper::toBaseExecution)
+                .toList();
     }
 
     @Override

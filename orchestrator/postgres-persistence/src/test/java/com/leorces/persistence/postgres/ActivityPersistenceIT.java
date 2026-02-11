@@ -57,10 +57,9 @@ class ActivityPersistenceIT extends RepositoryIT {
         var activity = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
 
         // When
-        var result = activityPersistence.delete(activity);
+        activityPersistence.delete(activity);
 
         // Then
-        assertThat(result.state()).isEqualTo(ActivityState.DELETED);
         var found = activityPersistence.findById(activity.id());
         assertThat(found).isEmpty();
     }
@@ -115,6 +114,23 @@ class ActivityPersistenceIT extends RepositoryIT {
     }
 
     @Test
+    @DisplayName("Should find all activities by IDs")
+    void findAll() {
+        // Given
+        var process = runOrderSubmittedProcess();
+        var activity1 = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
+        var activity2 = activityPersistence.run(ActivityTestData.createNotificationToSellerActivityExecution(process));
+        var ids = List.of(activity1.id(), activity2.id());
+
+        // When
+        var result = activityPersistence.findAll(ids);
+
+        // Then
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting("id").containsExactlyInAnyOrder(activity1.id(), activity2.id());
+    }
+
+    @Test
     @DisplayName("Should find active activities by process ID and definition IDs")
     void findActive() {
         // Given
@@ -140,24 +156,18 @@ class ActivityPersistenceIT extends RepositoryIT {
     }
 
     @Test
-    @DisplayName("Should find all active activities by process ID")
-    void testFindActive() {
+    @DisplayName("Should find all activities for process")
+    void findAllByProcessId() {
         // Given
         var process = runOrderSubmittedProcess();
-        var activity1 = activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
-        var activity2 = activityPersistence.run(ActivityTestData.createNotificationToSellerActivityExecution(process));
-        activityPersistence.complete(activity2); // Complete one activity
-
-        var processId = activity1.processId();
+        activityPersistence.run(ActivityTestData.createNotificationToClientActivityExecution(process));
+        activityPersistence.run(ActivityTestData.createNotificationToSellerActivityExecution(process));
 
         // When
-        var result = activityPersistence.findActive(processId);
+        var result = activityPersistence.findAll(process.id());
 
         // Then
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id()).isEqualTo(activity1.id());
-        assertThat(result.getFirst().state()).isEqualTo(ActivityState.ACTIVE);
-        assertThat(result.getFirst().processId()).isEqualTo(processId);
+        assertThat(result).hasSize(2);
     }
 
     @Test

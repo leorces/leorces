@@ -237,10 +237,10 @@ class ProcessPersistenceIT extends RepositoryIT {
 
         // When
         processPersistence.delete(process.id());
-        var result = processPersistence.findById(process.id()).get();
+        var result = processPersistence.findById(process.id());
 
         // Then
-        assertThat(result.state()).isEqualTo(ProcessState.DELETED);
+        assertThat(result).isEmpty();
     }
 
     @Test

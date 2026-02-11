@@ -46,14 +46,6 @@ public interface ActivityPersistence {
     ActivityExecution terminate(ActivityExecution activity);
 
     /**
-     * Delete an activity.
-     *
-     * @param activity the activity to delete
-     * @return the deleted activity
-     */
-    ActivityExecution delete(ActivityExecution activity);
-
-    /**
      * Marks an activity as failed.
      *
      * @param activity the activity to mark as failed
@@ -68,6 +60,13 @@ public interface ActivityPersistence {
      * @param state      the new activity state
      */
     void changeState(String activityId, ActivityState state);
+
+    /**
+     * Delete an activity.
+     *
+     * @param activity the activity to delete
+     */
+    void delete(ActivityExecution activity);
 
     /**
      * Deletes all active activities by its identifier.
@@ -93,6 +92,22 @@ public interface ActivityPersistence {
      * @return an optional containing the activity if found, empty otherwise
      */
     Optional<ActivityExecution> findByDefinitionId(String processId, String definitionId);
+
+    /**
+     * Finds all activities by their unique identifiers.
+     *
+     * @param ids the list of unique identifiers of the activities
+     * @return the list of activities found
+     */
+    List<ActivityExecution> findAll(List<String> ids);
+
+    /**
+     * Finds all activities within a process.
+     *
+     * @param processId the process identifier
+     * @return the list of all activities
+     */
+    List<ActivityExecution> findAll(String processId);
 
     /**
      * Finds all active activities for specified definition IDs within a process.

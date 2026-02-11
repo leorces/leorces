@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.leorces.extension.camunda.BpmnConstants.*;
 
@@ -64,19 +64,23 @@ public class CallActivityExtractor implements ActivityExtractionStrategy {
 
     private List<VariableMapping> extractVariableMappings(Element element, String mappingType) {
         var extensionElement = getExtensionElement(element);
-        if (extensionElement == null) {
-            return new ArrayList<>();
-        }
+        return extensionElement != null ? getMappings(extensionElement, mappingType) : List.of();
+    }
 
-        var mappings = new ArrayList<VariableMapping>();
+    private List<VariableMapping> getMappings(Element extensionElement, String mappingType) {
         var mappingElements = extensionElement.getElementsByTagNameNS(CAMUNDA_NAMESPACE, mappingType);
+        return IntStream.range(0, mappingElements.getLength())
+                .mapToObj(i -> (Element) mappingElements.item(i))
+                .map(this::createVariableMapping)
+                .filter(mapping -> !isEmpty(mapping))
+                .toList();
+    }
 
-        for (int i = 0; i < mappingElements.getLength(); i++) {
-            var mapping = (Element) mappingElements.item(i);
-            mappings.add(createVariableMapping(mapping));
-        }
-
-        return mappings;
+    private boolean isEmpty(VariableMapping mapping) {
+        return mapping.source() == null &&
+                mapping.target() == null &&
+                mapping.sourceExpression() == null &&
+                mapping.variables() == null;
     }
 
     private MultiInstanceLoopCharacteristics extractMultiInstanceLoopCharacteristics(Element element) {

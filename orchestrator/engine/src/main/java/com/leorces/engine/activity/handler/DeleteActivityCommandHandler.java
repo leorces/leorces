@@ -21,12 +21,6 @@ public class DeleteActivityCommandHandler implements CommandHandler<DeleteActivi
     @Override
     public void handle(DeleteActivityCommand command) {
         var activity = getActivity(command);
-
-        if (!canHandle(activity)) {
-            log.debug("Can't delete {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
-            return;
-        }
-
         log.debug("Delete {} activity with definitionId: {} and processId: {}", activity.type(), activity.definitionId(), activity.processId());
         behaviorResolver.resolveBehavior(activity.type()).delete(activity);
     }
@@ -37,12 +31,9 @@ public class DeleteActivityCommandHandler implements CommandHandler<DeleteActivi
     }
 
     private ActivityExecution getActivity(DeleteActivityCommand command) {
-        return dispatcher.execute(FindActivityCommand.byId(command.activityId()));
-    }
-
-    private boolean canHandle(ActivityExecution activity) {
-        return !activity.isInTerminalState()
-                && (!activity.process().isInTerminalState() || activity.isAsync());
+        return command.activity() == null
+                ? dispatcher.execute(FindActivityCommand.byId(command.activityId()))
+                : command.activity();
     }
 
 }

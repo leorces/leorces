@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("VariablePersistenceIT Tests")
 class VariablePersistenceIT extends RepositoryIT {
 
     @Test
@@ -228,6 +230,42 @@ class VariablePersistenceIT extends RepositoryIT {
         // Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should update definition id for variables")
+    void updateDefinitionId() {
+        // Given
+        var process = runOrderSubmittedProcess();
+        var variable = VariableTestData.createOrderVariable().toBuilder()
+                .processId(process.id())
+                .executionId(process.id())
+                .executionDefinitionId(process.definitionId())
+                .build();
+        variablePersistence.save(process.toBuilder().variables(List.of(variable)).build());
+        var newDefId = "new-def-id";
+
+        // When
+        variablePersistence.updateDefinitionId(newDefId, List.of(process.id()));
+
+        // Then
+        var variables = variablePersistence.findInProcess(process.id());
+        assertThat(variables).isNotEmpty();
+        assertThat(variables).allMatch(v -> v.executionDefinitionId().equals(newDefId));
+    }
+
+    @Test
+    @DisplayName("Should delete variables by execution id")
+    void deleteByExecutionId() {
+        // Given
+        var process = runProcess();
+
+        // When
+        variablePersistence.deleteByExecutionId(process.id());
+
+        // Then
+        var variables = variablePersistence.findInProcess(process.id());
+        assertThat(variables).isEmpty();
     }
 
     private Process runProcess() {

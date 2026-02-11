@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -33,8 +32,6 @@ public class ActivityExecution {
     String definitionId;
     Process process;
     List<Variable> variables;
-    @JsonIgnore
-    private Map<String, Object> scopedVariables;
     ActivityState state;
     int retries;
     LocalDateTime timeout;
@@ -43,9 +40,12 @@ public class ActivityExecution {
     LocalDateTime updatedAt;
     LocalDateTime startedAt;
     LocalDateTime completedAt;
+    @JsonIgnore
+    private Map<String, Object> scopedVariables;
 
     /**
      * Gets the variables associated with this activity execution.
+     *
      * @return non-null list of variables
      */
     public List<Variable> getVariables() {
@@ -62,6 +62,7 @@ public class ActivityExecution {
 
     /**
      * Gets the activity definition from the getProcess definition.
+     *
      * @return the activity definition
      */
     @JsonIgnore
@@ -73,6 +74,7 @@ public class ActivityExecution {
 
     /**
      * Gets the getProcess definition of the getProcess this activity belongs to.
+     *
      * @return the getProcess definition
      */
     @JsonIgnore
@@ -82,6 +84,7 @@ public class ActivityExecution {
 
     /**
      * Gets the ID of the getProcess definition.
+     *
      * @return the getProcess definition ID
      */
     @JsonIgnore
@@ -91,6 +94,7 @@ public class ActivityExecution {
 
     /**
      * Gets the key of the getProcess definition.
+     *
      * @return the getProcess definition key
      */
     @JsonIgnore
@@ -100,6 +104,7 @@ public class ActivityExecution {
 
     /**
      * Gets the type of the activity.
+     *
      * @return the activity type
      */
     @JsonIgnore
@@ -109,6 +114,7 @@ public class ActivityExecution {
 
     /**
      * Gets the ID of the getProcess instance.
+     *
      * @return the getProcess ID
      */
     @JsonIgnore
@@ -118,6 +124,7 @@ public class ActivityExecution {
 
     /**
      * Gets the next activities based on outgoing sequence flows.
+     *
      * @return list of next activity definitions
      */
     @JsonIgnore
@@ -130,6 +137,7 @@ public class ActivityExecution {
 
     /**
      * Gets the previous activities based on incoming sequence flows.
+     *
      * @return list of previous activity definitions
      */
     @JsonIgnore
@@ -142,6 +150,7 @@ public class ActivityExecution {
 
     /**
      * Gets the activities that are children of this activity (for subprocesses).
+     *
      * @return list of child activity definitions
      */
     @JsonIgnore
@@ -153,6 +162,7 @@ public class ActivityExecution {
 
     /**
      * Gets the scope of this activity execution.
+     *
      * @return list of definition IDs in scope
      */
     @JsonIgnore
@@ -162,6 +172,7 @@ public class ActivityExecution {
 
     /**
      * Gets the input mappings of the activity.
+     *
      * @return map of input mappings
      */
     @JsonIgnore
@@ -171,6 +182,7 @@ public class ActivityExecution {
 
     /**
      * Gets the output mappings of the activity.
+     *
      * @return map of output mappings
      */
     @JsonIgnore
@@ -180,6 +192,7 @@ public class ActivityExecution {
 
     /**
      * Gets the ID of the parent activity definition.
+     *
      * @return parent definition ID or null
      */
     @JsonIgnore
@@ -189,6 +202,7 @@ public class ActivityExecution {
 
     /**
      * Checks if this activity has a parent.
+     *
      * @return true if has parent
      */
     @JsonIgnore
@@ -198,6 +212,7 @@ public class ActivityExecution {
 
     /**
      * Checks if this activity is configured as asynchronous.
+     *
      * @return true if asynchronous
      */
     @JsonIgnore
@@ -207,6 +222,7 @@ public class ActivityExecution {
 
     /**
      * Gets the outgoing sequence flow IDs.
+     *
      * @return list of outgoing flow IDs
      */
     @JsonIgnore
@@ -216,6 +232,7 @@ public class ActivityExecution {
 
     /**
      * Checks if the activity state is SCHEDULED.
+     *
      * @return true if SCHEDULED
      */
     public boolean isScheduled() {
@@ -224,6 +241,7 @@ public class ActivityExecution {
 
     /**
      * Checks if the activity state is ACTIVE.
+     *
      * @return true if ACTIVE
      */
     public boolean isActive() {
@@ -232,6 +250,7 @@ public class ActivityExecution {
 
     /**
      * Checks if the activity state is COMPLETED.
+     *
      * @return true if COMPLETED
      */
     public boolean isCompleted() {
@@ -240,6 +259,7 @@ public class ActivityExecution {
 
     /**
      * Checks if the activity state is TERMINATED.
+     *
      * @return true if TERMINATED
      */
     public boolean isTerminated() {
@@ -248,6 +268,7 @@ public class ActivityExecution {
 
     /**
      * Checks if the activity state is FAILED.
+     *
      * @return true if FAILED
      */
     public boolean isFailed() {
@@ -255,49 +276,122 @@ public class ActivityExecution {
     }
 
     /**
-     * Checks if the activity state is DELETED.
-     * @return true if DELETED
-     */
-    public boolean isDeleted() {
-        return ActivityState.DELETED.equals(state);
-    }
-
-    /**
      * Checks if the activity is in any terminal state.
+     *
      * @return true if in terminal state
      */
     public boolean isInTerminalState() {
         return state == ActivityState.TERMINATED
-                || state == ActivityState.COMPLETED
-                || state == ActivityState.DELETED;
+                || state == ActivityState.COMPLETED;
     }
 
     // Aliases for backward compatibility during migration
-    public String id() { return id; }
-    public String definitionId() { return definitionId; }
-    public Process process() { return process; }
-    public List<Variable> variables() { return getVariables(); }
-    public Map<String, Object> scopedVariables() { return scopedVariables; }
-    public ActivityState state() { return state; }
-    public int retries() { return retries; }
-    public LocalDateTime timeout() { return timeout; }
-    public ActivityFailure failure() { return failure; }
-    public LocalDateTime createdAt() { return createdAt; }
-    public LocalDateTime updatedAt() { return updatedAt; }
-    public LocalDateTime startedAt() { return startedAt; }
-    public LocalDateTime completedAt() { return completedAt; }
-    public ActivityDefinition definition() { return getDefinition(); }
-    public ProcessDefinition processDefinition() { return getProcessDefinition(); }
-    public String processDefinitionId() { return getProcessDefinitionId(); }
-    public String processDefinitionKey() { return getProcessDefinitionKey(); }
-    public ActivityType type() { return getType(); }
-    public String processId() { return getProcessId(); }
-    public List<ActivityDefinition> nextActivities() { return getNextActivities(); }
-    public List<ActivityDefinition> previousActivities() { return getPreviousActivities(); }
-    public List<ActivityDefinition> childActivities() { return getChildActivities(); }
-    public List<String> scope() { return getScope(); }
-    public Map<String, Object> inputs() { return getInputs(); }
-    public Map<String, Object> outputs() { return getOutputs(); }
-    public String parentDefinitionId() { return getParentDefinitionId(); }
-    public List<String> outgoing() { return getOutgoing(); }
+    public String id() {
+        return id;
+    }
+
+    public String definitionId() {
+        return definitionId;
+    }
+
+    public Process process() {
+        return process;
+    }
+
+    public List<Variable> variables() {
+        return getVariables();
+    }
+
+    public Map<String, Object> scopedVariables() {
+        return scopedVariables;
+    }
+
+    public ActivityState state() {
+        return state;
+    }
+
+    public int retries() {
+        return retries;
+    }
+
+    public LocalDateTime timeout() {
+        return timeout;
+    }
+
+    public ActivityFailure failure() {
+        return failure;
+    }
+
+    public LocalDateTime createdAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime updatedAt() {
+        return updatedAt;
+    }
+
+    public LocalDateTime startedAt() {
+        return startedAt;
+    }
+
+    public LocalDateTime completedAt() {
+        return completedAt;
+    }
+
+    public ActivityDefinition definition() {
+        return getDefinition();
+    }
+
+    public ProcessDefinition processDefinition() {
+        return getProcessDefinition();
+    }
+
+    public String processDefinitionId() {
+        return getProcessDefinitionId();
+    }
+
+    public String processDefinitionKey() {
+        return getProcessDefinitionKey();
+    }
+
+    public ActivityType type() {
+        return getType();
+    }
+
+    public String processId() {
+        return getProcessId();
+    }
+
+    public List<ActivityDefinition> nextActivities() {
+        return getNextActivities();
+    }
+
+    public List<ActivityDefinition> previousActivities() {
+        return getPreviousActivities();
+    }
+
+    public List<ActivityDefinition> childActivities() {
+        return getChildActivities();
+    }
+
+    public List<String> scope() {
+        return getScope();
+    }
+
+    public Map<String, Object> inputs() {
+        return getInputs();
+    }
+
+    public Map<String, Object> outputs() {
+        return getOutputs();
+    }
+
+    public String parentDefinitionId() {
+        return getParentDefinitionId();
+    }
+
+    public List<String> outgoing() {
+        return getOutgoing();
+    }
+
 }

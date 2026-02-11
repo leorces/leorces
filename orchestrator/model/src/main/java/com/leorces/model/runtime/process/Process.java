@@ -44,11 +44,6 @@ public record Process(
         return parentId != null;
     }
 
-    @JsonIgnore
-    public boolean containsActivityDefinition(String activityDefinitionId) {
-        return definition.getActivityById(activityDefinitionId).isPresent();
-    }
-
     public boolean isRootProcess() {
         return parentId == null;
     }
@@ -71,8 +66,7 @@ public record Process(
 
     public boolean isInTerminalState() {
         return state == ProcessState.TERMINATED
-                || state == ProcessState.COMPLETED
-                || state == ProcessState.DELETED;
+                || state == ProcessState.COMPLETED;
     }
 
 }

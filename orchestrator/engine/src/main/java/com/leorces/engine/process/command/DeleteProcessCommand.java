@@ -11,8 +11,8 @@ public record DeleteProcessCommand(
         return new DeleteProcessCommand(processId, true);
     }
 
-    public static DeleteProcessCommand of(String processId, boolean terminateCallActivity) {
-        return new DeleteProcessCommand(processId, terminateCallActivity);
+    public static DeleteProcessCommand of(String processId, boolean deleteCallActivity) {
+        return new DeleteProcessCommand(processId, deleteCallActivity);
     }
 
 }

@@ -44,8 +44,7 @@ public record ProcessExecution(
 
     public boolean isInTerminalState() {
         return state == ProcessState.TERMINATED
-                || state == ProcessState.COMPLETED
-                || state == ProcessState.DELETED;
+                || state == ProcessState.COMPLETED;
     }
 
     // It's possible to have multiple activities with the same definition id as it can be run more than once

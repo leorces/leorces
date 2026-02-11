@@ -74,10 +74,7 @@ public class CallActivityBehavior extends AbstractActivityBehavior {
 
     @Override
     public void delete(ActivityExecution callActivity) {
-        if (!callActivity.process().isInTerminalState()) {
-            dispatcher.dispatch(DeleteProcessCommand.of(callActivity.id(), false));
-        }
-
+        dispatcher.dispatch(DeleteProcessCommand.of(callActivity.id(), false));
         activityPersistence.delete(callActivity);
     }
 
