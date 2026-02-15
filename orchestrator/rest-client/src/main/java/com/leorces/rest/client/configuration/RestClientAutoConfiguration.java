@@ -14,6 +14,7 @@ import com.leorces.rest.client.configuration.properties.rest.RestClientPropertie
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,11 @@ import org.springframework.web.client.RestClient;
 })
 public class RestClientAutoConfiguration {
 
+    /**
+     * Creates an ObjectMapper for the Leorces RestClient.
+     *
+     * @return the ObjectMapper instance
+     */
     @Bean("leorcesRestClientObjectMapper")
     public ObjectMapper leorcesRestClientObjectMapper() {
         var mapper = new ObjectMapper();
@@ -41,7 +47,15 @@ public class RestClientAutoConfiguration {
         return mapper;
     }
 
+    /**
+     * Creates the Leorces RestClient when the host is configured.
+     *
+     * @param properties                    the RestClient properties
+     * @param leorcesRestClientObjectMapper the ObjectMapper for JSON conversion
+     * @return the RestClient instance
+     */
     @Bean("leorcesRestClient")
+    @ConditionalOnProperty(name = "leorces.rest.host")
     public RestClient leorcesRestClient(RestClientProperties properties,
                                         @Qualifier("leorcesRestClientObjectMapper") ObjectMapper leorcesRestClientObjectMapper) {
         var messageConverter = new MappingJackson2HttpMessageConverter(leorcesRestClientObjectMapper);
@@ -57,6 +71,28 @@ public class RestClientAutoConfiguration {
                 .build();
     }
 
+    /**
+     * Creates a mock Leorces RestClient that throws an error when used, if the host is not configured.
+     *
+     * @return the mock RestClient instance
+     */
+    @Bean("leorcesRestClient")
+    @ConditionalOnMissingBean(name = "leorcesRestClient")
+    public RestClient leorcesRestClientMock() {
+        return RestClient.builder()
+                .requestInterceptor((request, body, execution) -> {
+                    throw new IllegalStateException("leorces.rest.host is not configured");
+                })
+                .build();
+    }
+
+    /**
+     * Creates the MetricService bean if enabled.
+     *
+     * @param meterRegistry     the MeterRegistry
+     * @param metricsProperties the metrics properties
+     * @return the MetricService instance
+     */
     @Bean
     @ConditionalOnProperty(name = "leorces.metrics.enabled", havingValue = "true", matchIfMissing = true)
     public MetricService metricService(MeterRegistry meterRegistry,

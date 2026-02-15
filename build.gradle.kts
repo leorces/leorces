@@ -4,11 +4,11 @@ plugins {
     jacoco
 }
 
-val springBootVersion = libs.versions.spring.boot.get()!!
+val springBootVersion = libs.versions.spring.boot.get()
 
 allprojects {
     group = "com.leorces"
-    version = "0.6.2"
+    version = "0.6.3"
 }
 
 subprojects {

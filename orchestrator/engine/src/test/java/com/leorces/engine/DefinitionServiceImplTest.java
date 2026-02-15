@@ -1,5 +1,7 @@
 package com.leorces.engine;
 
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.definition.command.SaveDefinitionsCommand;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
@@ -24,24 +26,28 @@ class DefinitionServiceImplTest {
     @Mock
     private DefinitionPersistence persistence;
 
+    @Mock
+    private CommandDispatcher dispatcher;
+
     @InjectMocks
     private DefinitionServiceImpl service;
 
     @Test
-    @DisplayName("save should delegate to persistence")
+    @DisplayName("save should delegate to dispatcher")
     void saveDelegates() {
         // Given
         var definition = mock(ProcessDefinition.class);
         var definitions = List.of(definition);
-        when(persistence.save(definitions)).thenReturn(definitions);
+        var command = new SaveDefinitionsCommand(definitions);
+        when(dispatcher.execute(command)).thenReturn(definitions);
 
         // When
         var result = service.save(definitions);
 
         // Then
         assertThat(result).isEqualTo(definitions);
-        verify(persistence).save(definitions);
-        verifyNoMoreInteractions(persistence);
+        verify(dispatcher).execute(command);
+        verifyNoInteractions(persistence);
     }
 
     @Test

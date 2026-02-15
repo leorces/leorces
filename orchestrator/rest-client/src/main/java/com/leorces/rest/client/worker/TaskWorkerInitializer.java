@@ -4,6 +4,7 @@ import com.leorces.rest.client.exception.ClientConfigurationValidationException;
 import com.leorces.rest.client.handler.ExternalTaskHandler;
 import com.leorces.rest.client.model.worker.WorkerContext;
 import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
+@ConditionalOnProperty(name = "leorces.rest.host")
 public class TaskWorkerInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
     private final WorkerScheduler scheduler;

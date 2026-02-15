@@ -7,7 +7,7 @@ import java.time.Duration;
 
 @ConfigurationProperties(prefix = "leorces.rest")
 public record RestClientProperties(
-        @DefaultValue("http://localhost:8080") String host,
+        String host,
         @DefaultValue("PT30S") Duration connectTimeout,
         @DefaultValue("PT60S") Duration readTimeout
 ) {

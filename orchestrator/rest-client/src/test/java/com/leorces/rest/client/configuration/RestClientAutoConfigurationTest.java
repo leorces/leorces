@@ -10,8 +10,10 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("RestClientAutoConfiguration Tests")
 class RestClientAutoConfigurationTest {
@@ -58,6 +60,29 @@ class RestClientAutoConfigurationTest {
                 .run(context -> {
                     // Then
                     assertThat(context).doesNotHaveBean(MetricService.class);
+                });
+    }
+
+    @Test
+    @DisplayName("Should create real RestClient when leorces.rest.host is provided")
+    void shouldCreateRealRestClientWhenHostIsProvided() {
+        contextRunner
+                .withPropertyValues("leorces.rest.host=http://example.com")
+                .run(context -> {
+                    assertThat(context).hasBean("leorcesRestClient");
+                    assertThat(context.getBean("leorcesRestClient")).isInstanceOf(RestClient.class);
+                });
+    }
+
+    @Test
+    @DisplayName("Should create mock RestClient when leorces.rest.host is missing")
+    void shouldCreateMockRestClientWhenHostIsMissing() {
+        contextRunner
+                .run(context -> {
+                    assertThat(context).hasBean("leorcesRestClient");
+                    var restClient = (RestClient) context.getBean("leorcesRestClient");
+
+                    assertThrows(IllegalStateException.class, () -> restClient.get().uri("/test").retrieve().toBodilessEntity());
                 });
     }
 

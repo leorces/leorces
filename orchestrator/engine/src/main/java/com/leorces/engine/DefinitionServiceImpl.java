@@ -1,6 +1,8 @@
 package com.leorces.engine;
 
 import com.leorces.api.DefinitionService;
+import com.leorces.engine.core.CommandDispatcher;
+import com.leorces.engine.definition.command.SaveDefinitionsCommand;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.pagination.Pageable;
 import com.leorces.model.pagination.PageableData;
@@ -18,11 +20,12 @@ import java.util.Optional;
 public class DefinitionServiceImpl implements DefinitionService {
 
     private final DefinitionPersistence persistence;
+    private final CommandDispatcher dispatcher;
 
     @Override
     public List<ProcessDefinition> save(List<ProcessDefinition> definitions) {
         log.debug("Saving {} process definitions", definitions.size());
-        return persistence.save(definitions);
+        return dispatcher.execute(new SaveDefinitionsCommand(definitions));
     }
 
     @Override
