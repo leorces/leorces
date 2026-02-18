@@ -2,7 +2,7 @@
 
 --changeset leorces:1
 
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 -- ============================
 -- Table: definition
@@ -30,7 +30,7 @@ CREATE INDEX IF NOT EXISTS idx_definition_created
 
 CREATE INDEX IF NOT EXISTS idx_definition_search_trgm
     ON definition
-        USING GIN ((definition_id || ' ' || definition_key || ' ' || definition_name) gin_trgm_ops);
+        USING GIN ((definition_id || ' ' || definition_key || ' ' || definition_name) public.gin_trgm_ops);
 
 -- ============================
 -- Table: process
