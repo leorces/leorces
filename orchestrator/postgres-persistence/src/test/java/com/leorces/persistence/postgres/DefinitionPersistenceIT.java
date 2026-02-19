@@ -286,6 +286,37 @@ class DefinitionPersistenceIT extends RepositoryIT {
     }
 
     @Test
+    @DisplayName("Should find full process definition by ID when it exists")
+    void findFullById() {
+        // Given
+        var orderFulfillment = createOrderFulfillmentProcessDefinition();
+        var savedDefinition = definitionPersistence.save(List.of(orderFulfillment)).getFirst();
+
+        // When
+        var result = definitionPersistence.findFullById(savedDefinition.id());
+
+        // Then
+        assertThat(result).isPresent();
+        var foundDefinition = result.get();
+        assertThat(foundDefinition.id()).isEqualTo(savedDefinition.id());
+        assertThat(foundDefinition.key()).isEqualTo(orderFulfillment.key());
+        assertThat(foundDefinition.activities()).hasSameSizeAs(orderFulfillment.activities());
+    }
+
+    @Test
+    @DisplayName("Should return empty optional when process definition ID for full find does not exist")
+    void findFullById_NotFound() {
+        // Given
+        var nonExistentId = "non-existent-id";
+
+        // When
+        var result = definitionPersistence.findFullById(nonExistentId);
+
+        // Then
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     @DisplayName("Should find latest version of process definition by key")
     void findLatestByKey() {
         // Given

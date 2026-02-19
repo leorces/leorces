@@ -1,9 +1,7 @@
 package com.leorces.engine.process.handler;
 
-import com.leorces.api.exception.ExecutionException;
 import com.leorces.engine.core.CommandHandler;
 import com.leorces.engine.process.command.SuspendProcessCommand;
-import com.leorces.persistence.DefinitionPersistence;
 import com.leorces.persistence.ProcessPersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,28 +13,11 @@ import org.springframework.stereotype.Component;
 public class SuspendProcessCommandHandler implements CommandHandler<SuspendProcessCommand> {
 
     private final ProcessPersistence processPersistence;
-    private final DefinitionPersistence definitionPersistence;
 
     @Override
     public void handle(SuspendProcessCommand command) {
-        if (!command.isIdentifierPresent()) {
-            throw ExecutionException.of("Can't suspend process without identifier");
-        }
-
         if (command.processId() != null) {
             processPersistence.suspendById(command.processId());
-            return;
-        }
-
-        if (command.definitionId() != null) {
-            definitionPersistence.suspendById(command.definitionId());
-            processPersistence.suspendByDefinitionId(command.definitionId());
-            return;
-        }
-
-        if (command.definitionKey() != null) {
-            definitionPersistence.suspendByKey(command.definitionKey());
-            processPersistence.suspendByDefinitionKey(command.definitionKey());
         }
     }
 

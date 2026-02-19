@@ -158,6 +158,9 @@ public class DefinitionMapper {
     }
 
     private ProcessDefinitionData fromJson(PGobject jsonData) {
+        if (jsonData == null) {
+            return null;
+        }
         try {
             return objectMapper.readValue(jsonData.getValue(), ProcessDefinitionData.class);
         } catch (IOException e) {

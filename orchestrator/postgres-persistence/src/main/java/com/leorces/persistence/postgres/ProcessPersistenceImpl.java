@@ -7,7 +7,6 @@ import com.leorces.model.runtime.process.ProcessExecution;
 import com.leorces.model.runtime.process.ProcessState;
 import com.leorces.model.search.ProcessFilter;
 import com.leorces.persistence.ProcessPersistence;
-import com.leorces.persistence.VariablePersistence;
 import com.leorces.persistence.postgres.mapper.ProcessMapper;
 import com.leorces.persistence.postgres.repository.ProcessRepository;
 import com.leorces.persistence.postgres.utils.IdGenerator;
@@ -79,15 +78,15 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    public void suspendByDefinitionId(String definitionId) {
-        log.debug("Suspend processes by definition id: {}", definitionId);
-        processRepository.suspendByDefinitionId(definitionId);
+    public int suspendByDefinitionId(String definitionId, int batchSize) {
+        log.debug("Suspend processes by definition id: {}, batchSize: {}", definitionId, batchSize);
+        return processRepository.suspendByDefinitionId(definitionId, batchSize).size();
     }
 
     @Override
-    public void suspendByDefinitionKey(String definitionKey) {
-        log.debug("Suspend processes by definition key: {}", definitionKey);
-        processRepository.suspendByDefinitionKey(definitionKey);
+    public int suspendByDefinitionKey(String definitionKey, int batchSize) {
+        log.debug("Suspend processes by definition key: {}, batchSize: {}", definitionKey, batchSize);
+        return processRepository.suspendByDefinitionKey(definitionKey, batchSize).size();
     }
 
     @Override
@@ -97,15 +96,15 @@ public class ProcessPersistenceImpl implements ProcessPersistence {
     }
 
     @Override
-    public void resumeByDefinitionId(String definitionId) {
+    public int resumeByDefinitionId(String definitionId, int batchSize) {
         log.debug("Resume processes by definition id: {}", definitionId);
-        processRepository.resumeByDefinitionId(definitionId);
+        return processRepository.resumeByDefinitionId(definitionId, batchSize).size();
     }
 
     @Override
-    public void resumeByDefinitionKey(String definitionKey) {
+    public int resumeByDefinitionKey(String definitionKey, int batchSize) {
         log.debug("Resume processes by definition key: {}", definitionKey);
-        processRepository.resumeByDefinitionKey(definitionKey);
+        return processRepository.resumeByDefinitionKey(definitionKey, batchSize).size();
     }
 
     @Override

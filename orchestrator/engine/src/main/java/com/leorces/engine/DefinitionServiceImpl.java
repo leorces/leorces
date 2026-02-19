@@ -31,7 +31,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     @Override
     public Optional<ProcessDefinition> findById(String definitionId) {
         log.debug("Finding process definition by id: {}", definitionId);
-        return persistence.findById(definitionId);
+        return persistence.findFullById(definitionId);
     }
 
     @Override

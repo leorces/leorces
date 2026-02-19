@@ -30,6 +30,15 @@ public interface DefinitionPersistence {
     Optional<ProcessDefinition> findById(String id);
 
     /**
+     * Finds a process definition by its unique identifier with all details.
+     * Unlike findById, this method may return additional details or skip caching.
+     *
+     * @param id the unique identifier of the process definition
+     * @return an optional containing the full process definition if found, empty otherwise
+     */
+    Optional<ProcessDefinition> findFullById(String id);
+
+    /**
      * Finds the latest version of a process definition by its key.
      *
      * @param key the process definition key

@@ -196,26 +196,6 @@ class RuntimeServiceImplTest {
     }
 
     @Test
-    @DisplayName("Should suspend processes by definition ID")
-    void shouldSuspendProcessesByDefinitionId() {
-        // When
-        runtimeService.suspendProcessesByDefinitionId(DEFINITION_ID);
-
-        // Then
-        verify(runtimeClient).suspendProcessesByDefinitionId(DEFINITION_ID);
-    }
-
-    @Test
-    @DisplayName("Should suspend processes by definition key")
-    void shouldSuspendProcessesByDefinitionKey() {
-        // When
-        runtimeService.suspendProcessesByDefinitionKey(PROCESS_KEY);
-
-        // Then
-        verify(runtimeClient).suspendProcessesByDefinitionKey(PROCESS_KEY);
-    }
-
-    @Test
     @DisplayName("Should resume process by process ID")
     void shouldResumeProcessById() {
         // When
@@ -223,26 +203,6 @@ class RuntimeServiceImplTest {
 
         // Then
         verify(runtimeClient).resumeProcessById(EXECUTION_ID);
-    }
-
-    @Test
-    @DisplayName("Should resume processes by definition ID")
-    void shouldResumeProcessesByDefinitionId() {
-        // When
-        runtimeService.resumeProcessesByDefinitionId(DEFINITION_ID);
-
-        // Then
-        verify(runtimeClient).resumeProcessesByDefinitionId(DEFINITION_ID);
-    }
-
-    @Test
-    @DisplayName("Should resume processes by definition key")
-    void shouldResumeProcessesByDefinitionKey() {
-        // When
-        runtimeService.resumeProcessesByDefinitionKey(PROCESS_KEY);
-
-        // Then
-        verify(runtimeClient).resumeProcessesByDefinitionKey(PROCESS_KEY);
     }
 
     @Test

@@ -15,6 +15,7 @@ import java.util.Optional;
 import static com.leorces.persistence.postgres.repository.query.definition.COUNT_ALL_WITH_FILTERS.COUNT_ALL_WITH_FILTERS_QUERY;
 import static com.leorces.persistence.postgres.repository.query.definition.FIND_ALL_WITH_PAGINATION.FIND_ALL_WITH_PAGINATION_QUERY;
 import static com.leorces.persistence.postgres.repository.query.definition.FIND_BY_KEY_AND_VERSION.FIND_BY_KEY_AND_VERSION_QUERY;
+import static com.leorces.persistence.postgres.repository.query.definition.FIND_FULL_BY_ID.FIND_FULL_BY_ID_QUERY;
 import static com.leorces.persistence.postgres.repository.query.definition.FIND_LATEST_BY_KEY.FIND_LATEST_BY_KEY_QUERY;
 import static com.leorces.persistence.postgres.repository.query.definition.RESUME_BY_ID.RESUME_BY_ID_QUERY;
 import static com.leorces.persistence.postgres.repository.query.definition.RESUME_BY_KEY.RESUME_BY_KEY_QUERY;
@@ -23,6 +24,9 @@ import static com.leorces.persistence.postgres.repository.query.definition.SUSPE
 
 @Repository
 public interface DefinitionRepository extends CrudRepository<ProcessDefinitionEntity, String> {
+
+    @Query(FIND_FULL_BY_ID_QUERY)
+    Optional<ProcessDefinitionEntity> findFullById(@Param("definitionId") String id);
 
     @Query(FIND_LATEST_BY_KEY_QUERY)
     Optional<ProcessDefinitionEntity> findLatestByKey(@Param("definitionKey") String definitionKey);

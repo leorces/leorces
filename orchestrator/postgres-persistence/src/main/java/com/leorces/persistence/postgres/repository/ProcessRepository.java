@@ -104,25 +104,25 @@ public interface ProcessRepository extends CrudRepository<ProcessEntity, String>
     @Query(SUSPEND_BY_ID_QUERY)
     void suspendById(@Param("processId") String processId);
 
-    @Modifying
     @Query(SUSPEND_BY_DEFINITION_ID_QUERY)
-    void suspendByDefinitionId(@Param("definitionId") String definitionId);
+    List<String> suspendByDefinitionId(@Param("definitionId") String definitionId,
+                                       @Param("limit") int limit);
 
-    @Modifying
     @Query(SUSPEND_BY_DEFINITION_KEY_QUERY)
-    void suspendByDefinitionKey(@Param("definitionKey") String definitionKey);
+    List<String> suspendByDefinitionKey(@Param("definitionKey") String definitionKey,
+                                        @Param("limit") int limit);
 
     @Modifying
     @Query(RESUME_BY_ID_QUERY)
     void resumeById(@Param("processId") String processId);
 
-    @Modifying
     @Query(RESUME_BY_DEFINITION_ID_QUERY)
-    void resumeByDefinitionId(@Param("definitionId") String definitionId);
+    List<String> resumeByDefinitionId(@Param("definitionId") String definitionId,
+                                      @Param("limit") int limit);
 
-    @Modifying
     @Query(RESUME_BY_DEFINITION_KEY_QUERY)
-    void resumeByDefinitionKey(@Param("definitionKey") String definitionKey);
+    List<String> resumeByDefinitionKey(@Param("definitionKey") String definitionKey,
+                                       @Param("limit") int limit);
 
     @Query(UPDATE_DEFINITION_ID_QUERY)
     List<String> updateDefinitionId(@Param("toDefinitionId") String toDefinitionId,

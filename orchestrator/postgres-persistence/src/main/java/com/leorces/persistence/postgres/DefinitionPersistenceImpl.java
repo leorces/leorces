@@ -56,6 +56,12 @@ public class DefinitionPersistenceImpl implements DefinitionPersistence {
     }
 
     @Override
+    public Optional<ProcessDefinition> findFullById(String id) {
+        return definitionRepository.findFullById(id)
+                .map(definitionMapper::toDefinition);
+    }
+
+    @Override
     public Optional<ProcessDefinition> findLatestByKey(String key) {
         return cache.findLatestByKey(key).or(() -> {
             var definition = definitionRepository.findLatestByKey(key)

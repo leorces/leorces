@@ -5,6 +5,8 @@ import com.leorces.engine.admin.common.command.RunJobCommand;
 import com.leorces.engine.admin.common.model.JobType;
 import com.leorces.engine.admin.compaction.command.CompactionCommand;
 import com.leorces.engine.admin.migration.command.ProcessMigrationCommand;
+import com.leorces.engine.admin.suspend.command.ResumeProcessDefinitionCommand;
+import com.leorces.engine.admin.suspend.command.SuspendProcessDefinitionCommand;
 import com.leorces.engine.core.CommandDispatcher;
 import com.leorces.engine.core.CommandHandler;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,14 @@ public class RunJobCommandHandler implements CommandHandler<RunJobCommand> {
             case PROCESS_MIGRATION:
                 log.debug("Running process migration job with input: {}", command.input());
                 dispatcher.dispatch(new ProcessMigrationCommand(command.input()));
+                break;
+            case PROCESS_SUSPEND:
+                log.debug("Running process suspend job with input: {}", command.input());
+                dispatcher.dispatch(new SuspendProcessDefinitionCommand(command.input()));
+                break;
+            case PROCESS_RESUME:
+                log.debug("Running process resume job with input: {}", command.input());
+                dispatcher.dispatch(new ResumeProcessDefinitionCommand(command.input()));
                 break;
             default:
                 throw ExecutionException.of("Job type %s not supported".formatted(jobType));

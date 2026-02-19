@@ -56,14 +56,14 @@ class DefinitionServiceImplTest {
         // Given
         var definitionId = "def-1";
         var definition = mock(ProcessDefinition.class);
-        when(persistence.findById(definitionId)).thenReturn(Optional.of(definition));
+        when(persistence.findFullById(definitionId)).thenReturn(Optional.of(definition));
 
         // When
         var result = service.findById(definitionId);
 
         // Then
         assertThat(result).contains(definition);
-        verify(persistence).findById(definitionId);
+        verify(persistence).findFullById(definitionId);
         verifyNoMoreInteractions(persistence);
     }
 

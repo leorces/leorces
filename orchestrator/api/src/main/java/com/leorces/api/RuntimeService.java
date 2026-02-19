@@ -111,32 +111,6 @@ public interface RuntimeService {
     void suspendProcessById(String processId);
 
     /**
-     * Suspends all process instances associated with the given
-     * process definition ID.
-     * <p>
-     * Suspension prevents any further execution of the affected
-     * process instances, including asynchronous continuations,
-     * timers, and message handling, until they are activated again.
-     * </p>
-     *
-     * @param definitionId the unique identifier of the process definition
-     */
-    void suspendProcessesByDefinitionId(String definitionId);
-
-    /**
-     * Suspends all process instances associated with the given
-     * process definition key.
-     * <p>
-     * This operation applies to all versions of the process definition
-     * identified by the provided key, suspending their running
-     * process instances until activation.
-     * </p>
-     *
-     * @param definitionKey the key of the process definition
-     */
-    void suspendProcessesByDefinitionKey(String definitionKey);
-
-    /**
      * Activates a previously suspended process instance.
      * <p>
      * Once activated, the process instance resumes normal execution,
@@ -146,30 +120,6 @@ public interface RuntimeService {
      * @param processId the unique identifier of the process instance
      */
     void resumeProcessById(String processId);
-
-    /**
-     * Activates all suspended process instances associated with the given
-     * process definition ID.
-     * <p>
-     * This operation re-enables execution for all affected process
-     * instances, restoring normal processing behavior.
-     * </p>
-     *
-     * @param definitionId the unique identifier of the process definition
-     */
-    void resumeProcessesByDefinitionId(String definitionId);
-
-    /**
-     * Activates all suspended process instances associated with the given
-     * process definition key.
-     * <p>
-     * All process instances belonging to any version of the process
-     * definition identified by this key will be resumed.
-     * </p>
-     *
-     * @param definitionKey the key of the process definition
-     */
-    void resumeProcessesByDefinitionKey(String definitionKey);
 
     /**
      * Finds process by filter.

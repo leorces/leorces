@@ -11,6 +11,7 @@ import com.leorces.engine.configuration.properties.MetricsProperties;
 import com.leorces.engine.configuration.properties.ProcessProperties;
 import com.leorces.engine.configuration.properties.job.CompactionProperties;
 import com.leorces.engine.configuration.properties.job.ProcessMigrationProperties;
+import com.leorces.engine.configuration.properties.job.SuspendProcessDefinitionProperties;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,8 @@ import java.util.concurrent.Executors;
         MetricsProperties.class,
         CompactionProperties.class,
         ProcessMigrationProperties.class,
-        ProcessProperties.class
+        SuspendProcessDefinitionProperties.class,
+        ProcessProperties.class,
 })
 public class OrchestratorEngineAutoConfiguration {
 

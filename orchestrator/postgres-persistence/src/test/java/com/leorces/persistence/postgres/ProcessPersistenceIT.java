@@ -17,6 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("Process Persistence Integration Tests")
 class ProcessPersistenceIT extends RepositoryIT {
 
+    private static final int BATCH_SIZE = 10;
+    private static final int PAGE_SIZE = 10;
+    private static final String NON_EXISTENT_ID = "non-existent-id";
+    private static final String NON_EXISTENT_KEY = "non-existent-key";
+
     @Test
     @DisplayName("Should create and run a new process successfully and inherit suspended state from definition")
     void runInheritSuspended() {
@@ -140,7 +145,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         var process2 = processPersistence.run(createOrderSubmittedProcess());
 
         // When
-        processPersistence.suspendByDefinitionId(process1.definitionId());
+        processPersistence.suspendByDefinitionId(process1.definitionId(), BATCH_SIZE);
         var result1 = processPersistence.findById(process1.id()).get();
         var result2 = processPersistence.findById(process2.id()).get();
 
@@ -157,7 +162,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         var process2 = processPersistence.run(createOrderSubmittedProcess());
 
         // When
-        processPersistence.suspendByDefinitionKey(process1.definitionKey());
+        processPersistence.suspendByDefinitionKey(process1.definitionKey(), BATCH_SIZE);
         var result1 = processPersistence.findById(process1.id()).get();
         var result2 = processPersistence.findById(process2.id()).get();
 
@@ -191,14 +196,14 @@ class ProcessPersistenceIT extends RepositoryIT {
         // Given
         var process1 = processPersistence.run(createOrderSubmittedProcess());
         var process2 = processPersistence.run(createOrderSubmittedProcess());
-        processPersistence.suspendByDefinitionId(process1.definitionId());
+        processPersistence.suspendByDefinitionId(process1.definitionId(), BATCH_SIZE);
         var suspendedProcess1 = processPersistence.findById(process1.id()).get();
         var suspendedProcess2 = processPersistence.findById(process2.id()).get();
         assertThat(suspendedProcess1.suspended()).isEqualTo(true);
         assertThat(suspendedProcess2.suspended()).isEqualTo(true);
 
         // When
-        processPersistence.resumeByDefinitionId(process1.definitionId());
+        processPersistence.resumeByDefinitionId(process1.definitionId(), BATCH_SIZE);
         var result1 = processPersistence.findById(process1.id()).get();
         var result2 = processPersistence.findById(process2.id()).get();
 
@@ -213,14 +218,14 @@ class ProcessPersistenceIT extends RepositoryIT {
         // Given
         var process1 = processPersistence.run(createOrderSubmittedProcess());
         var process2 = processPersistence.run(createOrderSubmittedProcess());
-        processPersistence.suspendByDefinitionKey(process1.definitionKey());
+        processPersistence.suspendByDefinitionKey(process1.definitionKey(), BATCH_SIZE);
         var suspendedProcess1 = processPersistence.findById(process1.id()).get();
         var suspendedProcess2 = processPersistence.findById(process2.id()).get();
         assertThat(suspendedProcess1.suspended()).isEqualTo(true);
         assertThat(suspendedProcess2.suspended()).isEqualTo(true);
 
         // When
-        processPersistence.resumeByDefinitionId(process1.definitionId());
+        processPersistence.resumeByDefinitionKey(process1.definitionKey(), BATCH_SIZE);
         var result1 = processPersistence.findById(process1.id()).get();
         var result2 = processPersistence.findById(process2.id()).get();
 
@@ -264,7 +269,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         var process = processPersistence.run(createOrderSubmittedProcess());
 
         // When
-        var result = processPersistence.findExecutionsForUpdate(process.definitionId(), 10);
+        var result = processPersistence.findExecutionsForUpdate(process.definitionId(), BATCH_SIZE);
 
         // Then
         assertThat(result).isNotEmpty();
@@ -279,7 +284,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         processPersistence.complete(process.id());
 
         // When
-        var result = processPersistence.findAllFullyCompletedForUpdate(10);
+        var result = processPersistence.findAllFullyCompletedForUpdate(BATCH_SIZE);
 
         // Then
         assertThat(result).isNotEmpty();
@@ -294,7 +299,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         var newDefId = newDef.id();
 
         // When
-        var count = processPersistence.updateDefinitionId(process.definitionId(), newDefId, 10);
+        var count = processPersistence.updateDefinitionId(process.definitionId(), newDefId, BATCH_SIZE);
 
         // Then
         assertThat(count).isPositive();
@@ -338,7 +343,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         assertThat(foundProcess.variables()).hasSize(process.variables().size());
 
         // When & Then - non-existent process
-        var nonExistentResult = processPersistence.findById("non-existent-id");
+        var nonExistentResult = processPersistence.findById(NON_EXISTENT_ID);
         assertThat(nonExistentResult).isEmpty();
     }
 
@@ -366,7 +371,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         assertThat(execution.activities()).isNotNull();
 
         // When & Then - non-existent process
-        var nonExistentResult = processPersistence.findExecutionById("non-existent-id");
+        var nonExistentResult = processPersistence.findExecutionById(NON_EXISTENT_ID);
         assertThat(nonExistentResult).isEmpty();
     }
 
@@ -387,7 +392,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         assertThat(result.getFirst().businessKey()).isEqualTo(process1.businessKey());
 
         // When & Then - non-existent business key
-        var processFilter2 = ProcessFilter.builder().businessKey("non-existent-key").build();
+        var processFilter2 = ProcessFilter.builder().businessKey(NON_EXISTENT_KEY).build();
         var nonExistentResult = processPersistence.findAll(processFilter2);
         assertThat(nonExistentResult).isEmpty();
     }
@@ -448,7 +453,7 @@ class ProcessPersistenceIT extends RepositoryIT {
 
         // When & Then - non-matching business key
         var processFilter2 = ProcessFilter.builder()
-                .businessKey("non-existent-key")
+                .businessKey(NON_EXISTENT_KEY)
                 .variables(variables)
                 .build();
         var nonMatchingResult = processPersistence.findAll(processFilter2);
@@ -509,7 +514,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         // Given
         var process1 = processPersistence.run(createOrderSubmittedProcess());
         var process2 = processPersistence.run(createOrderSubmittedProcess());
-        var pageable = new Pageable(0, 10);
+        var pageable = new Pageable(0, PAGE_SIZE);
 
         // When
         var result = processPersistence.findAll(pageable);
@@ -517,7 +522,7 @@ class ProcessPersistenceIT extends RepositoryIT {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.data()).isNotEmpty();
-        assertThat(result.data()).hasSizeLessThanOrEqualTo(10);
+        assertThat(result.data()).hasSizeLessThanOrEqualTo(PAGE_SIZE);
         assertThat(result.total()).isPositive();
         var processIds = result.data().stream().map(Process::id).toList();
         assertThat(processIds).contains(process1.id(), process2.id());

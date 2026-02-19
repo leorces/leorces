@@ -72,8 +72,10 @@ public interface ProcessPersistence {
      * </p>
      *
      * @param definitionId the process definition identifier
+     * @param batchSize    the maximum number of processes to suspend in a single batch
+     * @return the number of suspended process instances
      */
-    void suspendByDefinitionId(String definitionId);
+    int suspendByDefinitionId(String definitionId, int batchSize);
 
     /**
      * Suspends all process instances associated with the given
@@ -84,8 +86,10 @@ public interface ProcessPersistence {
      * </p>
      *
      * @param definitionKey the process definition key
+     * @param batchSize     the maximum number of processes to suspend in a single batch
+     * @return the number of suspended process instances
      */
-    void suspendByDefinitionKey(String definitionKey);
+    int suspendByDefinitionKey(String definitionKey, int batchSize);
 
     /**
      * Activates a suspended process instance by its identifier.
@@ -107,8 +111,10 @@ public interface ProcessPersistence {
      * </p>
      *
      * @param definitionId the process definition identifier
+     * @param batchSize    the maximum number of processes to activate in a single batch
+     * @return the number of activated process instances
      */
-    void resumeByDefinitionId(String definitionId);
+    int resumeByDefinitionId(String definitionId, int batchSize);
 
     /**
      * Activates all suspended process instances associated with the given
@@ -119,8 +125,10 @@ public interface ProcessPersistence {
      * </p>
      *
      * @param definitionKey the process definition key
+     * @param batchSize     the maximum number of processes to activate in a single batch
+     * @return the number of activated process instances
      */
-    void resumeByDefinitionKey(String definitionKey);
+    int resumeByDefinitionKey(String definitionKey, int batchSize);
 
     /**
      * Changes the state of a process by its identifier.
@@ -136,6 +144,7 @@ public interface ProcessPersistence {
      * @param fromDefinitionId the current process definition ID
      * @param toDefinitionId   the new process definition ID
      * @param batchSize        the maximum number of processes to update in a single batch
+     * @return the number of updated process instances
      */
     int updateDefinitionId(String fromDefinitionId, String toDefinitionId, int batchSize);
 
@@ -144,6 +153,7 @@ public interface ProcessPersistence {
      *
      * @param toDefinitionId the new process definition identifier
      * @param processIds     the list of process identifiers to update
+     * @return the number of updated process instances
      */
     int updateDefinitionId(String toDefinitionId, List<String> processIds);
 

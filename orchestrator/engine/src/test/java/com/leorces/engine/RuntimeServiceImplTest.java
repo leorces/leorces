@@ -186,30 +186,6 @@ class RuntimeServiceImplTest {
     }
 
     @Test
-    @DisplayName("suspendProcessesByDefinitionId dispatches SuspendProcessCommand")
-    void suspendByDefinitionIdDelegates() {
-        var definitionId = "def1";
-
-        service.suspendProcessesByDefinitionId(definitionId);
-
-        var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
-        verify(dispatcher).dispatch(captor.capture());
-        assertThat(captor.getValue().definitionId()).isEqualTo(definitionId);
-    }
-
-    @Test
-    @DisplayName("suspendProcessesByDefinitionKey dispatches SuspendProcessCommand")
-    void suspendByDefinitionKeyDelegates() {
-        var definitionKey = "key1";
-
-        service.suspendProcessesByDefinitionKey(definitionKey);
-
-        var captor = ArgumentCaptor.forClass(SuspendProcessCommand.class);
-        verify(dispatcher).dispatch(captor.capture());
-        assertThat(captor.getValue().definitionKey()).isEqualTo(definitionKey);
-    }
-
-    @Test
     @DisplayName("resumeProcessById dispatches ResumeProcessCommand")
     void resumeProcessByIdDelegates() {
         var processId = "proc1";
@@ -219,30 +195,6 @@ class RuntimeServiceImplTest {
         var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
         verify(dispatcher).dispatch(captor.capture());
         assertThat(captor.getValue().processId()).isEqualTo(processId);
-    }
-
-    @Test
-    @DisplayName("resumeProcessesByDefinitionId dispatches ResumeProcessCommand")
-    void resumeByDefinitionIdDelegates() {
-        var definitionId = "def1";
-
-        service.resumeProcessesByDefinitionId(definitionId);
-
-        var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
-        verify(dispatcher).dispatch(captor.capture());
-        assertThat(captor.getValue().definitionId()).isEqualTo(definitionId);
-    }
-
-    @Test
-    @DisplayName("resumeProcessesByDefinitionKey dispatches ResumeProcessCommand")
-    void resumeByDefinitionKeyDelegates() {
-        var definitionKey = "key1";
-
-        service.resumeProcessesByDefinitionKey(definitionKey);
-
-        var captor = ArgumentCaptor.forClass(ResumeProcessCommand.class);
-        verify(dispatcher).dispatch(captor.capture());
-        assertThat(captor.getValue().definitionKey()).isEqualTo(definitionKey);
     }
 
     @Test
