@@ -26,7 +26,7 @@ public abstract class AbstractTriggerableStartEventBehavior
     public void trigger(Process process, ActivityDefinition definition) {
         var eventSubprocessDefinition = getEventSubprocess(process, definition);
         var existingEventSubprocess = activityPersistence.findByDefinitionId(process.id(), eventSubprocessDefinition.id());
-        if (existingEventSubprocess.isEmpty()) {
+        if (existingEventSubprocess.isEmpty() || existingEventSubprocess.get().isInTerminalState()) {
             dispatcher.dispatchAsync(RunActivityCommand.of(process, eventSubprocessDefinition));
         }
     }
