@@ -11,6 +11,7 @@ import java.util.List;
 
 import static com.leorces.persistence.postgres.repository.query.variable.DELETE_BY_EXECUTION_ID.DELETE_BY_PROCESS_ID_QUERY;
 import static com.leorces.persistence.postgres.repository.query.variable.DELETE_BY_EXECUTION_IDS.DELETE_BY_PROCESS_IDS_QUERY;
+import static com.leorces.persistence.postgres.repository.query.variable.FIND_ALL_PROCESS_VARIABLES.FIND_ALL_PROCESS_SCOPE_VARIABLES_QUERY;
 import static com.leorces.persistence.postgres.repository.query.variable.FIND_ALL_PROCESS_VARIABLES.FIND_ALL_PROCESS_VARIABLES_QUERY;
 import static com.leorces.persistence.postgres.repository.query.variable.FIND_ALL_VARIABLES_WITHIN_SCOPE.FIND_ALL_VARIABLES_WITHIN_SCOPE_QUERY;
 import static com.leorces.persistence.postgres.repository.query.variable.UPDATE_DEFINITION_ID.UPDATE_DEFINITION_ID_QUERY;
@@ -21,6 +22,10 @@ public interface VariableRepository extends CrudRepository<VariableEntity, Strin
     @Query(FIND_ALL_VARIABLES_WITHIN_SCOPE_QUERY)
     List<VariableEntity> findInScope(@Param("processId") String processId,
                                      @Param("scope") String[] scope);
+
+
+    @Query(FIND_ALL_PROCESS_SCOPE_VARIABLES_QUERY)
+    List<VariableEntity> findInProcessScope(@Param("processId") String processId);
 
     @Query(FIND_ALL_PROCESS_VARIABLES_QUERY)
     List<VariableEntity> findInProcess(@Param("processId") String processId);

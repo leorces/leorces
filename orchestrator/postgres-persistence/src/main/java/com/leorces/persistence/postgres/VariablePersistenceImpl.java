@@ -52,6 +52,13 @@ public class VariablePersistenceImpl implements VariablePersistence {
     }
 
     @Override
+    public List<Variable> findInProcessScope(String processId) {
+        log.debug("Finding variables in process scope: {}", processId);
+        var variableEntities = variableRepository.findInProcessScope(processId);
+        return variableMapper.toVariables(variableEntities);
+    }
+
+    @Override
     public List<Variable> findInProcess(String processId) {
         log.debug("Finding variables in process: {}", processId);
         var variableEntities = variableRepository.findInProcess(processId);

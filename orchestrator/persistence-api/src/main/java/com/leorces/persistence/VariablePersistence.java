@@ -46,6 +46,14 @@ public interface VariablePersistence {
     List<Variable> findInScope(String processId, List<String> scope);
 
     /**
+     * Finds all variables for a process scope.
+     *
+     * @param processId the process identifier
+     * @return the list of variables matching the process ID
+     */
+    List<Variable> findInProcessScope(String processId);
+
+    /**
      * Finds all variables for a process.
      *
      * @param processId the process identifier
