@@ -9,6 +9,7 @@ import com.leorces.juel.ExpressionEvaluator;
 import com.leorces.model.definition.ProcessDefinition;
 import com.leorces.model.definition.activity.ConditionalActivityDefinition;
 import com.leorces.model.runtime.variable.Variable;
+import com.leorces.persistence.VariablePersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,11 +26,13 @@ public class CorrelateVariablesCommandHandler implements CommandHandler<Correlat
     private final VariablesMapper variablesMapper;
     private final ExpressionEvaluator expressionEvaluator;
     private final CommandDispatcher dispatcher;
+    private final VariablePersistence variablePersistence;
 
     @Override
     public void handle(CorrelateVariablesCommand command) {
         var process = command.process();
-        var variables = command.variables();
+        var variables = variablePersistence.findInProcess(process.id());
+
 
         log.debug("Correlate variables with processId: {} and variables: {}", process.id(), variables);
         if (variables.isEmpty()) return;

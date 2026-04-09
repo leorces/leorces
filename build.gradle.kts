@@ -8,7 +8,7 @@ val springBootVersion = libs.versions.spring.boot.get()
 
 allprojects {
     group = "com.leorces"
-    version = "0.6.6"
+    version = "0.6.7"
 }
 
 subprojects {
