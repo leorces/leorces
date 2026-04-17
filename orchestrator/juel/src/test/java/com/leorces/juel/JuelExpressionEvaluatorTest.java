@@ -225,8 +225,8 @@ class JuelExpressionEvaluatorTest {
     }
 
     @Test
-    @DisplayName("Should handle exception during boolean evaluation")
-    void shouldHandleExceptionDuringBooleanEvaluation() {
+    @DisplayName("Should return false when boolean evaluation fails due to missing variables")
+    void shouldReturnFalseWhenBooleanEvaluationFails() {
         //Given
         var expression = "${invalid.boolean}";
         when(mockExpressionConverter.convertToSpelExpression(expression)).thenReturn("#invalid.boolean");
@@ -234,11 +234,30 @@ class JuelExpressionEvaluatorTest {
         when(mockSpelExpression.getValue(any(StandardEvaluationContext.class), eq(Boolean.class)))
                 .thenThrow(new RuntimeException("Boolean evaluation failed"));
 
-        //When & Then
-        assertThatThrownBy(() -> evaluator.evaluateBoolean(expression, TEST_VARIABLES))
-                .isInstanceOf(ExpressionEvaluationException.class)
-                .hasMessageContaining("Failed to evaluate boolean expression")
-                .hasCauseInstanceOf(RuntimeException.class);
+        //When
+        var result = evaluator.evaluateBoolean(expression, TEST_VARIABLES);
+
+        //Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("Should return false when boolean expression references undefined variables")
+    void shouldReturnFalseWhenBooleanExpressionReferencesUndefinedVariables() {
+        //Given
+        var expression = "${isTest and isCompleted}";
+        var convertedExpression = "#isTest and #isCompleted";
+        var emptyVariables = Map.<String, Object>of();
+        when(mockExpressionConverter.convertToSpelExpression(expression)).thenReturn(convertedExpression);
+        when(mockParser.parseExpression(convertedExpression)).thenReturn(mockSpelExpression);
+        when(mockSpelExpression.getValue(any(StandardEvaluationContext.class), eq(Boolean.class)))
+                .thenThrow(new RuntimeException("Variable not found"));
+
+        //When
+        var result = evaluator.evaluateBoolean(expression, emptyVariables);
+
+        //Then
+        assertThat(result).isFalse();
     }
 
     @Test

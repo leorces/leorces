@@ -79,14 +79,16 @@ public class JuelExpressionEvaluator implements ExpressionEvaluator {
     }
 
     /**
-     * Evaluates a boolean expression.
+     * Evaluates a boolean expression. Returns false if variables referenced in the expression are missing.
      */
     @Override
     public boolean evaluateBoolean(String expression, Map<String, Object> variables) {
-        return executeWithExceptionHandling(expression, "evaluate boolean expression", () -> {
+        try {
             var result = evaluate(expression, variables, Boolean.class);
             return Objects.requireNonNullElse(result, false);
-        });
+        } catch (ExpressionEvaluationException exception) {
+            return false;
+        }
     }
 
     /**
